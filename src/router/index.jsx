@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import App from '@/App.tsx';
-import AdminPages from '@/pages/admin/AdminPages.tsx';
+import App from '@/App.jsx';
+import AdminPages from '@/pages/admin/AdminPages.jsx';
 
 const router = createBrowserRouter([
   // 관리자

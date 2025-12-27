@@ -1,7 +1,7 @@
 import { RotateCw, ZoomIn, Star, ArrowLeft } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
-import Pagination from '@components/admin/Pagination.tsx';
+import Pagination from '@components/admin/Pagination.jsx';
 
 import { Badge } from '../ui/Badge';
 
