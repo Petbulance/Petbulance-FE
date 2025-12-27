@@ -21,6 +21,7 @@ import UserManagementView from '../views/UserManagementView';
 
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
+// import '@/admin.css'
 
 export default function AdminLayout() {
   const [currentMenu, setCurrentMenu] = useState('dashboard');

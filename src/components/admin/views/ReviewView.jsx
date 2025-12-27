@@ -1,7 +1,7 @@
 import { RotateCw, ZoomIn, Star, ArrowLeft } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
-import Pagination from '@components/admin/Pagination.jsx';
+import Pagination from '@/components/admin/Pagination.jsx';
 
 import { Badge } from '../ui/Badge';
 
@@ -24,7 +24,7 @@ const REVIEWS = Array.from({ length: 30 }).map((_, idx) => {
 });
 
 export default function ReviewView() {
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(1);
 
   const totalPages = Math.ceil(REVIEWS.length / PAGE_SIZE);

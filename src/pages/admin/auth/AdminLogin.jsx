@@ -1,18 +1,18 @@
 import { ShieldCheck, Lock, Mail, ArrowRight, Hospital } from 'lucide-react';
 import React, { useState } from 'react';
 
-export default function Login({ navigate, onLogin }) {
+export default function AdminLogin({ navigate, onLogin }) {
   const [email, setEmail] = useState('admin@petbulance.com');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
     setTimeout(() => {
       onLogin();
-      navigate('/index/admin');
+      navigate('/admin');
     }, 500);
   };
 
