@@ -1,11 +1,12 @@
 import './App.css'
 import './index.css'
+import AdminPages from '@/pages/admin/AdminPages.jsx';
 
 function App() {
 
   return (
     <>
-    <p>app</p>
+   <AdminPages></AdminPages>
     </>
   )
 }
