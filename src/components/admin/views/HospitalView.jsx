@@ -1,197 +1,241 @@
-import { Search, Share2, Phone, Clock } from 'lucide-react';
-import React from 'react';
+import {
+  Search,
+} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import Pagination from '@/components/admin/Pagination.jsx';
+import { HOSPITALS } from '@/components/admin/mock/hospitals.mock.js';
+/* 병원 샘플 데이터 35개 */
 
-import { Badge } from '../ui/Badge';
 
 export default function HospitalView() {
+  /* 페이징 */
+  const PAGE_SIZE = 10;
+  const [page, setPage] = useState(1);
+
+  /* 선택된 병원 */
+  const [selectedHospitalId, setSelectedHospitalId] = useState(
+    HOSPITALS[0].id
+  );
+
+  const totalPages = Math.ceil(HOSPITALS.length / PAGE_SIZE);
+
+  const pagedHospitals = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return HOSPITALS.slice(start, start + PAGE_SIZE);
+  }, [page]);
+
+  const selectedHospital = useMemo(
+    () =>
+      HOSPITALS.find((h) => h.id === selectedHospitalId),
+    [selectedHospitalId]
+  );
+
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
       <div className="flex h-[calc(100vh-180px)] gap-6">
-        <div className="flex w-1/3 flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-          <div className="border-b bg-gray-50/50 p-4">
+
+        {/* ================= 좌측 병원 리스트 ================= */}
+        <div className="flex w-1/3 flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm ">
+          {/* 검색 */}
+          <div className="border-b bg-gray-50/50 p-4 border-gray-100">
             <div className="relative">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
-                className="w-full rounded-lg border py-2 pr-4 pl-9 text-sm"
+                className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-4 text-sm outline-none focus:border-blue-500"
                 placeholder="병원명 검색..."
               />
             </div>
           </div>
-          <div className="flex-1 divide-y divide-gray-50 overflow-y-auto">
-            {[
-              '아크리스 동물병원',
-              '에코 특수동물병원',
-              '하니 특수병원',
-              '우성 동물센터',
-            ].map((name, i) => (
-              <div
-                key={i}
-                className={`cursor-pointer p-4 hover:bg-blue-50 ${i === 0 ? 'border-r-4 border-blue-600 bg-blue-50' : ''}`}
-              >
-                <div className="text-sm font-bold">{name}</div>
-                <div className="mt-1 text-xs text-gray-400">
-                  서울 강남구 역삼동 123-4
-                </div>
-                <div className="mt-2 flex gap-1">
-                  <Badge color="green">진료중</Badge>
-                  <Badge color="blue">파충류</Badge>
-                </div>
-              </div>
-            ))}
+
+          {/* 테이블 */}
+          <div className="flex-1 overflow-y-auto ">
+            <table className="w-full text-sm ">
+              <thead className="sticky top-0 bg-white ">
+              <tr className="border-b bg-gray-50 text-xs text-gray-500 border-gray-100">
+                <th className="px-4 py-2 text-left font-medium">
+                  병원명
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  DB ID
+                </th>
+              </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-50 ">
+              {pagedHospitals.map((h) => (
+                <tr
+                  key={h.id}
+                  onClick={() => setSelectedHospitalId(h.id)}
+                  className={`cursor-pointer transition ${
+                    h.id === selectedHospitalId
+                      ? 'bg-blue-50 border border-l-blue-600'
+                      : 'border border-transparent hover:bg-blue-50/50'
+                  }`}
+                >
+
+                <td className="px-4 py-3">
+                    <div className="font-semibold">
+                      {h.name}
+                    </div>
+                    <div className="mt-0.5 text-xs text-gray-400">
+                      {h.address}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500">
+                    {h.id}
+                  </td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="border-t bg-white py-4 border-gray-100">
+            <div className="flex justify-center">
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onChange={setPage}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto rounded-xl border border-gray-100 bg-white p-8 shadow-sm">
+        {/* ================= 우측 병원 상세 ================= */}
+        <div className="flex-1 overflow-y-auto rounded-xl border-gray-100 bg-white p-8">
+          {/* 헤더 */}
           <div className="mb-8 flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-black text-gray-800">
-                아크리스 동물병원
-              </h2>
-              <p className="text-sm text-gray-400">ID: PET_HOSP_000123</p>
+              <h2 className="text-2xl font-bold">{selectedHospital.name}</h2>
+              <p className="text-sm text-gray-400">
+                DB ID: {selectedHospital.id}
+              </p>
             </div>
-            <div className="flex gap-2">
-              <button className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold hover:bg-gray-50">
-                <Share2 className="h-4 w-4" /> 딥링크 복사
-              </button>
-              <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">
-                저장하기
-              </button>
-            </div>
+            <button className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">
+              변경사항 저장
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="space-y-4 rounded-2xl bg-gray-50 p-6">
-                <h3 className="flex items-center gap-2 border-b pb-2 text-sm font-bold text-gray-700">
-                  <Phone className="h-4 w-4 text-blue-500" /> 기본 정보 및 편의
-                  기능
-                </h3>
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase">
-                      전화번호
-                    </label>
-                    <input
-                      className="w-full rounded border bg-white p-2 text-sm"
-                      defaultValue="02-1234-5678"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase">
-                      주소
-                    </label>
-                    <input
-                      className="w-full rounded border bg-white p-2 text-sm"
-                      defaultValue="서울 강남구 역삼로 123"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase">
-                        위도(Lat)
-                      </label>
-                      <input
-                        className="w-full rounded border bg-white p-2 text-sm"
-                        defaultValue="37.123456"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase">
-                        경도(Lng)
-                      </label>
-                      <input
-                        className="w-full rounded border bg-white p-2 text-sm"
-                        defaultValue="127.123456"
-                      />
-                    </div>
-                  </div>
-                </div>
+            {/* ================= 좌측 컬럼 ================= */}
+            <div className="space-y-6 ">
+              {/* 병원명 */}
+              <div className="space-y-1 ">
+                <label className="text-sm font-medium">병원명</label>
+                <input
+                  className="w-full rounded border p-2 text-sm border-gray-200 mt-2"
+                  value={selectedHospital.name}
+                  readOnly
+                />
               </div>
 
-              <div className="space-y-4 rounded-2xl bg-gray-50 p-6">
-                <h3 className="flex items-center gap-2 border-b pb-2 text-sm font-bold text-gray-700">
-                  <Clock className="h-4 w-4 text-blue-500" /> 운영 시간 관리
-                </h3>
-                <div className="space-y-2">
-                  {[
-                    '월요일',
-                    '화요일',
-                    '수요일',
-                    '목요일',
-                    '금요일',
-                    '토요일',
-                    '일/공휴일',
-                  ].map((day) => (
-                    <div
-                      key={day}
-                      className="flex items-center justify-between rounded border bg-white p-2 text-xs"
-                    >
-                      <span className="w-16 font-bold">{day}</span>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="time"
-                          className="rounded border p-1"
-                          defaultValue="09:00"
-                        />
-                        <span>~</span>
-                        <input
-                          type="time"
-                          className="rounded border p-1"
-                          defaultValue="18:00"
-                        />
-                      </div>
-                      <label className="flex items-center gap-1">
-                        <input type="checkbox" className="h-3 w-3" />{' '}
-                        <span className="text-[10px]">휴무</span>
-                      </label>
-                    </div>
-                  ))}
+              {/* 전화번호 */}
+              <div className="space-y-1 ">
+                <label className="text-sm font-medium">전화번호</label>
+                <input
+                  className="w-full rounded border p-2 text-sm border-gray-200 mt-2"
+                  value={selectedHospital.phone}
+                  readOnly
+                />
+              </div>
+
+              {/* 주소 */}
+              <div className="space-y-1">
+                <label className="text-sm font-medium">주소</label>
+                <input
+                  className="w-full rounded border p-2 text-sm border-gray-200 mt-2"
+                  value={selectedHospital.address}
+                  readOnly
+                />
+              </div>
+
+              {/* 위도 / 경도 */}
+              <div className="space-y-1">
+                <label className="text-sm font-medium">위도 / 경도</label>
+                <div className="flex gap-2">
+                  <input
+                    className="w-1/2 rounded border p-2 text-sm text-gray-400 border-gray-200 mt-2"
+                    value="37.12345"
+                    readOnly
+                  />
+                  <input
+                    className="w-1/2 rounded border p-2 text-sm text-gray-400 border-gray-200 mt-2"
+                    value="127.12345"
+                    readOnly
+                  />
                 </div>
               </div>
             </div>
 
+            {/* ================= 우측 컬럼 ================= */}
             <div className="space-y-6">
-              <div className="space-y-4 rounded-2xl bg-gray-50 p-6">
-                <h3 className="border-b pb-2 text-sm font-bold text-gray-700">
-                  진료 가능 동물종 (태그)
-                </h3>
-                <div className="flex flex-wrap gap-2">
+              {/* 운영 시간 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">운영시간</label>
+
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 ">
                   {[
-                    '파충류',
-                    '조류',
-                    '양서류',
-                    '소형 포유류',
-                    '고슴도치',
-                    '토끼',
-                  ].map((tag) => (
+                    { day: '월', value: '09:00 ~ 18:00' },
+                    { day: '화', value: '09:00 ~ 18:00' },
+                    { day: '수', value: '09:00 ~ 18:00' },
+                    { day: '목', value: '09:00 ~ 18:00' },
+                    { day: '금', value: '09:00 ~ 18:00' },
+                    { day: '토', value: '09:00 ~ 13:00' },
+                    { day: '일', value: '휴무' },
+                  ].map(({ day, value }) => (
                     <div
-                      key={tag}
-                      className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-xs"
+                      key={day}
+                      className="flex items-center gap-2 text-sm"
                     >
-                      {tag} <button className="text-red-400">×</button>
+                      <span className="w-6 text-gray-500">{day}</span>
+                      <input
+                        className="flex-1 rounded border px-2 py-1 text-xs text-gray-700 border-gray-200 mt-2"
+                        value={value}
+                        readOnly
+                      />
                     </div>
                   ))}
-                  <button className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-600">
-                    + 추가
-                  </button>
                 </div>
               </div>
 
-              <div className="space-y-4 rounded-2xl bg-gray-50 p-6">
-                <h3 className="border-b pb-2 text-sm font-bold text-gray-700">
-                  병원 소개글
-                </h3>
-                <textarea
-                  className="h-40 w-full rounded-xl border bg-white p-4 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                  defaultValue={`전국 최대 규모의 특수동물 전문 병원입니다.\n30년 경력의 전문의가 상주하며 최첨단 의료 시설을 갖추고 있습니다.\n파충류 및 희귀 조류 수술이 가능합니다.`}
+
+              {/* 진료 가능 종 */}
+              <div className="space-y-1">
+                <label className="text-sm font-medium">
+                  진료 가능 종 (태그)
+                </label>
+                <input
+                  className="w-full rounded border p-2 text-sm border-gray-200 mt-2"
+                  value={selectedHospital.tags.join(', ')}
+                  readOnly
                 />
-                <p className="text-[10px] text-gray-400">
-                  * 5줄 이상 작성 시 앱에서 '더보기' 버튼이 자동 활성화됩니다.
-                </p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">
+                  태그 (쉼표 구분)
+                </label>
+                <input
+                  className="w-full rounded border p-2 text-sm border-gray-200 mt-2"
+                  value={selectedHospital.tags.join(', ')}
+                  readOnly
+                />
+              </div>
+
+              {/* 병원 소개글 */}
+              <div className="space-y-1">
+                <label className="text-sm font-medium">병원 소개글</label>
+                <textarea
+                  className="h-32 w-full rounded border p-3 text-sm border-gray-200 mt-2"
+                  value={selectedHospital.intro}
+                  readOnly
+                />
               </div>
             </div>
           </div>
         </div>
+
+
       </div>
     </div>
   );
