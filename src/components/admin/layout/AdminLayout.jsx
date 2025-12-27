@@ -6,7 +6,7 @@ import {
   Users,
   Settings,
   MessageSquare,
-  MessageSquareQuote,
+  MessageSquareQuote, Stethoscope, AlertTriangle, Headphones, Activity, Shield,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
@@ -18,9 +18,10 @@ import HospitalView from '../views/HospitalView';
 import ReviewView from '../views/ReviewView';
 import SettingsView from '../views/SettingsView';
 import UserManagementView from '../views/UserManagementView';
-
+import ActivityLogs from '../views/ActivityLogs.jsx';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
+
 // import '@/admin.css'
 
 export default function AdminLayout() {
@@ -30,12 +31,13 @@ export default function AdminLayout() {
   const menuItems = [
     { id: 'dashboard', label: '대시보드', icon: LayoutDashboard },
     { id: 'users', label: '유저 관리', icon: Users },
-    { id: 'hospital', label: '병원 관리', icon: Hospital },
-    { id: 'review', label: '리뷰 검수', icon: ClipboardCheck },
-    { id: 'community', label: '커뮤니티 관리', icon: MessageSquareQuote },
-    { id: 'customer', label: '고객 센터', icon: MessageSquare },
+    { id: 'hospitals', label: '병원 관리', icon: Stethoscope },
+    { id: 'reviews', label: '리뷰 관리', icon: MessageSquare },
+    { id: 'community', label: '커뮤 관리', icon: AlertTriangle },
+    { id: 'cs', label: '고객센터', icon: Headphones },
     { id: 'content', label: '콘텐츠 관리', icon: FileText },
-    { id: 'settings', label: '시스템 설정', icon: Settings },
+    { id: 'admins', label: '관리자 계정', icon: Shield },
+    { id: 'logs', label: '행동 로그', icon: Activity },
   ];
 
   useEffect(() => {
@@ -49,18 +51,20 @@ export default function AdminLayout() {
         return <DashboardView />;
       case 'users':
         return <UserManagementView />;
-      case 'hospital':
+      case 'hospitals':
         return <HospitalView />;
-      case 'review':
+      case 'reviews':
         return <ReviewView />;
       case 'community':
         return <CommunityManagementView />;
-      case 'customer':
+      case 'cs':
         return <CustomerCenterView />;
       case 'content':
         return <ContentView />;
-      case 'settings':
+      case 'admins':
         return <SettingsView />;
+      case 'logs':
+        return <ActivityLogs />;
       default:
         return null;
     }
