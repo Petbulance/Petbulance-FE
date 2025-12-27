@@ -12,11 +12,11 @@ export default function AdminSidebar({
       className={`${isOpen ? 'w-64' : 'w-20'} z-20 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300`}
     >
       <div className="flex items-center gap-3 overflow-hidden p-6 whitespace-nowrap">
-        <div className="rounded-xl bg-blue-600 p-2 text-white shadow-lg shadow-blue-100">
+        <div className="rounded-xl bg-[#2DA969] p-2 text-white shadow-lg shadow-blue-100">
           <Hospital className="h-6 w-6" />
         </div>
         {isOpen && (
-          <span className="text-xl font-black tracking-tighter text-blue-600">
+          <span className="text-xl font-black tracking-tighter text-[#2DA969]">
             PETBULANCE
           </span>
         )}
@@ -28,7 +28,7 @@ export default function AdminSidebar({
             onClick={() => onChange(item.id)}
             className={`flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 transition-all ${
               currentMenu === item.id
-                ? 'scale-[1.02] bg-blue-600 font-bold text-white shadow-md shadow-blue-100'
+                ? 'scale-[1.02] bg-[#2DA969] font-bold text-white shadow-md shadow-blue-100'
                 : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
             }`}
           >
