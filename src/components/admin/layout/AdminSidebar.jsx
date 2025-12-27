@@ -1,5 +1,5 @@
 import { Hospital } from 'lucide-react';
-
+import logo from '@/assets/images/pet_logo.svg';
 export default function AdminSidebar({
   menus,
   isOpen,
@@ -12,8 +12,13 @@ export default function AdminSidebar({
       className={`${isOpen ? 'w-64' : 'w-20'} z-20 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300`}
     >
       <div className="flex items-center gap-3 overflow-hidden p-6 whitespace-nowrap">
-        <div className="rounded-xl bg-[#2DA969] p-2 text-white shadow-lg shadow-blue-100">
-          <Hospital className="h-6 w-6" />
+        <div className="rounded-xl">
+          {/*<Hospital className="h-6 w-6" />*/}
+          <img
+            src={logo}
+            alt="Petbulance Logo"
+            className="h-15 w-15"
+          />
         </div>
         {isOpen && (
           <span className="text-xl font-black tracking-tighter text-[#2DA969]">
