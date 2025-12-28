@@ -1,5 +1,7 @@
 import logo from '@/assets/images/pet_logo.svg';
-
+import {
+LogOut
+} from 'lucide-react';
 export default function AdminSidebar({
                                        menus,
                                        isOpen,
@@ -50,12 +52,12 @@ export default function AdminSidebar({
       </nav>
 
       {/* 토글 */}
-      <button
-        onClick={onToggle}
-        className="flex justify-center p-4 text-gray-300 hover:text-gray-600"
-      >
-        {isOpen ? 'Side Close' : 'Open'}
-      </button>
+      <div className="p-4 border-t border-gray-100">
+        <button className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:text-red-600 w-full rounded-lg hover:bg-red-50 transition-colors">
+          <LogOut size={20} />
+          로그아웃
+        </button>
+      </div>
     </aside>
   );
 }
