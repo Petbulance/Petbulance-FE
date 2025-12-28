@@ -1,4 +1,4 @@
-import logo from '@/assets/images/pet_logo.svg';
+import logo from '@/assets/images/logo/pet_logo.svg';
 import {
 LogOut
 } from 'lucide-react';
