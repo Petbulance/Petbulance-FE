@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import partyIcon from '@/assets/images/logo/pet_logo.svg';
-import TermsBottomSheet from '@/components/user/TermsBottomSheet.jsx';
+import TermsBottomSheet from '@/components/user/ui/TermsBottomSheet.jsx';
 
 export default function SignupComplete() {
   const [open, setOpen] = useState(true);

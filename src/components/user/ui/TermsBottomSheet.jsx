@@ -3,11 +3,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Accordion } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/dialog.jsx';
+import { Accordion } from '@/components/ui/accordion.jsx';
+import { Button } from '@/components/ui/button.jsx';
 import { useState } from 'react';
-import TermsAgreementItem from './TermsAgreementItem';
+import TermsAgreementItem from './TermsAgreementItem.jsx';
 
 export default function TermsBottomSheet({ open, onClose }) {
   const [agree1, setAgree1] = useState(false);

@@ -1,20 +1,12 @@
 import {
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from '@/components/ui/accordion';
-import { Checkbox } from '@/components/ui/checkbox';
+  AccordionItem, AccordionTrigger, AccordionContent,
+} from '@/components/ui/accordion.jsx';
+import { Checkbox } from '@/components/ui/checkbox.jsx';
 
 export default function TermsAgreementItem({
-                                             value,
-                                             label,
-                                             checked,
-                                             onCheckedChange,
-                                             children,
-                                             required = false,
+                                             value, label, checked, onCheckedChange, children, required = false,
                                            }) {
-  return (
-    <AccordionItem value={value} className="border-b border-gray-100">
+  return (<AccordionItem value={value} className="border-b border-gray-100">
       <div className="flex items-center gap-3">
         {/* 체크박스 */}
         <Checkbox
@@ -77,6 +69,5 @@ export default function TermsAgreementItem({
       >
         {children}
       </AccordionContent>
-    </AccordionItem>
-  );
+    </AccordionItem>);
 }
