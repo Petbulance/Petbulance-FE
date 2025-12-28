@@ -1,14 +1,14 @@
-import './App.css'
-import './index.css'
+import './App.css';
+import './index.css';
 import AdminPages from '@/pages/admin/AdminPages.jsx';
 
 function App() {
 
   return (
     <>
-   <AdminPages></AdminPages>
+      <p>유저 화면</p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

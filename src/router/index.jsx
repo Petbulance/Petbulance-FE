@@ -5,10 +5,6 @@ import AdminPages from '@/pages/admin/AdminPages.jsx';
 import AdminLogin from '@/pages/admin/auth/AdminLogin.jsx';
 
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Navigate to="/admin/auth/login" replace />,
-  },
   // 관리자
   {
     path: '/admin',
