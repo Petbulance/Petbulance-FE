@@ -1,8 +1,8 @@
 import React from 'react';
-import logo from '@/assets/images/pet_logo.svg';
-import kakaoLogo from '@/assets/images/kakao-svgrepo-com.svg';
-import googleLogo from '@/assets/images/google-color-svgrepo-com.svg';
-import appleLogo from '@/assets/images/apple-173-svgrepo-com.svg';
+import logo from '@/assets/images/logo/pet_logo.svg';
+import kakaoLogo from '@/assets/images/logo/kakao-svgrepo-com.svg';
+import googleLogo from '@/assets/images/logo/google-color-svgrepo-com.svg';
+import appleLogo from '@/assets/images/logo/apple-173-svgrepo-com.svg';
 
 export default function Login() {
   return (<div className="flex min-h-screen flex-col items-center justify-center bg-white px-6">

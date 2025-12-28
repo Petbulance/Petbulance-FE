@@ -13,6 +13,7 @@ import SettingsView from '@/components/admin/views/SettingsView.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import ContentView from '@/components/admin/views/ContentView.jsx';
 import Login from '@/pages/user/auth/Login.jsx';
+import SignupComplete from '@/components/user/SignupComplete.jsx';
 
 const router = createBrowserRouter([
   // 관리자
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
   {
     path: '/index/auth/login',
     element: <Login />,
+  },
+  {
+    path: '/index/auth/signupcomplete',
+    element: <SignupComplete />,
   },
 ]);
 
