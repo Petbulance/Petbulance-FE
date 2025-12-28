@@ -72,8 +72,8 @@ export default function CommunityManagementView() {
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full text-sm text-left table-fixed">
-              <thead className="bg-gray-50 border-b">
+            <table className="w-full text-sm text-left table-fixed ">
+              <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="w-[8%] px-6 py-3">유형</th>
                 <th className="w-[32%] px-6 py-3">
