@@ -17,14 +17,17 @@ export default function SignupComplete() {
         className="mb-6 h-[90px] w-[90px] object-contain"
       />
 
-      <h2 className="mb-2 text-lg font-bold text-emerald-600">
-        따뜻한햄스터07님, 환영해요!
+      <h2 className="mb-2 flex items-center gap-1 text-lg font-bold">
+        <span className="text-success">따뜻한햄스터07님</span>
+        <span className="text-gray-800">환영해요!</span>
       </h2>
 
-      <p className="mb-8 text-sm text-gray-500 leading-relaxed">
-        펫블런스에서 지금 필요한<br />
-        병원 정보를 검색해보세요
-      </p>
+      <h2 className="mb-8 text-sm text-gray-500 leading-relaxed">
+        <span className="text-success">펫블런스</span>
+        <span className="text-gray-800">에서 지금 필요한<br />
+        병원 정보를 검색해보세요</span>
+      </h2>
+
     </div>
 
     {/* 버튼 영역은 아래로 밀기 */}
@@ -43,9 +46,9 @@ export default function SignupComplete() {
 
   "
 
-      onClick={()=> {
-        navigate('/index');
-      }}>
+        onClick={() => {
+          navigate('/index');
+        }}>
 
         시작하기
       </button>

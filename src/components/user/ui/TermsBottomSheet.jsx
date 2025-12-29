@@ -41,7 +41,7 @@ export default function TermsBottomSheet({ open, onClose }) {
         <div className="flex max-h-[90vh] flex-col px-6 py-6">
           {/* 헤더 (고정) */}
           <DialogHeader>
-            <DialogTitle className="text-base font-bold">
+            <DialogTitle className="text-base font-bold text-gray-950">
               펫블런스를 쓰려면 동의가 필요해요
             </DialogTitle>
           </DialogHeader>
@@ -93,15 +93,15 @@ export default function TermsBottomSheet({ open, onClose }) {
           {/* 버튼 영역 (항상 바텀) */}
           <div className="pt-4">
             <Button
-              className="w-full bg-emerald-500"
+              className="w-full bg-primary"
               disabled={!canSubmit}
             >
-              동의하기
+             <p className="text-inverse">동의하기</p>
             </Button>
 
             <button
               onClick={onClose}
-              className="mt-2 w-full text-sm text-gray-400"
+              className="mt-2 w-full text-sm text-caption"
             >
               닫기
             </button>
