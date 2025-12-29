@@ -14,6 +14,9 @@ import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import ContentView from '@/components/admin/views/ContentView.jsx';
 import Login from '@/pages/user/auth/Login.jsx';
 import SignupComplete from '@/components/user/SignupComplete.jsx';
+import KakaoCallback from '@/pages/admin/auth/KakaoCallback.jsx';
+import GoogleCallback from '@/pages/admin/auth/GoogleCallback.jsx';
+import NaverCallback from '@/pages/admin/auth/NaverCallback.jsx';
 
 const router = createBrowserRouter([
   // 관리자
@@ -41,6 +44,8 @@ const router = createBrowserRouter([
     path: '/*',
     element: <App />,
   },
+
+  // 로그인 , 소셜 로그인
   {
     path: '/index/auth/login',
     element: <Login />,
@@ -49,6 +54,18 @@ const router = createBrowserRouter([
     path: '/index/auth/signupcomplete',
     element: <SignupComplete />,
   },
+  {
+    path: '/auth/kakao/callback',
+    element: <KakaoCallback />,
+  },
+  {
+    path: '/auth/google/callback',
+    element: <GoogleCallback />,
+  },
+  {
+    path: '/auth/naver/callback',
+    element: <NaverCallback />,
+  }
 ]);
 
 export default router;
