@@ -1,0 +1,127 @@
+/* =========================================================
+   DESIGN TOKENS (Generated from Tokens Studio)
+   ========================================================= */
+
+:root {
+    /* =====================
+       Color · Primitive
+       ===================== */
+
+    /* Base */
+    --color-base-white: #ffffff;
+    --color-base-black: #000000;
+
+    /* Gray */
+    --color-gray-50: #fafafa;
+    --color-gray-100: #f5f5f5;
+    --color-gray-200: #eeeeee;
+    --color-gray-300: #e0e0e0;
+    --color-gray-400: #bdbdbd;
+    --color-gray-500: #9e9e9e;
+    --color-gray-600: #757575;
+    --color-gray-700: #616161;
+    --color-gray-800: #424242;
+    --color-gray-900: #222222;
+    --color-gray-950: #1e1e1e;
+
+    /* Primary */
+    --color-primary-50: #e7f9ef;
+    --color-primary-100: #cff2e0;
+    --color-primary-200: #a2e6c3;
+    --color-primary-300: #72d9a4;
+    --color-primary-400: #46ce88;
+    --color-primary-500: #2da969;
+    --color-primary-600: #248955;
+    --color-primary-700: #1b653f;
+    --color-primary-800: #12442b;
+    --color-primary-900: #092014;
+
+    /* Secondary */
+    --color-secondary-500: #1c334b;
+    --color-secondary-600: #192e44;
+    --color-secondary-700: #142435;
+
+    /* Status */
+    --color-positive-500: #27be69;
+    --color-negative-500: #ef2b2a;
+    --color-warning-500: #ffbf0f;
+    --color-info-500: #067dfd;
+
+    /* =====================
+       Color · Semantic
+       ===================== */
+
+    /* Background */
+    --bg-frame-default: var(--color-base-white);
+    --bg-frame-subtle: var(--color-gray-100);
+    --bg-frame-medium: var(--color-gray-200);
+    --bg-frame-strong: var(--color-gray-300);
+    --bg-frame-overlay: var(--color-gray-900);
+
+    /* Text */
+    --text-primary: var(--color-gray-950);
+    --text-secondary: var(--color-gray-800);
+    --text-tertiary: var(--color-gray-700);
+    --text-disabled: var(--color-gray-400);
+    --text-caption: var(--color-gray-500);
+    --text-inverse: var(--color-base-white);
+
+    /* Action */
+    --action-primary: var(--color-primary-500);
+    --action-primary-hover: var(--color-primary-600);
+    --action-primary-pressed: var(--color-primary-700);
+    --action-primary-disabled: var(--color-gray-300);
+    --action-primary-text: var(--color-base-white);
+
+    --action-link: var(--color-info-500);
+    --action-link-hover: var(--color-info-600);
+
+    /* Status */
+    --status-success: var(--color-positive-500);
+    --status-error: var(--color-negative-500);
+    --status-warning: var(--color-warning-500);
+    --status-info: var(--color-info-500);
+
+    /* Border */
+    --border-subtle: var(--color-gray-300);
+    --border-default: var(--color-gray-500);
+    --border-strong: var(--color-gray-900);
+
+    /* Icon */
+    --icon-default: var(--color-gray-800);
+    --icon-disabled: var(--color-gray-400);
+    --icon-inverse: var(--color-base-white);
+
+    /* =====================
+       Sizing
+       ===================== */
+
+    --spacing-xxxs: 2px;
+    --spacing-xxs: 4px;
+    --spacing-xs: 8px;
+    --spacing-s: 12px;
+    --spacing-m: 16px;
+    --spacing-l: 20px;
+    --spacing-xl: 24px;
+    --spacing-xxl: 32px;
+    --spacing-xxxl: 40px;
+
+    /* =====================
+       Typography
+       ===================== */
+
+    --font-family-base: "Pretendard Variable", system-ui, -apple-system, BlinkMacSystemFont;
+
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-lg: 20px;
+    --font-size-xl: 27px;
+
+    --line-height-sm: 20px;
+    --line-height-base: 24px;
+    --line-height-lg: 28px;
+}
