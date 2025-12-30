@@ -5,7 +5,7 @@ import googleLogo from '@/assets/images/logo/google-color-svgrepo-com.svg';
 import naverLogo from '@/assets/images/logo/NAVER_LOGO.png';
 import api from '@/apis/api.jsx';
 
-export default function Login() {
+export default function SocialSignUp() {
   const state = Math.random().toString(36).substring(2);
   const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}&response_type=code`;
   const GOOGLE_AUTH_URL = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${import.meta.env.VITE_GOOGLE_REDIRECT_URI}&response_type=code

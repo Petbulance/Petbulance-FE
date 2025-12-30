@@ -12,7 +12,7 @@ import CustomerCenterView from '@/components/admin/views/CustomerCenterView.jsx'
 import SettingsView from '@/components/admin/views/SettingsView.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import ContentView from '@/components/admin/views/ContentView.jsx';
-import Login from '@/pages/user/auth/Login.jsx';
+import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import SignupComplete from '@/components/user/SignupComplete.jsx';
 import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
 import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
   // 로그인 , 소셜 로그인
   {
     path: '/index/auth/login',
-    element: <Login />,
+    element: <SocialSignUp />,
   },
   {
     path: '/index/auth/signupcomplete',
