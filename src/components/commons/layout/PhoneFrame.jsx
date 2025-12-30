@@ -1,7 +1,7 @@
 export function PhoneFrame({ children }) {
   return (
     <div className="
-        w-full
+        w-[620px]
         min-h-dvh
         max-w-phone
         overflow-hidden

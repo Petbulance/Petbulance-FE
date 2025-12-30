@@ -1,13 +1,19 @@
 import './App.css';
 
 import AdminPages from '@/pages/admin/AdminPages.jsx';
+import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
+import { ServiceBanner } from '@/components/commons/banner/index.jsx';
+import Login from '@/pages/user/auth/Login.jsx';
 
 function App() {
 
   return (
-    <>
-      <p>유저 화면</p>
-    </>
+
+      <LayoutShell banner={<ServiceBanner />}>
+        <Login />
+        {/*<ServiceBanner/>*/}
+      </LayoutShell>
+
   );
 }
 
