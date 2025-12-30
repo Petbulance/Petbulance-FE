@@ -14,9 +14,9 @@ import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import ContentView from '@/components/admin/views/ContentView.jsx';
 import Login from '@/pages/user/auth/Login.jsx';
 import SignupComplete from '@/components/user/SignupComplete.jsx';
-import KakaoCallback from '@/pages/admin/auth/KakaoCallback.jsx';
-import GoogleCallback from '@/pages/admin/auth/GoogleCallback.jsx';
-import NaverCallback from '@/pages/admin/auth/NaverCallback.jsx';
+import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
+import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
+import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
 
 const router = createBrowserRouter([
   // 관리자
