@@ -17,6 +17,7 @@ import SignupComplete from '@/components/user/SignupComplete.jsx';
 import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
 import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
 import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
+import Home from '@/pages/user/Home.jsx';
 
 const router = createBrowserRouter([
   // 관리자
@@ -44,7 +45,10 @@ const router = createBrowserRouter([
     path: '/*',
     element: <App />,
   },
-
+  {
+    path: '/index',
+    element: <Home />,
+  },
   // 로그인 , 소셜 로그인
   {
     path: '/index/auth/login',
@@ -65,7 +69,7 @@ const router = createBrowserRouter([
   {
     path: '/auth/naver/callback',
     element: <NaverCallback />,
-  }
+  },
 ]);
 
 export default router;
