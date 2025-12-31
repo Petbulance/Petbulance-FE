@@ -18,6 +18,10 @@ import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
 import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
 import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
 import Home from '@/pages/user/Home.jsx';
+import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
+import MainLayout from '@/components/user/layout/MainLayout.jsx';
+import { ServiceBanner } from '@/components/commons/banner/index.jsx';
+import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 
 const router = createBrowserRouter([
   // 관리자
@@ -48,6 +52,16 @@ const router = createBrowserRouter([
   {
     path: '/index',
     element: <Home />,
+  },
+  {
+    path: '/community',
+    element: (
+      <LayoutShell banner={<ServiceBanner />}>
+        <MainLayout title="커뮤니티">
+          <CommunityPage />
+        </MainLayout>
+      </LayoutShell>
+    ),
   },
   // 로그인 , 소셜 로그인
   {
