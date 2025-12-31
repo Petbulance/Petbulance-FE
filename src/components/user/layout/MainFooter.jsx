@@ -2,7 +2,7 @@ import { Group, HealthCross, Home, OverflowMenuHorizontal, Review } from '@carbo
 
 const MENUS = [
   { label: '홈', icon: Home },
-  { label: '병원검색', icon: HealthCross }, // 👈 변경
+  { label: '병원검색', icon: HealthCross },
   { label: '병원후기', icon: Review },
   { label: '커뮤니티', icon: Group },
   { label: 'My', icon: OverflowMenuHorizontal
