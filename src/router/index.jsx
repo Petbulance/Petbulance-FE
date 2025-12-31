@@ -22,6 +22,7 @@ import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
 import MainLayout from '@/components/user/layout/MainLayout.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
+import MyPage from '@/pages/user/my/MyPage.jsx';
 
 const router = createBrowserRouter([
   // 관리자
@@ -59,6 +60,16 @@ const router = createBrowserRouter([
       <LayoutShell banner={<ServiceBanner />}>
         <MainLayout title="커뮤니티">
           <CommunityPage />
+        </MainLayout>
+      </LayoutShell>
+    ),
+  },
+  {
+    path: '/my',
+    element: (
+      <LayoutShell banner={<ServiceBanner />}>
+        <MainLayout title="마이페이지">
+          <MyPage />
         </MainLayout>
       </LayoutShell>
     ),
