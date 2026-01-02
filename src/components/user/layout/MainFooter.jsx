@@ -6,7 +6,7 @@ const MENUS = [
   { label: '병원검색', icon: HealthCross, path: '/index/hospitals' },
   { label: '병원후기', icon: Review, path: '/index/reviews' },
   { label: '커뮤니티', icon: Group, path: '/index/community' },
-  { label: 'My', icon: OverflowMenuHorizontal, path: '/index/my' },
+  { label: 'My', icon: OverflowMenuHorizontal, path: '/index/mypage' },
 ];
 
 export default function MainFooter() {

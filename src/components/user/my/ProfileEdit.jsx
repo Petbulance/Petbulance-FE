@@ -1,0 +1,102 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import cameraIcon from '@/assets/images/icons/cameraIcon.svg';
+import defaultImg from '@/assets/images/icons/defaultImg.svg';
+import successCheckImg from '@/assets/images/icons/successCheckImg.svg';
+import dangerCheckImg from '@/assets/images/icons/dangerCheckImg.svg';
+
+
+export default function ProfileEdit() {
+  const navigate = useNavigate();
+
+  // 기존 사용자 정보 (더미 → API 교체)
+  const originalNickname = '따뜻한햄스터07';
+
+  const [nickname, setNickname] = useState(originalNickname);
+  const [profileImage, setProfileImage] = useState(null);
+
+  // 저장 가능 여부
+  const canSave = nickname !== originalNickname;
+
+  const handleSave = () => {
+    if (!canSave) return;
+
+    console.log('저장', {
+      nickname,
+      profileImage,
+    });
+
+    navigate(-1);
+  };
+
+  return (
+    <div className="flex h-full flex-col bg-white px-4 py-4">
+      {/* ================= 프로필 이미지 ================= */}
+      <div className="mb-6 flex flex-col items-center">
+        <div className="relative mt-5">
+          <img
+            src={profileImage || defaultImg}
+            alt="프로필"
+            className="h-24 w-24 rounded-full object-cover border-[0.8px] border-[var(--border-secondary,#757575)]"
+          />
+
+          <button
+            className="absolute bottom-0 right-0 rounded-full bg-[#EEEEEE] p-1 border-[0.8px] border-[var(--border-secondary,#757575)]"
+            onClick={() => {
+              // 이미지 업로드 연결 예정
+              console.log('이미지 변경');
+            }}
+          >
+            <img src={cameraIcon} alt="카메라" />
+          </button>
+        </div>
+      </div>
+
+      {/* ================= 닉네임 입력 ================= */}
+      <div className="space-y-1">
+        <label className="text-xs text-gray-800">
+          닉네임
+        </label>
+
+        <input
+          type="text"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-800"
+        />
+
+        {nickname === originalNickname ? (
+          <p className="text-xs text-gray-800">
+            현재 닉네임이에요
+          </p>
+        ) : nickname.length < 2 ? (
+          <p className="flex items-center gap-1 text-xs text-red-500">
+            <img src={dangerCheckImg} alt="성공" className="h-3 w-3" />
+            2자 이상 입력해주세요
+          </p>
+        ) : (
+          <p className="flex items-center gap-1 text-xs text-success">
+            <img src={successCheckImg} alt="성공" className="h-3 w-3" />
+            사용 가능한 닉네임이에요!
+          </p>
+        )}
+      </div>
+
+      {/* ================= 저장 버튼 ================= */}
+      <div className="mt-20">
+        <button
+          onClick={handleSave}
+          disabled={!canSave}
+          className={`w-full rounded-xl py-3 text-sm font-semibold transition ${
+            canSave
+              ? 'border border-success text-success'
+              : 'cursor-not-allowed border border-gray-300 text-gray-300'
+          }`}
+        >
+          저장
+        </button>
+
+      </div>
+    </div>
+  );
+}

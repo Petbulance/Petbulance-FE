@@ -2,6 +2,7 @@ import { Bell, ChevronRight } from 'lucide-react';
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
 
 import { Bullhorn, Document, Forum, Headset, Information, Login, Review, Security,Version } from '@carbon/icons-react';
+import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 
 function Group({ title, children }) {
   return (
@@ -29,24 +30,22 @@ function Item({ Icon, iconNode, label, right }) {
     </div>
   );
 }
-
-
 export default function MyPage() {
+  const isLoggedIn = true;
+
+  const user = {
+    name: '따뜻한햄스터07',
+    email: 'user@example.com',
+    profileImage: 'https://picsum.photos/seed/profile/200/200',
+  };
+
   return (
     <div className="space-y-4 bg-gray-100 px-4 py-4">
-      <section className="rounded-xl bg-white p-4 ">
-        <div className="flex justify-between">
-          <div>
-            <h1 className="text-sm font-semibold">로그인 해주세요</h1>
-            <p className="text-xs text-caption">
-              회원가입까지 단 3초!
-            </p>
-          </div>
-          <button className="text-sm font-medium text-[#424242] ">
-            로그인 하기
-          </button>
-        </div>
-      </section>
+      {/* 상단 프로필 영역 */}
+      <ProfileSection
+        isLoggedIn={isLoggedIn}
+        user={user}
+      />
 
       {/* 사용자 설정 */}
       <Group title="사용자 설정">
@@ -75,7 +74,7 @@ export default function MyPage() {
         <Item Icon={Headset} label="문의 및 고객센터" />
         <Item Icon={Information} label="약관 및 정책" />
       </Group>
-
     </div>
   );
 }
+

@@ -25,6 +25,8 @@ import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 import MyPage from '@/pages/user/my/MyPage.jsx';
 import Hospitals from '@/pages/user/Hospitals.jsx';
 import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
+import ProfileEdit from '@/components/user/my/ProfileEdit.jsx';
+import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -99,7 +101,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'my',
+        path: 'mypage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <MainLayout title="마이페이지">
@@ -107,6 +109,19 @@ const router = createBrowserRouter([
             </MainLayout>
           </LayoutShell>
         ),
+      }, {
+        path: 'mypage/profile/edit',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="프로필수정">
+              <ProfileEdit />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },
+      {
+        path: '/index/mypage/profile/edit',
+        element: <ProfileEdit />,
       },
 
       {
