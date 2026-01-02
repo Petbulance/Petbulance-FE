@@ -2,12 +2,13 @@ import { Group, HealthCross, Home, OverflowMenuHorizontal, Review } from '@carbo
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const MENUS = [
-  { label: '홈', icon: Home, path: '/' },
-  { label: '병원검색', icon: HealthCross, path: '/hospitals' },
-  { label: '병원후기', icon: Review, path: '/reviews' },
-  { label: '커뮤니티', icon: Group, path: '/community' },
-  { label: 'My', icon: OverflowMenuHorizontal, path: '/my' },
+  { label: '홈', icon: Home, path: '/index/home' },
+  { label: '병원검색', icon: HealthCross, path: '/index/hospitals' },
+  { label: '병원후기', icon: Review, path: '/index/reviews' },
+  { label: '커뮤니티', icon: Group, path: '/index/community' },
+  { label: 'My', icon: OverflowMenuHorizontal, path: '/index/my' },
 ];
+
 export default function MainFooter() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,7 +17,7 @@ export default function MainFooter() {
     <footer className="sticky bottom-0 border-t bg-white">
       <ul className="flex justify-around py-2">
         {MENUS.map((menu) => {
-          const isActive = location.pathname === menu.path;
+          const isActive = location.pathname.startsWith(menu.path);
 
           return (
             <li

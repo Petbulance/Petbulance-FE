@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import App from '@/App.jsx';
 import AdminLogin from '@/pages/admin/auth/AdminLogin.jsx';
@@ -23,9 +23,16 @@ import MainLayout from '@/components/user/layout/MainLayout.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 import MyPage from '@/pages/user/my/MyPage.jsx';
+import Hospitals from '@/pages/user/Hospitals.jsx';
+import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
 
 const router = createBrowserRouter([
-  // 관리자
+  /* ================= 루트 리다이렉트 ================= */
+  {
+    path: '/',
+    element: <Navigate to="/index/home" replace />,
+  },
+  /* ================= 관리자 ================= */
   {
     path: '/admin',
     element: <AdminLayout />,
@@ -45,56 +52,78 @@ const router = createBrowserRouter([
     path: '/admin/auth/login',
     element: <AdminLogin />,
   },
-  // 서비스
-  {
-    path: '/*',
-    element: <App />,
-  },
+
+  /* ================= 사용자 서비스 ================= */
   {
     path: '/index',
-    element: <Home />,
+    element: <App />, // Provider / Outlet
+    children: [
+      { index: true, element: <Home /> },
+
+      {
+        path: 'home',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MainLayout title="펫뷸런스">
+              <Home />
+            </MainLayout>
+          </LayoutShell>
+        ),
+      },     {
+        path: 'hospitals',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MainLayout title="병원 검색">
+              <Hospitals />
+            </MainLayout>
+          </LayoutShell>
+        ),
+      },
+      {
+        path: 'reviews',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MainLayout title="병원 후기">
+              <HosptialsReviews />
+            </MainLayout>
+          </LayoutShell>
+        ),
+      },  {
+        path: 'community',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MainLayout title="커뮤니티">
+              <CommunityPage />
+            </MainLayout>
+          </LayoutShell>
+        ),
+      },
+      {
+        path: 'my',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MainLayout title="마이페이지">
+              <MyPage />
+            </MainLayout>
+          </LayoutShell>
+        ),
+      },
+
+      {
+        path: 'auth/login',
+        element: <SocialSignUp />,
+      },
+      {
+        path: 'auth/signupcomplete',
+        element: <SignupComplete />,
+      },
+    ],
   },
-  {
-    path: '/community',
-    element: (
-      <LayoutShell banner={<ServiceBanner />}>
-        <MainLayout title="커뮤니티">
-          <CommunityPage />
-        </MainLayout>
-      </LayoutShell>
-    ),
-  },
-  {
-    path: '/my',
-    element: (
-      <LayoutShell banner={<ServiceBanner />}>
-        <MainLayout title="마이페이지">
-          <MyPage />
-        </MainLayout>
-      </LayoutShell>
-    ),
-  },
-  // 로그인 , 소셜 로그인
-  {
-    path: '/index/auth/login',
-    element: <SocialSignUp />,
-  },
-  {
-    path: '/index/auth/signupcomplete',
-    element: <SignupComplete />,
-  },
-  {
-    path: '/auth/kakao/callback',
-    element: <KakaoCallback />,
-  },
-  {
-    path: '/auth/google/callback',
-    element: <GoogleCallback />,
-  },
-  {
-    path: '/auth/naver/callback',
-    element: <NaverCallback />,
-  },
+
+  /* ================= OAuth ================= */
+  { path: '/auth/kakao/callback', element: <KakaoCallback /> },
+  { path: '/auth/google/callback', element: <GoogleCallback /> },
+  { path: '/auth/naver/callback', element: <NaverCallback /> },
 ]);
 
 export default router;

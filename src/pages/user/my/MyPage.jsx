@@ -1,4 +1,5 @@
 import { Bell, ChevronRight } from 'lucide-react';
+import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
 
 import { Bullhorn, Document, Forum, Headset, Information, Login, Review, Security,Version } from '@carbon/icons-react';
 
@@ -15,11 +16,12 @@ function Group({ title, children }) {
     </section>
   );
 }
-function Item({ icon: Icon, label, right }) {
+function Item({ Icon, iconNode, label, right }) {
   return (
     <div className="flex items-center justify-between px-4 py-3">
       <div className="flex items-center gap-3">
-        {Icon && <Icon className="h-4 w-4 text-gray-600" />}
+        {iconNode}
+        {!iconNode && Icon && <Icon className="h-4 w-4 text-black" />}
         <span className="text-sm">{label}</span>
       </div>
 
@@ -27,6 +29,7 @@ function Item({ icon: Icon, label, right }) {
     </div>
   );
 }
+
 
 export default function MyPage() {
   return (
@@ -47,32 +50,32 @@ export default function MyPage() {
 
       {/* 사용자 설정 */}
       <Group title="사용자 설정">
-        <Item icon={Bell} label="알림 설정" />
-        <Item icon={Login} label="로그인 계정 관리" />
-        <Item icon={Security} label="권한" />
-      </Group>
-
-      {/* 작성글 관리 */}
-      <Group title="작성글 관리">
-        <Item icon={Review} label="후기 관리" />
-        <Item icon={Document} label="게시글 관리" />
-        <Item icon={Forum} label="댓글 관리" />
-      </Group>
-
-      {/* 고객지원 */}
-      <Group title="고객지원">
-        <Item icon={Bullhorn} label="공지사항" />
-        <Item icon={Headset} label="문의 및 고객센터" />
-        <Item icon={Information} label="약관 및 정책" />
-        {/*<Item icon={Version}
-          label="최신버전 업데이트"
-          right={
-            <span className="text-xs text-green-600 font-medium">
-              1.1.0
-            </span>
+        <Item
+          label="알림 설정"
+          iconNode={
+            <img
+              src={notificationIcon}
+              className="h-4 w-4"
+              alt="알림 설정"
+            />
           }
-        />*/}
+        />
+        <Item Icon={Login} label="로그인 계정 관리" />
+        <Item Icon={Security} label="권한" />
       </Group>
+
+      <Group title="작성글 관리">
+        <Item Icon={Review} label="후기 관리" />
+        <Item Icon={Document} label="게시글 관리" />
+        <Item Icon={Forum} label="댓글 관리" />
+      </Group>
+
+      <Group title="고객지원">
+        <Item Icon={Bullhorn} label="공지사항" />
+        <Item Icon={Headset} label="문의 및 고객센터" />
+        <Item Icon={Information} label="약관 및 정책" />
+      </Group>
+
     </div>
   );
 }
