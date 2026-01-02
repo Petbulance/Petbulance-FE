@@ -3,7 +3,7 @@ import MainFooter from '@/components/user/layout/MainFooter.jsx';
 
 export default function MainLayout({ title, children }) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-100">
       {/* Header */}
       <MainHeader title={title} />
 

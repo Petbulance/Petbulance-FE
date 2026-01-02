@@ -30,7 +30,7 @@ function Item({ icon: Icon, label, right }) {
 
 export default function MyPage() {
   return (
-    <div className="space-y-4 bg-gray-50 px-4 py-4">
+    <div className="space-y-4 bg-gray-100 px-4 py-4">
       <section className="rounded-xl bg-white p-4 ">
         <div className="flex justify-between">
           <div>

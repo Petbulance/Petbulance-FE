@@ -1,8 +1,16 @@
-import { Bell } from 'lucide-react';
 import { Notification } from '@carbon/icons-react';
+
 export default function MainHeader({ title }) {
+  const isMyPage = title === '마이페이지';
+
   return (
-    <header className="sticky top-0 z-50 bg-white px-4 py-3 shadow-sm">
+    <header
+      className={`sticky top-0 z-50 px-4 py-3 ${
+        isMyPage
+          ? 'bg-gray-100'
+          : 'bg-white shadow-sm'
+      }`}
+    >
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold text-gray-900">
           {title}
