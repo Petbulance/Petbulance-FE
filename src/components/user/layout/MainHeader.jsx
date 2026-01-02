@@ -23,8 +23,8 @@ export default function MainHeader({ title }) {
       <div className="flex items-center justify-between">
         {/* 타이틀 */}
         <h1
-          className={`text-lg font-bold ${
-            isHome ? 'text-success' : 'text-gray-900'
+          className={`text-[25px] font-semibold ${
+            isHome ? 'text-[#2DA969]' : 'text-gray-900'
           }`}
         >
           {title}
