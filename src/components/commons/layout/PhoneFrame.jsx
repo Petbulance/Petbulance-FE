@@ -1,11 +1,15 @@
 export function PhoneFrame({ children }) {
   return (
-    <div className="
+    <div
+      className="
+        flex
+        h-dvh
+        max-h-dvh
         w-[620px]
-        min-h-dvh
         max-w-phone
+        flex-col
         overflow-hidden
-      bg-white
+        bg-white
       "
     >
       {children}
