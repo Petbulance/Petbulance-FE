@@ -3,12 +3,15 @@ import MainFooter from '@/components/user/layout/MainFooter.jsx';
 
 export default function MainLayout({ title, children }) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-100">
+    <div className="flex h-full flex-col bg-gray-100 overflow-hidden">
       {/* Header */}
       <MainHeader title={title} />
 
-      {/* Content */}
-      <main className="flex-1">{children}</main>
+      {/* Content (여기만 스크롤) */}
+      <main className="flex-1 overflow-y-auto bg-red-100">
+
+        {children}
+      </main>
 
       {/* Footer */}
       <MainFooter />

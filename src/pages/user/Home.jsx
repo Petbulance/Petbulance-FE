@@ -1,6 +1,3 @@
-import { Outlet } from 'react-router-dom';
-import MainHeader from '@/components/user/layout/MainHeader.jsx';
-import MainFooter from '@/components/user/layout/MainFooter.jsx';
 import NearbyHospitalShortcut from '@/components/user/home/NearbyHospitalShortcut.jsx';
 import HomeBanner from '@/components/user/home/HomeBanner.jsx';
 import LatestReceiptReview from '@/components/user/home/LatestReceiptReview.jsx';
