@@ -1,9 +1,9 @@
 import { Notification } from '@carbon/icons-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function MainHeader({ title }) {
   const location = useLocation();
-
+  const navigate = useNavigate();
   const isMyPage = title === '마이페이지';
   const isHome = location.pathname === '/index/home';
 
@@ -30,7 +30,10 @@ export default function MainHeader({ title }) {
           {title}
         </h1>
         <div className="relative">
-          <Notification className="h-5 w-5 text-gray-600" />
+          <Notification
+            className="h-5 w-5 text-gray-600 cursor-pointer"
+            onClick={() => navigate('/index/notification')}
+          />
 
           {/* 🔴 알림 뱃지 */}
           {notificationCount > 0 && (

@@ -27,6 +27,8 @@ import Hospitals from '@/pages/user/Hospitals.jsx';
 import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
 import ProfileEdit from '@/components/user/my/ProfileEdit.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
+import NotificationPage from '@/pages/user/NotificationPage.jsx';
+import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -132,8 +134,19 @@ const router = createBrowserRouter([
         path: 'auth/signupcomplete',
         element: <SignupComplete />,
       },
+      {
+        path: 'notification',
+        element:
+        <LayoutShell banner={<ServiceBanner />}>
+          <NotiLayout >
+            <NotificationPage />
+          </NotiLayout>
+        </LayoutShell>,
+      },
+
     ],
   },
+  // 노티
 
   /* ================= OAuth ================= */
   { path: '/auth/kakao/callback', element: <KakaoCallback /> },
