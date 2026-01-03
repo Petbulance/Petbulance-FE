@@ -25,10 +25,13 @@ import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 import MyPage from '@/pages/user/my/MyPage.jsx';
 import Hospitals from '@/pages/user/Hospitals.jsx';
 import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
-import ProfileEdit from '@/components/user/my/ProfileEdit.jsx';
+import ProfileEdit from '@/pages/user/my/ProfileEdit.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
-import NotificationPage from '@/pages/user/NotificationPage.jsx';
+import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
+import { Toaster } from 'sonner';
+import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
+import Authorization from '@/pages/user/my/Authorization.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -102,6 +105,7 @@ const router = createBrowserRouter([
           </LayoutShell>
         ),
       },
+      // 마이페이지
       {
         path: 'mypage',
         element: (
@@ -111,7 +115,8 @@ const router = createBrowserRouter([
             </MainLayout>
           </LayoutShell>
         ),
-      }, {
+      },
+      {
         path: 'mypage/profile/edit',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -122,26 +127,47 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/index/mypage/profile/edit',
-        element: <ProfileEdit />,
+        path: '/index/mypage/authorization',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="권한" left="true">
+              <Authorization />
+            </MypageLayout>
+          </LayoutShell>
+        ),
       },
-
+      // 로그인 관련
       {
         path: 'auth/login',
-        element: <SocialSignUp />,
+        element:
+          <LayoutShell banner={<ServiceBanner />}>
+              <SocialSignUp />
+          </LayoutShell>
+
       },
       {
         path: 'auth/signupcomplete',
         element: <SignupComplete />,
       },
+      // 알림
       {
         path: 'notification',
         element:
         <LayoutShell banner={<ServiceBanner />}>
-          <NotiLayout >
+          <NotiLayout title="알림">
             <NotificationPage />
           </NotiLayout>
         </LayoutShell>,
+      },
+      {
+        path: 'notification/setting',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <NotiLayout title="알림 설정">
+              <NotificationSetting />
+            </NotiLayout>
+          </LayoutShell>
+        ),
       },
 
     ],

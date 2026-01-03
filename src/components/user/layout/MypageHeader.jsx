@@ -5,7 +5,7 @@ export default function MypageHeader({ onSave, canSave }) {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-50 bg-white px-4 py-3">
+    <header className="sticky top-0 z-50 bg-white px-4 py-3 shadow-sm">
       <div className="relative flex items-center justify-between">
         {/* 좌측: 뒤로가기 */}
         <button onClick={() => navigate(-1)}>

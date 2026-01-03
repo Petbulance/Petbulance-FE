@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import cameraIcon from '@/assets/images/icons/cameraIcon.svg';
 import defaultImg from '@/assets/images/icons/defaultImg.svg';
 import successCheckImg from '@/assets/images/icons/successCheckImg.svg';
 import dangerCheckImg from '@/assets/images/icons/dangerCheckImg.svg';
-
 
 export default function ProfileEdit() {
   const navigate = useNavigate();
@@ -15,8 +15,25 @@ export default function ProfileEdit() {
   const [nickname, setNickname] = useState(originalNickname);
   const [profileImage, setProfileImage] = useState(null);
 
+  /* ================= 유효성 검사 ================= */
+
+  // 한글 / 영문 / 숫자만 허용
+  const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
+
+  const isSame = nickname === originalNickname;
+  const isEmpty = nickname.length === 0;
+  const isTooShort = nickname.length < 2;
+  const isTooLong = nickname.length > 12;
+  const hasSpecialChar = !nicknameRegex.test(nickname);
+
   // 저장 가능 여부
-  const canSave = nickname !== originalNickname;
+  const canSave =
+    !isSame &&
+    !isTooShort &&
+    !isTooLong &&
+    !hasSpecialChar;
+
+  /* ================= 저장 ================= */
 
   const handleSave = () => {
     if (!canSave) return;
@@ -41,6 +58,7 @@ export default function ProfileEdit() {
           />
 
           <button
+            type="button"
             className="absolute bottom-0 right-0 rounded-full bg-[#EEEEEE] p-1 border-[0.8px] border-[var(--border-secondary,#757575)]"
             onClick={() => {
               // 이미지 업로드 연결 예정
@@ -54,7 +72,7 @@ export default function ProfileEdit() {
 
       {/* ================= 닉네임 입력 ================= */}
       <div className="space-y-1">
-        <label className="text-xs text-gray-800">
+        <label className="text-[19px] text-gray-800">
           닉네임
         </label>
 
@@ -62,20 +80,35 @@ export default function ProfileEdit() {
           type="text"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
-          className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-800"
+          className="w-full mt-3 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-[20px] text-gray-800"
         />
 
-        {nickname === originalNickname ? (
-          <p className="text-xs text-gray-800">
+        {/* ================= 상태 메시지 ================= */}
+        {isSame ? (
+          <p className="text-[16px] text-gray-800">
             현재 닉네임이에요
           </p>
-        ) : nickname.length < 2 ? (
-          <p className="flex items-center gap-1 text-xs text-red-500">
-            <img src={dangerCheckImg} alt="성공" className="h-3 w-3" />
+        ) : nickname.length === 0 ? (
+          <p className="text-[16px] text-gray-800">
+            2~12자, 한글/영문/숫자 사용 가능해요
+          </p>
+        ) : isTooShort ? (
+          <p className="flex items-center gap-1 text-[16px] text-red-500">
+            <img src={dangerCheckImg} alt="경고" className="h-3 w-3" />
             2자 이상 입력해주세요
           </p>
+        ) : isTooLong ? (
+          <p className="flex items-center gap-1 text-[16px] text-red-500">
+            <img src={dangerCheckImg} alt="경고" className="h-3 w-3" />
+            12자 이하로 입력해주세요
+          </p>
+        ) : hasSpecialChar ? (
+          <p className="flex items-center gap-1 text-[16px] text-red-500">
+            <img src={dangerCheckImg} alt="경고" className="h-3 w-3" />
+            특수문자는 사용할 수 없어요
+          </p>
         ) : (
-          <p className="flex items-center gap-1 text-xs text-success">
+          <p className="flex items-center gap-1 text-[16px] text-success">
             <img src={successCheckImg} alt="성공" className="h-3 w-3" />
             사용 가능한 닉네임이에요!
           </p>
@@ -87,7 +120,7 @@ export default function ProfileEdit() {
         <button
           onClick={handleSave}
           disabled={!canSave}
-          className={`w-full rounded-xl py-3 text-sm font-semibold transition ${
+          className={`w-full rounded-xl py-3 text-[27px] font-semibold transition ${
             canSave
               ? 'border border-success text-success'
               : 'cursor-not-allowed border border-gray-300 text-gray-300'
@@ -95,7 +128,6 @@ export default function ProfileEdit() {
         >
           저장
         </button>
-
       </div>
     </div>
   );
