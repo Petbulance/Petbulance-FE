@@ -91,7 +91,7 @@ export default function HomeBanner() {
       {/* ================= 배너 캐러셀 ================= */}
       <Carousel
         setApi={setApi}
-        opts={{ loop: true }}
+        opts={{ loop: true , align: 'start', }}
         plugins={[
           Autoplay({
             delay: 2500,
@@ -100,11 +100,11 @@ export default function HomeBanner() {
         ]}
         className="overflow-hidden "
       >
-        <CarouselContent className="-ml-4">
+        <CarouselContent className="-ml-0">
           {BANNERS.map((banner) => (
             <CarouselItem
               key={banner.id}
-              className="basis-[90%] pl-2"
+              className="basis-[97%] mr-[10px] pl-0"
             >
               <div className="relative overflow-hidden rounded-lg">
                 <img
