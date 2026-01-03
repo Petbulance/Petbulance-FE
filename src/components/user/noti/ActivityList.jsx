@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TrashCan } from '@carbon/icons-react';
 import ConfirmDangerModal from '@/components/commons/layout/ConfirmDangerModal.jsx';
+import { toast } from 'sonner';
 
 export default function ActivityList({ NOTIFICATIONS }) {
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -10,6 +11,17 @@ export default function ActivityList({ NOTIFICATIONS }) {
   const handleDeleteAll = () => {
     console.log('알림함 비우기');
     setOpenConfirm(false);
+    toast('알림함을 비웠어요', {
+      style: {
+        width: '100%',
+        background: '#222222E5',
+        color: '#ffffff',
+      },
+      action: {
+        label: '✕',
+        onClick: () => toast.dismiss(),
+      },
+    });
   };
 
   return (

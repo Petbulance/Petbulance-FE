@@ -29,6 +29,7 @@ import ProfileEdit from '@/pages/user/my/ProfileEdit.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import NotificationPage from '@/pages/user/NotificationPage.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
+import { Toaster } from 'sonner';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
