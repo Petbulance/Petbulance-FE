@@ -69,7 +69,10 @@ export default function MyPage() {
             navigate('/index/notification/setting')
           }
         />
-        <Item Icon={Login} label="로그인 계정 관리" />
+        <Item Icon={Login} label="로그인 계정 관리"
+              onClick={() =>
+                navigate('/index/mypage/loginsetting')
+              }/>
         <Item Icon={Security} label="권한" onClick={()=>{
           navigate('/index/mypage/authorization')
         }} />
