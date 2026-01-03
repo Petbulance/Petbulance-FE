@@ -25,7 +25,7 @@ import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 import MyPage from '@/pages/user/my/MyPage.jsx';
 import Hospitals from '@/pages/user/Hospitals.jsx';
 import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
-import ProfileEdit from '@/components/user/my/ProfileEdit.jsx';
+import ProfileEdit from '@/pages/user/my/ProfileEdit.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import NotificationPage from '@/pages/user/NotificationPage.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
