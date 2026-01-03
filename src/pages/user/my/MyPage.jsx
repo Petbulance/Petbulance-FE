@@ -79,7 +79,10 @@ export default function MyPage() {
       </Group>
 
       <Group title="작성글 관리">
-        <Item Icon={Review} label="후기 관리" />
+        <Item Icon={Review} label="후기 관리"
+              onClick={() =>
+          navigate('/index/mypage/reviewmanage')
+        }/>
         <Item Icon={Document} label="게시글 관리" />
         <Item Icon={Forum} label="댓글 관리" />
       </Group>
