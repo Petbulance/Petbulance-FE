@@ -117,6 +117,7 @@ const router = createBrowserRouter([
           <LayoutShell banner={<ServiceBanner />}>
             <MypageLayout title="프로필수정">
               <ProfileEdit />
+
             </MypageLayout>
           </LayoutShell>
         ),
@@ -128,7 +129,11 @@ const router = createBrowserRouter([
 
       {
         path: 'auth/login',
-        element: <SocialSignUp />,
+        element:
+          <LayoutShell banner={<ServiceBanner />}>
+              <SocialSignUp />
+          </LayoutShell>
+
       },
       {
         path: 'auth/signupcomplete',

@@ -31,7 +31,7 @@ function Item({ Icon, iconNode, label, right }) {
   );
 }
 export default function MyPage() {
-  const isLoggedIn = true;
+  const isLoggedIn = false;
 
   const user = {
     name: '따뜻한햄스터07',

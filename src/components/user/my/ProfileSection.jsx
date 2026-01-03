@@ -1,27 +1,51 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ConfirmSuccessModal from '@/components/commons/layout/ConfirmSuccessModal.jsx';
 
 export default function ProfileSection({ isLoggedIn, user }) {
-
   const navigate = useNavigate();
-
+  const [openModal, setOpenModal] = useState(false);
+  // 비로그인
   if (!isLoggedIn) {
     return (
-      <section className="rounded-xl bg-white p-4">
-        <div className="flex justify-between">
-          <div>
-            <h1 className="text-sm font-semibold">로그인 해주세요</h1>
-            <p className="text-xs text-caption">
-              회원가입까지 단 3초!
-            </p>
+      <>
+        <section className="rounded-xl bg-white p-4">
+          <div className="flex justify-between">
+            <div>
+              <h1 className="text-sm font-semibold">로그인 해주세요</h1>
+              <p className="text-xs text-caption">
+                회원가입까지 단 3초!
+              </p>
+            </div>
+
+            <button
+              className="text-sm font-medium text-[#424242]"
+              onClick={() => setOpenModal(true)}
+            >
+              로그인 하기
+            </button>
           </div>
-          <button className="text-sm font-medium text-[#424242]">
-            로그인 하기
-          </button>
-        </div>
-      </section>
+        </section>
+
+        <ConfirmSuccessModal
+          open={openModal}
+          title="알림"
+          content={
+            <>
+              로그인이 필요한 서비스예요.<br />
+              로그인하시겠어요?
+            </>
+          }
+          cancelText="그냥 볼래요"
+          confirmText="로그인"
+          onCancel={() => setOpenModal(false)}
+          onConfirm={() => navigate('/index/auth/login')}
+        />
+      </>
     );
   }
 
+  // 로그인
   return (
     <section className="rounded-xl bg-white p-4">
       <div className="flex items-center justify-between">
