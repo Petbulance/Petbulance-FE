@@ -5,7 +5,7 @@ import PopularPostList from '@/components/user/home/PopularPostList.jsx';
 
 export default function Home() {
   return (
-    <div className="space-y-6 px-4 py-4 bg-white">
+    <div className="space-y-6 px-[24px] py-[24px] bg-white">
       <NearbyHospitalShortcut />
       <HomeBanner />
       <LatestReceiptReview />

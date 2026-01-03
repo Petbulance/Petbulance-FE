@@ -6,11 +6,10 @@ import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 
 function Group({ title, children }) {
   return (
-    <section className="rounded-xl bg-white ">
-      <h3 className="px-4 py-3 text-sm font-semibold text-gray-800 text-left">
+    <section className="rounded-xl bg-white mb-[20px] ">
+      <h3 className="px-[24px] py-[8px] text-[18px] font-semibold text-[#1e1e1e] text-left ">
         {title}
       </h3>
-
       <div>
         {children}
       </div>
@@ -20,15 +19,15 @@ function Group({ title, children }) {
 function Item({ Icon, iconNode, label, right, onClick }) {
   return (
     <div
-      className="flex cursor-pointer items-center justify-between px-4 py-3"
+      className="flex cursor-pointer items-center justify-between h-[48px]  px-[24px] py-3"
       onClick={onClick}
     >
       <div className="flex items-center gap-3">
         {iconNode}
         {!iconNode && Icon && (
-          <Icon className="h-4 w-4 text-black" />
+          <Icon className="h-5 w-5 text-black" />
         )}
-        <span className="text-sm">{label}</span>
+        <span className="text-[19px]">{label}</span>
       </div>
 
       {right ?? (
@@ -48,7 +47,7 @@ export default function MyPage() {
   };
 
   return (
-    <div className="space-y-4 bg-gray-100 px-4 py-4">
+    <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
       {/* 상단 프로필 영역 */}
       <ProfileSection
         isLoggedIn={isLoggedIn}
@@ -62,7 +61,7 @@ export default function MyPage() {
           iconNode={
             <img
               src={notificationIcon}
-              className="h-4 w-4"
+              className="h-5 w-5"
               alt="알림 설정"
             />
           }
@@ -70,14 +69,20 @@ export default function MyPage() {
             navigate('/index/notification/setting')
           }
         />
-        <Item Icon={Login} label="로그인 계정 관리" />
+        <Item Icon={Login} label="로그인 계정 관리"
+              onClick={() =>
+                navigate('/index/mypage/loginsetting')
+              }/>
         <Item Icon={Security} label="권한" onClick={()=>{
           navigate('/index/mypage/authorization')
         }} />
       </Group>
 
       <Group title="작성글 관리">
-        <Item Icon={Review} label="후기 관리" />
+        <Item Icon={Review} label="후기 관리"
+              onClick={() =>
+          navigate('/index/mypage/reviewmanage')
+        }/>
         <Item Icon={Document} label="게시글 관리" />
         <Item Icon={Forum} label="댓글 관리" />
       </Group>

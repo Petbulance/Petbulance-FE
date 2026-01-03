@@ -23,7 +23,7 @@ export default function MainHeader({ title }) {
       <div className="flex items-center justify-between">
         {/* 타이틀 */}
         <h1
-          className={`text-[25px] font-semibold ${
+          className={`text-[25px] font-semibold pl-[8px] ${
             isHome ? 'text-[#2DA969]' : 'text-gray-900'
           }`}
         >
@@ -35,7 +35,7 @@ export default function MainHeader({ title }) {
             onClick={() => navigate('/index/notification')}
           />
 
-          {/* 🔴 알림 뱃지 */}
+          {/* 알림 뱃지 */}
           {notificationCount > 0 && (
             <span className="absolute -right-2 -top-2 flex min-w-[18px] items-center justify-center rounded-full bg-success px-1 text-[10px] font-semibold text-white">
               {displayCount}

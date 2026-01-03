@@ -144,7 +144,7 @@ export default function LatestReceiptReview() {
           {REVIEWS.map((review) => (
             <CarouselItem
               key={review.id}
-              className="basis-[50%] pl-4"
+              className="basis-[70%] pl-4"
             >
               {/* 카드 */}
               <div className="flex gap-3 rounded-xl bg-gray-100 p-3 shadow-sm">

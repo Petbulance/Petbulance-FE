@@ -32,6 +32,8 @@ import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
 import { Toaster } from 'sonner';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
 import Authorization from '@/pages/user/my/Authorization.jsx';
+import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
+import ReviewManage from '@/pages/user/my/ReviewManage.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -132,6 +134,24 @@ const router = createBrowserRouter([
           <LayoutShell banner={<ServiceBanner />}>
             <MypageLayout title="권한" left="true">
               <Authorization />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },  {
+        path: '/index/mypage/loginsetting',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="로그인 설정" left="true">
+              <LoginSetting />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      }, {
+        path: '/index/mypage/reviewmanage',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="게시글 관리" left="true">
+              <ReviewManage />
             </MypageLayout>
           </LayoutShell>
         ),
