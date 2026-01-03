@@ -39,7 +39,7 @@ function Item({ Icon, iconNode, label, right, onClick }) {
 }
 
 export default function MyPage() {
-  const isLoggedIn = false;
+  const isLoggedIn = true;
   const navigate = useNavigate();
   const user = {
     name: '따뜻한햄스터07',
@@ -71,7 +71,9 @@ export default function MyPage() {
           }
         />
         <Item Icon={Login} label="로그인 계정 관리" />
-        <Item Icon={Security} label="권한" />
+        <Item Icon={Security} label="권한" onClick={()=>{
+          navigate('/index/mypage/authorization')
+        }} />
       </Group>
 
       <Group title="작성글 관리">

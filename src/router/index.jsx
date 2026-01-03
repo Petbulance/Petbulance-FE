@@ -31,6 +31,7 @@ import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
 import { Toaster } from 'sonner';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
+import Authorization from '@/pages/user/my/Authorization.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -104,6 +105,7 @@ const router = createBrowserRouter([
           </LayoutShell>
         ),
       },
+      // 마이페이지
       {
         path: 'mypage',
         element: (
@@ -113,22 +115,28 @@ const router = createBrowserRouter([
             </MainLayout>
           </LayoutShell>
         ),
-      }, {
+      },
+      {
         path: 'mypage/profile/edit',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <MypageLayout title="프로필수정">
               <ProfileEdit />
-
             </MypageLayout>
           </LayoutShell>
         ),
       },
       {
-        path: '/index/mypage/profile/edit',
-        element: <ProfileEdit />,
+        path: '/index/mypage/authorization',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="권한" left="true">
+              <Authorization />
+            </MypageLayout>
+          </LayoutShell>
+        ),
       },
-
+      // 로그인 관련
       {
         path: 'auth/login',
         element:
@@ -141,6 +149,7 @@ const router = createBrowserRouter([
         path: 'auth/signupcomplete',
         element: <SignupComplete />,
       },
+      // 알림
       {
         path: 'notification',
         element:
