@@ -17,9 +17,10 @@ export default function NotiLayout({ title, children }) {
 
       <Toaster
         position="bottom-center"
-        container={() =>
-          document.getElementById('noti-layout-container')
-        }
+        offset={24}
+        style={{ width: '100%', maxWidth: '572px', height: '44px' }}
+        toastOptions={{ style: { width: '100%', height: '44px' } }}
+        className="!left-1/2 !translate-x-1/2 !right-auto !top-auto !bottom-6 w-full max-w-[572px] h-[44px]"
       />
     </div>
   );

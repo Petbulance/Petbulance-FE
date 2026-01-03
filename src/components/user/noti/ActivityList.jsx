@@ -12,8 +12,12 @@ export default function ActivityList({ NOTIFICATIONS }) {
     console.log('알림함 비우기');
     setOpenConfirm(false);
     toast('알림함을 비웠어요', {
+      position: 'bottom-center',
       style: {
         width: '100%',
+        height: '44px',
+        display: 'flex',
+        alignItems: 'center',
         background: '#222222E5',
         color: '#ffffff',
       },
