@@ -1,6 +1,6 @@
 import { Bell, ChevronRight } from 'lucide-react';
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
-
+import { useNavigate } from 'react-router-dom';
 import { Bullhorn, Document, Forum, Headset, Information, Login, Review, Security,Version } from '@carbon/icons-react';
 import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 
@@ -17,22 +17,30 @@ function Group({ title, children }) {
     </section>
   );
 }
-function Item({ Icon, iconNode, label, right }) {
+function Item({ Icon, iconNode, label, right, onClick }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div
+      className="flex cursor-pointer items-center justify-between px-4 py-3"
+      onClick={onClick}
+    >
       <div className="flex items-center gap-3">
         {iconNode}
-        {!iconNode && Icon && <Icon className="h-4 w-4 text-black" />}
+        {!iconNode && Icon && (
+          <Icon className="h-4 w-4 text-black" />
+        )}
         <span className="text-sm">{label}</span>
       </div>
 
-      {right ?? <ChevronRight className="h-4 w-4 text-gray-400" />}
+      {right ?? (
+        <ChevronRight className="h-4 w-4 text-gray-400" />
+      )}
     </div>
   );
 }
+
 export default function MyPage() {
   const isLoggedIn = false;
-
+  const navigate = useNavigate();
   const user = {
     name: '따뜻한햄스터07',
     email: 'user@example.com',
@@ -57,6 +65,9 @@ export default function MyPage() {
               className="h-4 w-4"
               alt="알림 설정"
             />
+          }
+          onClick={() =>
+            navigate('/index/notification/setting')
           }
         />
         <Item Icon={Login} label="로그인 계정 관리" />
