@@ -1,5 +1,5 @@
-import { ChevronLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { NOTICE_ITEMS } from '@/data/notices.js';
 
 const BADGE_STYLE = {
   이벤트: 'bg-[#E6FAEE] text-[#27BE69]',
@@ -7,11 +7,11 @@ const BADGE_STYLE = {
   광고: 'bg-[#FAF5B8] text-[#142435]',
 };
 
-export default function NoticeDetail({ NOTIFICATIONS }) {
+export default function NoticeDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const notice = NOTIFICATIONS.find(
+  const notice = NOTICE_ITEMS.find(
     (n) => n.id === Number(id)
   );
 
@@ -27,12 +27,6 @@ export default function NoticeDetail({ NOTIFICATIONS }) {
 
   return (
     <div className="flex h-full flex-col bg-white">
-      {/* 헤더 */}
-      <header className="flex h-[48px] items-center border-b px-4">
-        <button onClick={() => navigate(-1)}>
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-      </header>
 
       {/* 내용 */}
       <main className="flex-1 overflow-y-auto px-6 py-5">
@@ -48,7 +42,7 @@ export default function NoticeDetail({ NOTIFICATIONS }) {
           {notice.title}
         </h1>
 
-        <p className="mt-1 text-[14px] text-gray-400">
+        <p className="mt-1 text-[14px] text-gray-400 border-b">
           {notice.date}
         </p>
 

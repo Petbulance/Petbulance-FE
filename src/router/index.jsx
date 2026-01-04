@@ -188,7 +188,7 @@ const router = createBrowserRouter([
         path: '/index/mypage/notice/:id',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MypageLayout title="" left="true">
+            <MypageLayout title="공지사항" left="true">
               <NoticeDetail />
             </MypageLayout>
           </LayoutShell>
