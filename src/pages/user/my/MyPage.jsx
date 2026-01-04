@@ -96,12 +96,12 @@ export default function MyPage() {
       <Group title="고객지원">
         <Item Icon={Bullhorn} label="공지사항"
               onClick={() =>
-          navigate('/index/mypage/notice')
-        } />
+                navigate('/index/mypage/notice')
+              } />
         <Item Icon={Headset} label="문의 및 고객센터"
               onClick={() =>
-          navigate('/index/mypage/support')
-        } />
+                navigate('/index/mypage/support')
+              } />
         <Item Icon={Information} label="약관 및 정책"
               onClick={() =>
                 navigate('/index/mypage/terms')

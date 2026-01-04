@@ -36,6 +36,8 @@ import ReviewManage from '@/pages/user/my/ReviewManage.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
 import Notice from '@/pages/user/my/Notice.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
+import Support from '@/pages/user/my/Support.jsx';
+import SupportPartnerForm from '@/pages/user/my/SupportPartnerForm.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -167,7 +169,7 @@ const router = createBrowserRouter([
           </LayoutShell>
         ),
       },{
-        path: '/index/mypage/commnetmanage',
+        path: '/index/mypage/commentmanage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <MypageLayout title="댓글 관리" left="true">
@@ -197,8 +199,17 @@ const router = createBrowserRouter([
         path: '/index/mypage/support',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MypageLayout title="공지사항" left="true">
-              <BoardManage />
+            <MypageLayout title="문의 및 고객센터" left="true">
+              <Support />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/partner',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="광고/병원 제휴 문의" left="true">
+              <SupportPartnerForm />
             </MypageLayout>
           </LayoutShell>
         ),
