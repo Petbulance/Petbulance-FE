@@ -150,7 +150,7 @@ const router = createBrowserRouter([
         path: '/index/mypage/reviewmanage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MypageLayout title="게시글 관리" left="true">
+            <MypageLayout title="후기 관리" left="true">
               <ReviewManage />
             </MypageLayout>
           </LayoutShell>
