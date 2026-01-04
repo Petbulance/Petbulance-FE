@@ -75,7 +75,7 @@ export default function ActivityList({ NOTIFICATIONS }) {
         ))
       )}
 
-      {/* 🔴 알림함 비우기 컨펌 */}
+      {/* 알림함 비우기 컨펌 */}
       <ConfirmDangerModal
         open={openConfirm}
         content="알림함을 비우시겠습니까?"

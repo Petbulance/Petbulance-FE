@@ -3,6 +3,7 @@ import thumbsUpDouble from '@/assets/images/icons/Thumbs-up-double--filled.svg';
 import reviewsCheck from '@/assets/images/icons/ReviewsCheck.svg';
 import ReviewList from '@/components/user/my/reviewManage/ReviewList.jsx';
 import EmptyReview from '@/components/user/my/reviewManage/EmptyReview.jsx';
+import { useState } from 'react';
 
 /* ================= 더미 데이터 ================= */
 const DUMMY_REVIEWS = [
@@ -153,7 +154,8 @@ const DUMMY_REVIEWS = [
 
 
 export default function ReviewManage() {
-  const reviews = DUMMY_REVIEWS;
+  const [reviews, setReviews] = useState(DUMMY_REVIEWS);
+  const [backupReviews, setBackupReviews] = useState([]);
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -161,7 +163,12 @@ export default function ReviewManage() {
         {reviews.length === 0 ? (
           <EmptyReview />
         ) : (
-          <ReviewList reviews={reviews} />
+          <ReviewList
+            reviews={reviews}
+            setReviews={setReviews}
+            backupReviews={backupReviews}
+            setBackupReviews={setBackupReviews}
+          />
         )}
       </main>
     </div>
