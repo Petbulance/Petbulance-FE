@@ -1,4 +1,5 @@
 import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const BADGE_STYLE = {
   이벤트: 'bg-[#E6FAEE] text-[#27BE69]',
@@ -7,6 +8,7 @@ const BADGE_STYLE = {
 };
 
 export default function NoticeList({ NOTIFICATIONS }) {
+  const navigate = useNavigate();
   const notices = NOTIFICATIONS.filter((n) => n.isNotice);
 
   if (notices.length === 0) {
@@ -22,9 +24,17 @@ export default function NoticeList({ NOTIFICATIONS }) {
   return (
     <div className="bg-white">
       {notices.map((item) => (
-        <div
+        <button
           key={item.id}
-          className="flex items-center justify-between border-b px-4 py-4"
+          type="button"
+          onClick={() => navigate(`/index/mypage/notice/${item.id}`)}
+          className="
+            flex w-full items-center justify-between
+            border-b px-4 py-4
+            text-left
+            hover:bg-gray-50
+            active:bg-gray-100
+          "
         >
           <div>
             <span
@@ -45,7 +55,7 @@ export default function NoticeList({ NOTIFICATIONS }) {
           </div>
 
           <ChevronLeft className="h-8 w-8 rotate-180 text-[#E0E0E0]" />
-        </div>
+        </button>
       ))}
     </div>
   );

@@ -29,11 +29,20 @@ import ProfileEdit from '@/pages/user/my/ProfileEdit.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
-import { Toaster } from 'sonner';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
 import ReviewManage from '@/pages/user/my/ReviewManage.jsx';
+import BoardManage from '@/pages/user/my/BoardManage.jsx';
+import Notice from '@/pages/user/my/Notice.jsx';
+import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
+import Support from '@/pages/user/my/Support/Support.jsx';
+import SupportPartnerForm from '@/pages/user/my/Support/SupportPartnerForm.jsx';
+import SupportMyInquiry from '@/components/user/my/SupportMyInquiry.jsx';
+import SupportWritePage from '@/pages/user/my/Support/SupportWritePage.jsx';
+import SupportInquiryDetail from '@/pages/user/my/Support/SupportInquiryDetail.jsx';
+import TermsPage from '@/pages/user/my/TermsPage.jsx';
+import TermsDetailPage from '@/pages/user/my/TermsDetailPage.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -150,8 +159,112 @@ const router = createBrowserRouter([
         path: '/index/mypage/reviewmanage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MypageLayout title="게시글 관리" left="true">
+            <MypageLayout title="후기 관리" left="true">
               <ReviewManage />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      }, {
+        path: '/index/mypage/boardmanage',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="게시글 관리" left="true">
+              <BoardManage />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/commentmanage',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="댓글 관리" left="true">
+              <BoardManage />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/notice',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="공지사항" left="true">
+              <Notice />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/notice/:id',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="공지사항" left="true">
+              <NoticeDetail />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="문의 및 고객센터" left="true">
+              <Support />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/partner',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="광고/병원 제휴 문의" left="true">
+              <SupportPartnerForm />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/MyInquiry',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="문의 작성" left="true">
+              <SupportMyInquiry />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/myinquiry/detail/:id',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout >
+              <SupportInquiryDetail />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/myinquiry/modify/:id',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <SupportWritePage/>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/write',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <SupportWritePage/>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/terms',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="약관 및 정책" left="true">
+              <TermsPage />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/terms/:id',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="약관 및 정책" left="true">
+              <TermsDetailPage />
             </MypageLayout>
           </LayoutShell>
         ),
@@ -161,7 +274,7 @@ const router = createBrowserRouter([
         path: 'auth/login',
         element:
           <LayoutShell banner={<ServiceBanner />}>
-              <SocialSignUp />
+            <SocialSignUp />
           </LayoutShell>
 
       },
@@ -173,11 +286,11 @@ const router = createBrowserRouter([
       {
         path: 'notification',
         element:
-        <LayoutShell banner={<ServiceBanner />}>
-          <NotiLayout title="알림">
-            <NotificationPage />
-          </NotiLayout>
-        </LayoutShell>,
+          <LayoutShell banner={<ServiceBanner />}>
+            <NotiLayout title="알림">
+              <NotificationPage />
+            </NotiLayout>
+          </LayoutShell>,
       },
       {
         path: 'notification/setting',

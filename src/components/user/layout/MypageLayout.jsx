@@ -6,6 +6,7 @@ export default function MypageLayout({
                                        title,
                                        left = false,
                                        children,
+                                       onSubmit,
                                      }) {
   console.log(left)
   return (
@@ -15,14 +16,16 @@ export default function MypageLayout({
       {left ? (
         <MypageLeftHeader title={title} />
       ) : (
-        <MypageHeader title={title} />
+        <MypageHeader title={title} onSubmit={onSubmit}/>
       )}
 
       {/* Content */}
-      <main className="flex-1 min-h-0 overflow-y-auto">
+      <main className="relative flex-1 min-h-0 overflow-y-auto">
         {children}
       </main>
       <MainFooter />
+
     </div>
+
   );
 }

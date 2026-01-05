@@ -1,6 +1,3 @@
-import emptyReview from '@/assets/images/pageImages/emptyReview.svg';
-import thumbsUpDouble from '@/assets/images/icons/Thumbs-up-double--filled.svg';
-import reviewsCheck from '@/assets/images/icons/ReviewsCheck.svg';
 import ReviewList from '@/components/user/my/reviewManage/ReviewList.jsx';
 import EmptyReview from '@/components/user/my/reviewManage/EmptyReview.jsx';
 import { useState } from 'react';
@@ -153,7 +150,7 @@ const DUMMY_REVIEWS = [
 ];
 
 
-export default function ReviewManage() {
+export default function BoardManage() {
   const [reviews, setReviews] = useState(DUMMY_REVIEWS);
   const [backupReviews, setBackupReviews] = useState([]);
 

@@ -1,7 +1,7 @@
-import { Bell, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
 import { useNavigate } from 'react-router-dom';
-import { Bullhorn, Document, Forum, Headset, Information, Login, Review, Security,Version } from '@carbon/icons-react';
+import { Bullhorn, Document, Forum, Headset, Information, Login, Review, Security } from '@carbon/icons-react';
 import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 
 function Group({ title, children }) {
@@ -81,16 +81,31 @@ export default function MyPage() {
       <Group title="작성글 관리">
         <Item Icon={Review} label="후기 관리"
               onClick={() =>
-          navigate('/index/mypage/reviewmanage')
-        }/>
-        <Item Icon={Document} label="게시글 관리" />
-        <Item Icon={Forum} label="댓글 관리" />
+                navigate('/index/mypage/reviewmanage')
+              }/>
+        <Item Icon={Document} label="게시글 관리"
+              onClick={() =>
+                navigate('/index/mypage/boardmanage')
+              }/>
+        <Item Icon={Forum} label="댓글 관리"
+              onClick={() =>
+                navigate('/index/mypage/commentmanage')
+              }/>
       </Group>
 
       <Group title="고객지원">
-        <Item Icon={Bullhorn} label="공지사항" />
-        <Item Icon={Headset} label="문의 및 고객센터" />
-        <Item Icon={Information} label="약관 및 정책" />
+        <Item Icon={Bullhorn} label="공지사항"
+              onClick={() =>
+                navigate('/index/mypage/notice')
+              } />
+        <Item Icon={Headset} label="문의 및 고객센터"
+              onClick={() =>
+                navigate('/index/mypage/support')
+              } />
+        <Item Icon={Information} label="약관 및 정책"
+              onClick={() =>
+                navigate('/index/mypage/terms')
+              }/>
       </Group>
     </div>
   );

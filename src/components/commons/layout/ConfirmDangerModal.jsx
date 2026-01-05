@@ -1,12 +1,12 @@
 export default function ConfirmDangerModal({
-                                            open,
-                                            title,
-                                            content,
-                                            confirmText = '확인',
-                                            cancelText = '취소',
-                                            onConfirm,
-                                            onCancel,
-                                          }) {
+                                             open,
+                                             title,
+                                             content,
+                                             confirmText = '확인',
+                                             cancelText = '취소',
+                                             onConfirm,
+                                             onCancel,
+                                           }) {
   if (!open) return null;
 
   return (
@@ -16,11 +16,10 @@ export default function ConfirmDangerModal({
         className="absolute inset-0 bg-black/60"
         onClick={onCancel}
       />
-
       {/* modal */}
       <div className="relative w-[420px] rounded-xl bg-white p-5 text-center">
         {title && (
-          <h2 className="mb-2 text-[20px] font-semibold text-[#1e1e1e]">
+          <h2 className="mb-2 text-[19px] font-semibold text-caption">
             {title}
           </h2>
         )}
