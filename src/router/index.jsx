@@ -235,6 +235,13 @@ const router = createBrowserRouter([
           </LayoutShell>
         ),
       },{
+        path: '/index/mypage/support/myinquiry/modify/:id',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <SupportWritePage/>
+          </LayoutShell>
+        ),
+      },{
         path: '/index/mypage/support/write',
         element: (
           <LayoutShell banner={<ServiceBanner />}>

@@ -30,9 +30,10 @@ export default function MypageHeader({ title, onSubmit }) {
       return
     }
 
-    if (isDetail) {
+    if (isDetail && currentInquiry) {
       navigate(
-        `/index/mypage/support/myinquiry/modify/${currentInquiry.id}`
+        `/index/mypage/support/myinquiry/modify/${currentInquiry.id}`,
+        { state: { inquiry: currentInquiry } },
       )
     }
   }
@@ -42,7 +43,7 @@ export default function MypageHeader({ title, onSubmit }) {
     : isDetail
       ? '수정'
       : isModify
-        ? '수정'
+        ? '완료'
         : ''
 
   return (

@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useSupportWriteStore } from '@/stores/useSupportWriteStore';
 import MypageLayout from '@/components/user/layout/MypageLayout';
 import SupportWrite from '@/components/user/my/SupportWrite.jsx';
+import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore.js';
 
 export default function SupportWritePage() {
   const navigate = useNavigate()
@@ -12,13 +14,28 @@ export default function SupportWritePage() {
     title,
     content,
     reset,
+    setFromInquiry,
   } = useSupportWriteStore()
+
+  const { currentInquiry } = useSupportInquiryStore()
+
+  const inquiryFromState = location.state?.inquiry
 
   const isWrite = location.pathname.includes('/write')
   const isModify = location.pathname.includes('/modify')
 
   const canSubmit =
     title.trim().length > 0 && content.trim().length > 0
+
+  useEffect(() => {
+    if (!isModify) return
+
+    const inquiry = inquiryFromState || currentInquiry
+
+    if (inquiry) {
+      setFromInquiry(inquiry)
+    }
+  }, [isModify, inquiryFromState, currentInquiry, setFromInquiry])
 
   const handleSubmit = async () => {
     if (!canSubmit) return
@@ -34,9 +51,13 @@ export default function SupportWritePage() {
         // TODO: 수정 API
         console.log('UPDATE', { title, content })
       }
+      const toastMessage = isWrite
+        ? '작성한 문의를 등록했어요'
+        : '문의 내용을 수정했어요'
+
       navigate(-1)
       reset()
-      toast('작성한 문의를 등록했어요', {
+      toast(toastMessage, {
         position: 'bottom-center',
         duration: 4000,
         style: {
