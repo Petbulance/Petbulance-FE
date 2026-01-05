@@ -37,7 +37,7 @@ export default function SupportWrite() {
               value={title}
               placeholder="제목을 입력하세요."
               onChange={(e) => setTitle(e.target.value)}
-              className="pr-10"
+              className="pr-10 bg-white"
             />
 
             {title && (
@@ -61,6 +61,7 @@ export default function SupportWrite() {
             placeholder="문의 내용을 입력하세요."
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            className="pr-10 bg-white"
           />
         </section>
       </main>
