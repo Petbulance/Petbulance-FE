@@ -9,7 +9,7 @@ export default function SupportList() {
       {/* 문의 작성 */}
       <button
         type="button"
-        onClick={() => navigate('/index/mypage/support/write')}
+        onClick={() => navigate('/index/mypage/support/MyInquiry')}
         className="
           flex w-full items-center justify-between
           border-b px-4 py-4

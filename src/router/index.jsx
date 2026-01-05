@@ -38,6 +38,9 @@ import Notice from '@/pages/user/my/Notice.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import Support from '@/pages/user/my/Support.jsx';
 import SupportPartnerForm from '@/pages/user/my/SupportPartnerForm.jsx';
+import SupportMyInquiry from '@/components/user/my/SupportMyInquiry.jsx';
+import SupportWritePage from '@/pages/user/my/SupportWritePage.jsx';
+import SupportInquiryDetail from '@/pages/user/my/SupportInquiryDetail.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -211,6 +214,31 @@ const router = createBrowserRouter([
             <MypageLayout title="광고/병원 제휴 문의" left="true">
               <SupportPartnerForm />
             </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/MyInquiry',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="문의 작성" left="true">
+              <SupportMyInquiry />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/myinquiry/detail/:id',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout >
+              <SupportInquiryDetail />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/support/write',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <SupportWritePage/>
           </LayoutShell>
         ),
       },{
