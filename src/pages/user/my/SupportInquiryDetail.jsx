@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore.js';
 import { useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore.js';
 
 // 임시 더미 데이터
 const NOTIFICATIONS = [
@@ -33,21 +33,25 @@ const NOTIFICATIONS = [
 ]
 
 export default function SupportInquiryDetail() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { id } = useParams()
-  const { setInquiry, clearInquiry } =
+  const { currentInquiry, setInquiry, clearInquiry } =
     useSupportInquiryStore()
 
-  const inquiry = NOTIFICATIONS.find(
+  const inquiryFromState = location.state?.inquiry
+  const fallbackInquiry = NOTIFICATIONS.find(
     (item) => item.id === Number(id)
   )
+
+  const inquiry = inquiryFromState || currentInquiry || fallbackInquiry
 
   useEffect(() => {
     if (!inquiry) return
     setInquiry(inquiry)
 
     return () => clearInquiry()
-  }, [inquiry])
+  }, [inquiry, setInquiry, clearInquiry])
 
   if (!inquiry) {
     return (
@@ -106,7 +110,7 @@ export default function SupportInquiryDetail() {
       {/* ================= Bottom Buttons ================= */}
       <footer className="flex gap-3  px-4 py-[32px]">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/index/mypage/support/MyInquiry")}
           className="
             flex-1 rounded-lg border border-[#E0E0E0]
             py-3 text-[15px] font-medium text-[#424242]
