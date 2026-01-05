@@ -14,9 +14,9 @@ export default function TermsAgreementItem({
 
   return (
     <>
-      <div className="flex items-center justify-between border-b border-gray-100 py-3">
+      <div className="flex items-center h-[48px] justify-between py-[14px]">
         {/* 좌측 영역 */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 h-[20px]">
           {/* 체크박스 */}
           <div
             className="flex h-5 w-5 cursor-pointer items-center justify-center"
@@ -25,13 +25,13 @@ export default function TermsAgreementItem({
             <img
               src={checked ? blueImg : grayImg}
               alt={checked ? 'checked' : 'unchecked'}
-              className="h-5 w-5"
+              className="h-[11px] w-[19px]"
             />
           </div>
 
           {/* 약관명 */}
-          <span className="text-sm font-medium text-gray-900">
-            <span className="mr-1 font-bold text-tertiary">
+          <span className="text-[18px] text-tertiary">
+            <span className="mr-1 font-semibold">
               [{required ? '필수' : '선택'}]
             </span>
             {label}
@@ -42,7 +42,7 @@ export default function TermsAgreementItem({
         <button
           type="button"
           onClick={() => setOpenDetail(true)}
-          className="text-sm font-medium text-primary"
+          className="text-[15px] font-medium text-caption"
         >
           자세히
         </button>

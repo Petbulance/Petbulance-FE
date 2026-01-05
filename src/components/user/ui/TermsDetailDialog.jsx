@@ -3,14 +3,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, } from '@/components/
 export default function TermsDetailDialog({ open, onClose, title, content }) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-h-[80vh] w-full max-w-md overflow-y-auto">
+      <DialogContent className="max-h-[80vh] w-full  overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-base font-bold">
+          <DialogTitle className="text-[27px] font-semibold text-[#1e1e1e]">
             {title}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="mt-4 whitespace-pre-line text-sm text-gray-700">
+        <div className="mt-6 whitespace-pre-line text-[16px] text-[#1e1e1e]">
           {content}
         </div>
       </DialogContent>
