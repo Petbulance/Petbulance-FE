@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Users,
-  Stethoscope,
-  MessageSquare,
-  AlertTriangle,
-  Headphones,
-  FileText,
-  Shield,
   Activity,
+  AlertTriangle,
+  FileText,
+  Headphones,
+  LayoutDashboard,
+  MessageSquare,
+  ScrollText,
+  Shield,
+  Stethoscope,
+  Users
 } from 'lucide-react';
 
 import AdminHeader from './AdminHeader';
@@ -30,6 +31,7 @@ export default function AdminLayout() {
     { id: 'content', label: '콘텐츠 관리', icon: FileText, path: '/admin/content' },
     { id: 'admins', label: '관리자 계정', icon: Shield, path: '/admin/admins' },
     { id: 'logs', label: '행동 로그', icon: Activity, path: '/admin/logs' },
+    { id: 'terms', label: '약관 관리', icon: ScrollText, path: '/admin/terms' },
   ];
 
   useEffect(() => {

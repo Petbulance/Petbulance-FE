@@ -43,6 +43,7 @@ import SupportWritePage from '@/pages/user/my/Support/SupportWritePage.jsx';
 import SupportInquiryDetail from '@/pages/user/my/Support/SupportInquiryDetail.jsx';
 import TermsPage from '@/pages/user/my/TermsPage.jsx';
 import TermsDetailPage from '@/pages/user/my/TermsDetailPage.jsx';
+import TermsManage from '@/components/admin/views/TermsManage.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -64,6 +65,7 @@ const router = createBrowserRouter([
       { path: 'content', element: <ContentView /> },
       { path: 'admins', element: <SettingsView /> },
       { path: 'logs', element: <ActivityLogs /> },
+      { path: 'terms',element: <TermsManage /> },
     ],
   },
   {

@@ -1,15 +1,19 @@
 /* 유저 전용 */
 body:not(.admin) #root {
-  /*max-width: 1280px;*/
-  margin: 0 auto;
-  text-align: center;
-  background: #E7F9EF;
+    /*max-width: 1280px;*/
+    margin: 0 auto;
+    text-align: center;
+    background: #E7F9EF;
 }
 
 /* 관리자 전용 */
 body.admin #root {
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  text-align: left;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.ck-editor__editable_inline {
+    min-height: 360px !important;
 }
