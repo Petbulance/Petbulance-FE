@@ -6,9 +6,8 @@ export default function KakaoCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const code = new URL(window.location.href).searchParams.get('code');
-
-    if (!code) {
+    const authCode = new URL(window.location.href).searchParams.get('code');
+    if (!authCode) {
       navigate('/index/auth/login');
       return;
     }
@@ -16,8 +15,8 @@ export default function KakaoCallback() {
     const sendCode = async () => {
       try {
         const res = await api.post('/auth/social/login', {
-          // provider: 'KAKAO',
-          code,
+          provider: 'KAKAO',
+          authCode,
         });
         console.log('로구',res)
         /**
@@ -27,11 +26,10 @@ export default function KakaoCallback() {
          *   refreshToken: 'yyy'
          * }
          */
-        const { accessToken, refreshToken } = res.data;
-
+        // const { accessToken, refreshToken } = res.data;
         // 토큰 저장 (예: localStorage)
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+        // localStorage.setItem('accessToken', accessToken);
+        // localStorage.setItem('refreshToken', refreshToken);
 
         // 메인 페이지 이동
         navigate('/');
