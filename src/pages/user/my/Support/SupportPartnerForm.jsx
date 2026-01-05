@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { Checkbox } from '@/components/ui/checkbox.jsx';
+import { Textarea } from '@/components/ui/textarea.jsx';
+import { Label } from '@/components/ui/label.jsx';
 import ConfirmSupportModal from '@/components/commons/layout/ConfirmSupportModal.jsx';
 
 export default function SupportPartnerForm() {

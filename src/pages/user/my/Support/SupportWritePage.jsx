@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useSupportWriteStore } from '@/stores/useSupportWriteStore';
-import MypageLayout from '@/components/user/layout/MypageLayout';
+import { useSupportWriteStore } from '@/stores/useSupportWriteStore.js';
+import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import SupportWrite from '@/components/user/my/SupportWrite.jsx';
 import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore.js';
 import ConfirmSupportModal from '@/components/commons/layout/ConfirmSupportModal.jsx';
