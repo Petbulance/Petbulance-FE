@@ -36,11 +36,13 @@ import ReviewManage from '@/pages/user/my/ReviewManage.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
 import Notice from '@/pages/user/my/Notice.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
-import Support from '@/pages/user/my/Support.jsx';
-import SupportPartnerForm from '@/pages/user/my/SupportPartnerForm.jsx';
+import Support from '@/pages/user/my/Support/Support.jsx';
+import SupportPartnerForm from '@/pages/user/my/Support/SupportPartnerForm.jsx';
 import SupportMyInquiry from '@/components/user/my/SupportMyInquiry.jsx';
-import SupportWritePage from '@/pages/user/my/SupportWritePage.jsx';
-import SupportInquiryDetail from '@/pages/user/my/SupportInquiryDetail.jsx';
+import SupportWritePage from '@/pages/user/my/Support/SupportWritePage.jsx';
+import SupportInquiryDetail from '@/pages/user/my/Support/SupportInquiryDetail.jsx';
+import TermsPage from '@/pages/user/my/TermsPage.jsx';
+import TermsDetailPage from '@/pages/user/my/TermsDetailPage.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -252,8 +254,17 @@ const router = createBrowserRouter([
         path: '/index/mypage/terms',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MypageLayout title="공지사항" left="true">
-              <BoardManage />
+            <MypageLayout title="약관 및 정책" left="true">
+              <TermsPage />
+            </MypageLayout>
+          </LayoutShell>
+        ),
+      },{
+        path: '/index/mypage/terms/:id',
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <MypageLayout title="약관 및 정책" left="true">
+              <TermsDetailPage />
             </MypageLayout>
           </LayoutShell>
         ),
