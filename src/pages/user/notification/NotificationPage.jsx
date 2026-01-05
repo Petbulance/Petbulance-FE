@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import NotificationHeader from '@/components/user/layout/NotificationHeader.jsx';
-import { ChevronLeft, Settings } from 'lucide-react';
-import NotificationTabs from '@/components/user/noti/NotificationTabs.jsx';
-import NoticeList from '@/components/user/noti/NoticeList.jsx';
+
 import ActivityList from '@/components/user/noti/ActivityList.jsx';
+import NoticeList from '@/components/user/noti/NoticeList.jsx';
+import NotificationTabs from '@/components/user/noti/NotificationTabs.jsx';
+
 const NOTIFICATIONS = [
   /* ================= 공지사항 ================= */
   {
@@ -47,8 +47,7 @@ const NOTIFICATIONS = [
     id: 6,
     type: '활동',
     category: '소형포유류 · 일상/자랑',
-    content:
-      '“햄스터 케이지 추천해주세요” 글에 베테랑님이 댓글을 달았어요.',
+    content: '“햄스터 케이지 추천해주세요” 글에 베테랑님이 댓글을 달았어요.',
     time: '2일 전',
     isNotice: false,
     isRead: false, // ❌ 읽지 않음 (1)
@@ -109,8 +108,7 @@ const NOTIFICATIONS = [
     id: 12,
     type: '활동',
     category: '고양이 · 일상',
-    content:
-      '“고양이 간식 추천해주세요” 글에 집사님이 댓글을 달았어요.',
+    content: '“고양이 간식 추천해주세요” 글에 집사님이 댓글을 달았어요.',
     time: '18일 전',
     isNotice: false,
     isRead: true,
@@ -119,8 +117,7 @@ const NOTIFICATIONS = [
     id: 13,
     type: '활동',
     category: '강아지 · 건강',
-    content:
-      '“강아지 예방접종 주기 궁금해요” 글에 수의사님이 댓글을 달았어요.',
+    content: '“강아지 예방접종 주기 궁금해요” 글에 수의사님이 댓글을 달았어요.',
     time: '20일 전',
     isNotice: false,
     isRead: true,
@@ -139,28 +136,23 @@ const NOTIFICATIONS = [
     id: 15,
     type: '활동',
     category: '소형포유류 · 사육',
-    content:
-      '“햄스터 케이지 청소 주기” 글에 햄찌집사님이 댓글을 달았어요.',
+    content: '“햄스터 케이지 청소 주기” 글에 햄찌집사님이 댓글을 달았어요.',
     time: '25일 전',
     isNotice: false,
     isRead: true,
   },
 ];
 
-
 export default function NotificationPage() {
   const [activeTab, setActiveTab] = useState('공지사항');
 
   return (
-    <div className="flex h-full flex-col ">
-      <NotificationTabs
-        active={activeTab}
-        onChange={setActiveTab}
-      />
+    <div className="flex h-full flex-col">
+      <NotificationTabs active={activeTab} onChange={setActiveTab} />
 
-      <main className="flex-1 overflow-y-auto ">
+      <main className="flex-1 overflow-y-auto">
         {activeTab === '공지사항' ? (
-          <NoticeList  NOTIFICATIONS={NOTIFICATIONS}/>
+          <NoticeList NOTIFICATIONS={NOTIFICATIONS} />
         ) : (
           <ActivityList NOTIFICATIONS={NOTIFICATIONS} />
         )}

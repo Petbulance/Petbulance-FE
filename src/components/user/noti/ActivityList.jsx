@@ -1,7 +1,8 @@
-import { useState } from 'react';
 import { TrashCan } from '@carbon/icons-react';
-import ConfirmDangerModal from '@/components/commons/layout/ConfirmDangerModal.jsx';
+import { useState } from 'react';
 import { toast } from 'sonner';
+
+import ConfirmDangerModal from '@/components/commons/layout/ConfirmDangerModal.jsx';
 
 export default function ActivityList({ NOTIFICATIONS }) {
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -29,7 +30,7 @@ export default function ActivityList({ NOTIFICATIONS }) {
   };
 
   return (
-    <div className="bg-white h-full flex flex-col">
+    <div className="flex h-full flex-col bg-white">
       {/* 상단 액션 */}
       <div className="flex items-center justify-between px-4 py-3 text-xs text-gray-400">
         <button
@@ -47,9 +48,7 @@ export default function ActivityList({ NOTIFICATIONS }) {
       {/* 🔔 Empty State */}
       {activities.length === 0 ? (
         <div className="flex flex-1 items-center justify-center">
-          <p className="text-[18px] text-[#424242]">
-            내 활동 알림이 없어요
-          </p>
+          <p className="text-[18px] text-[#424242]">내 활동 알림이 없어요</p>
         </div>
       ) : (
         activities.map((item) => (
@@ -60,17 +59,11 @@ export default function ActivityList({ NOTIFICATIONS }) {
             }`}
           >
             <div className="mb-1 flex items-center justify-between">
-              <p className="text-[18px] text-caption">
-                {item.category}
-              </p>
-              <p className="text-[18px] text-caption">
-                {item.time}
-              </p>
+              <p className="text-caption text-[18px]">{item.category}</p>
+              <p className="text-caption text-[18px]">{item.time}</p>
             </div>
 
-            <p className="text-[18px] text-[#1e1e1e]">
-              {item.content}
-            </p>
+            <p className="text-[18px] text-[#1e1e1e]">{item.content}</p>
           </div>
         ))
       )}

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function Badge({ children, color = 'gray' }) {
   const COLORS = {
     yellow: 'bg-yellow-100 text-yellow-800 border-yellow-200',

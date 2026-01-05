@@ -1,29 +1,25 @@
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useSupportWriteStore } from '@/stores/useSupportWriteStore';
 
 export default function SupportWrite() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const {
-    title,
-    content,
-    setTitle,
-    setContent,
-    reset,
-  } = useSupportWriteStore()
+  const { title, content, setTitle, setContent, reset } =
+    useSupportWriteStore();
 
   const handleSubmit = async () => {
-    if (!title.trim() || !content.trim()) return
+    if (!title.trim() || !content.trim()) return;
 
     // ✅ TODO: API 연동
-    console.log('SUBMIT', { title, content })
+    console.log('SUBMIT', { title, content });
 
-    reset()
-    navigate(-1)
-  }
+    reset();
+    navigate(-1);
+  };
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -37,14 +33,14 @@ export default function SupportWrite() {
               value={title}
               placeholder="제목을 입력하세요."
               onChange={(e) => setTitle(e.target.value)}
-              className="pr-10 bg-white"
+              className="bg-white pr-10"
             />
 
             {title && (
               <button
                 type="button"
                 onClick={() => setTitle('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
+                className="absolute top-1/2 right-2 -translate-y-1/2 p-1"
               >
                 <X className="h-4 w-4 text-[#9E9E9E]" />
               </button>
@@ -61,10 +57,10 @@ export default function SupportWrite() {
             placeholder="문의 내용을 입력하세요."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="pr-10 bg-white"
+            className="bg-white pr-10"
           />
         </section>
       </main>
     </div>
-  )
+  );
 }

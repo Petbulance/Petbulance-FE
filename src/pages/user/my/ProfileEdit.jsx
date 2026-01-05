@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import cameraIcon from '@/assets/images/icons/cameraIcon.svg';
+import dangerCheckImg from '@/assets/images/icons/dangerCheckImg.svg';
 import defaultImg from '@/assets/images/icons/defaultImg.svg';
 import successCheckImg from '@/assets/images/icons/successCheckImg.svg';
-import dangerCheckImg from '@/assets/images/icons/dangerCheckImg.svg';
 
 export default function ProfileEdit() {
   const navigate = useNavigate();
@@ -21,17 +21,12 @@ export default function ProfileEdit() {
   const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
 
   const isSame = nickname === originalNickname;
-  const isEmpty = nickname.length === 0;
   const isTooShort = nickname.length < 2;
   const isTooLong = nickname.length > 12;
   const hasSpecialChar = !nicknameRegex.test(nickname);
 
   // 저장 가능 여부
-  const canSave =
-    !isSame &&
-    !isTooShort &&
-    !isTooLong &&
-    !hasSpecialChar;
+  const canSave = !isSame && !isTooShort && !isTooLong && !hasSpecialChar;
 
   /* ================= 저장 ================= */
 
@@ -54,12 +49,12 @@ export default function ProfileEdit() {
           <img
             src={profileImage || defaultImg}
             alt="프로필"
-            className="h-24 w-24 rounded-full object-cover border-[0.8px] border-[var(--border-secondary,#757575)]"
+            className="h-24 w-24 rounded-full border-[0.8px] border-[var(--border-secondary,#757575)] object-cover"
           />
 
           <button
             type="button"
-            className="absolute bottom-0 right-0 rounded-full bg-[#EEEEEE] p-1 border-[0.8px] border-[var(--border-secondary,#757575)]"
+            className="absolute right-0 bottom-0 rounded-full border-[0.8px] border-[var(--border-secondary,#757575)] bg-[#EEEEEE] p-1"
             onClick={() => {
               // 이미지 업로드 연결 예정
               console.log('이미지 변경');
@@ -72,22 +67,18 @@ export default function ProfileEdit() {
 
       {/* ================= 닉네임 입력 ================= */}
       <div className="space-y-1">
-        <label className="text-[19px] text-gray-800">
-          닉네임
-        </label>
+        <label className="text-[19px] text-gray-800">닉네임</label>
 
         <input
           type="text"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
-          className="w-full mt-3 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-[20px] text-gray-800"
+          className="mt-3 w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-[20px] text-gray-800"
         />
 
         {/* ================= 상태 메시지 ================= */}
         {isSame ? (
-          <p className="text-[16px] text-gray-800">
-            현재 닉네임이에요
-          </p>
+          <p className="text-[16px] text-gray-800">현재 닉네임이에요</p>
         ) : nickname.length === 0 ? (
           <p className="text-[16px] text-gray-800">
             2~12자, 한글/영문/숫자 사용 가능해요
@@ -108,7 +99,7 @@ export default function ProfileEdit() {
             특수문자는 사용할 수 없어요
           </p>
         ) : (
-          <p className="flex items-center gap-1 text-[16px] text-success">
+          <p className="text-success flex items-center gap-1 text-[16px]">
             <img src={successCheckImg} alt="성공" className="h-3 w-3" />
             사용 가능한 닉네임이에요!
           </p>
@@ -122,7 +113,7 @@ export default function ProfileEdit() {
           disabled={!canSave}
           className={`w-full rounded-xl py-3 text-[27px] font-semibold transition ${
             canSave
-              ? 'border border-success text-success'
+              ? 'border-success text-success border'
               : 'cursor-not-allowed border border-gray-300 text-gray-300'
           }`}
         >

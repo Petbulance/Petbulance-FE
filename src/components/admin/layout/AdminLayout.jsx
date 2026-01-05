@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Activity,
   AlertTriangle,
@@ -10,8 +8,10 @@ import {
   ScrollText,
   Shield,
   Stethoscope,
-  Users
+  Users,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
@@ -22,13 +22,38 @@ export default function AdminLayout() {
   const navigate = useNavigate();
 
   const menuItems = [
-    { id: 'dashboard', label: '대시보드', icon: LayoutDashboard, path: '/admin' },
+    {
+      id: 'dashboard',
+      label: '대시보드',
+      icon: LayoutDashboard,
+      path: '/admin',
+    },
     { id: 'users', label: '유저 관리', icon: Users, path: '/admin/users' },
-    { id: 'hospitals', label: '병원 관리', icon: Stethoscope, path: '/admin/hospitals' },
-    { id: 'reviews', label: '리뷰 관리', icon: MessageSquare, path: '/admin/reviews' },
-    { id: 'community', label: '커뮤 관리', icon: AlertTriangle, path: '/admin/community' },
+    {
+      id: 'hospitals',
+      label: '병원 관리',
+      icon: Stethoscope,
+      path: '/admin/hospitals',
+    },
+    {
+      id: 'reviews',
+      label: '리뷰 관리',
+      icon: MessageSquare,
+      path: '/admin/reviews',
+    },
+    {
+      id: 'community',
+      label: '커뮤 관리',
+      icon: AlertTriangle,
+      path: '/admin/community',
+    },
     { id: 'cs', label: '고객센터', icon: Headphones, path: '/admin/cs' },
-    { id: 'content', label: '콘텐츠 관리', icon: FileText, path: '/admin/content' },
+    {
+      id: 'content',
+      label: '콘텐츠 관리',
+      icon: FileText,
+      path: '/admin/content',
+    },
     { id: 'admins', label: '관리자 계정', icon: Shield, path: '/admin/admins' },
     { id: 'logs', label: '행동 로그', icon: Activity, path: '/admin/logs' },
     { id: 'terms', label: '약관 관리', icon: ScrollText, path: '/admin/terms' },

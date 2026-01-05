@@ -1,9 +1,7 @@
-import emptyReview from '@/assets/images/pageImages/emptyReview.svg';
-import thumbsUpDouble from '@/assets/images/icons/Thumbs-up-double--filled.svg';
-import reviewsCheck from '@/assets/images/icons/ReviewsCheck.svg';
-import ReviewList from '@/components/user/my/reviewManage/ReviewList.jsx';
-import EmptyReview from '@/components/user/my/reviewManage/EmptyReview.jsx';
 import { useState } from 'react';
+
+import EmptyReview from '@/components/user/my/reviewManage/EmptyReview.jsx';
+import ReviewList from '@/components/user/my/reviewManage/ReviewList.jsx';
 
 /* ================= 더미 데이터 ================= */
 const DUMMY_REVIEWS = [
@@ -152,7 +150,6 @@ const DUMMY_REVIEWS = [
   },
 ];
 
-
 export default function ReviewManage() {
   const [reviews, setReviews] = useState(DUMMY_REVIEWS);
   const [backupReviews, setBackupReviews] = useState([]);
@@ -174,4 +171,3 @@ export default function ReviewManage() {
     </div>
   );
 }
-

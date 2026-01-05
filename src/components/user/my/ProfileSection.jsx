@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import ConfirmSuccessModal from '@/components/commons/layout/ConfirmSuccessModal.jsx';
 
 export default function ProfileSection({ isLoggedIn, user }) {
@@ -13,9 +14,7 @@ export default function ProfileSection({ isLoggedIn, user }) {
           <div className="flex justify-between">
             <div>
               <h1 className="text-sm font-semibold">로그인 해주세요</h1>
-              <p className="text-xs text-caption">
-                회원가입까지 단 3초!
-              </p>
+              <p className="text-caption text-xs">회원가입까지 단 3초!</p>
             </div>
 
             <button
@@ -32,7 +31,8 @@ export default function ProfileSection({ isLoggedIn, user }) {
           title="알림"
           content={
             <>
-              로그인이 필요한 서비스예요.<br />
+              로그인이 필요한 서비스예요.
+              <br />
               로그인하시겠어요?
             </>
           }
@@ -57,19 +57,15 @@ export default function ProfileSection({ isLoggedIn, user }) {
             className="h-10 w-10 rounded-full object-cover"
           />
           <div>
-            <p className="text-sm font-semibold">
-              {user.name}
-            </p>
-            <p className="text-xs text-gray-400">
-              {user.email}
-            </p>
+            <p className="text-sm font-semibold">{user.name}</p>
+            <p className="text-xs text-gray-400">{user.email}</p>
           </div>
         </div>
 
         {/* 우측 버튼 */}
         <button
           onClick={() => navigate('/index/mypage/profile/edit')}
-          className="rounded-md border border-success px-3 py-1 text-xs font-medium text-success"
+          className="border-success text-success rounded-md border px-3 py-1 text-xs font-medium"
         >
           프로필 수정
         </button>

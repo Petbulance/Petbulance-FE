@@ -1,49 +1,49 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import App from '@/App.jsx';
-import AdminLogin from '@/pages/admin/auth/AdminLogin.jsx';
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
+import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
+import CommunityManagementView from '@/components/admin/views/CommunityManagementView.jsx';
+import ContentView from '@/components/admin/views/ContentView.jsx';
+import CustomerCenterView from '@/components/admin/views/CustomerCenterView.jsx';
 import DashboardView from '@/components/admin/views/DashboardView.jsx';
-import UserManagementView from '@/components/admin/views/UserManagementView.jsx';
 import HospitalView from '@/components/admin/views/HospitalView.jsx';
 import ReviewView from '@/components/admin/views/ReviewView.jsx';
-import CommunityManagementView from '@/components/admin/views/CommunityManagementView.jsx';
-import CustomerCenterView from '@/components/admin/views/CustomerCenterView.jsx';
 import SettingsView from '@/components/admin/views/SettingsView.jsx';
-import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
-import ContentView from '@/components/admin/views/ContentView.jsx';
-import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
-import SignupComplete from '@/components/user/SignupComplete.jsx';
-import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
-import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
-import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
-import Home from '@/pages/user/Home.jsx';
-import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
-import MainLayout from '@/components/user/layout/MainLayout.jsx';
+import TermsManage from '@/components/admin/views/TermsManage.jsx';
+import UserManagementView from '@/components/admin/views/UserManagementView.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
-import MyPage from '@/pages/user/my/MyPage.jsx';
+import MainLayout from '@/components/user/layout/MainLayout.jsx';
+import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
+import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
+import SupportMyInquiry from '@/components/user/my/SupportMyInquiry.jsx';
+import SignupComplete from '@/components/user/SignupComplete.jsx';
+import AdminLogin from '@/pages/admin/auth/AdminLogin.jsx';
+import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
+import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
+import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
+import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
+import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
+import Home from '@/pages/user/Home.jsx';
 import Hospitals from '@/pages/user/Hospitals.jsx';
 import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
-import ProfileEdit from '@/pages/user/my/ProfileEdit.jsx';
-import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
-import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
-import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
-import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
 import Authorization from '@/pages/user/my/Authorization.jsx';
-import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
-import ReviewManage from '@/pages/user/my/ReviewManage.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
+import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
+import MyPage from '@/pages/user/my/MyPage.jsx';
 import Notice from '@/pages/user/my/Notice.jsx';
-import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
+import ProfileEdit from '@/pages/user/my/ProfileEdit.jsx';
+import ReviewManage from '@/pages/user/my/ReviewManage.jsx';
 import Support from '@/pages/user/my/Support/Support.jsx';
-import SupportPartnerForm from '@/pages/user/my/Support/SupportPartnerForm.jsx';
-import SupportMyInquiry from '@/components/user/my/SupportMyInquiry.jsx';
-import SupportWritePage from '@/pages/user/my/Support/SupportWritePage.jsx';
 import SupportInquiryDetail from '@/pages/user/my/Support/SupportInquiryDetail.jsx';
-import TermsPage from '@/pages/user/my/TermsPage.jsx';
+import SupportPartnerForm from '@/pages/user/my/Support/SupportPartnerForm.jsx';
+import SupportWritePage from '@/pages/user/my/Support/SupportWritePage.jsx';
 import TermsDetailPage from '@/pages/user/my/TermsDetailPage.jsx';
-import TermsManage from '@/components/admin/views/TermsManage.jsx';
+import TermsPage from '@/pages/user/my/TermsPage.jsx';
+import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
+import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
+import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
       { path: 'content', element: <ContentView /> },
       { path: 'admins', element: <SettingsView /> },
       { path: 'logs', element: <ActivityLogs /> },
-      { path: 'terms',element: <TermsManage /> },
+      { path: 'terms', element: <TermsManage /> },
     ],
   },
   {
@@ -89,7 +89,8 @@ const router = createBrowserRouter([
             </MainLayout>
           </LayoutShell>
         ),
-      },     {
+      },
+      {
         path: 'hospitals',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -108,7 +109,8 @@ const router = createBrowserRouter([
             </MainLayout>
           </LayoutShell>
         ),
-      },  {
+      },
+      {
         path: 'community',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -148,7 +150,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },  {
+      },
+      {
         path: '/index/mypage/loginsetting',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -157,7 +160,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      }, {
+      },
+      {
         path: '/index/mypage/reviewmanage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -166,7 +170,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      }, {
+      },
+      {
         path: '/index/mypage/boardmanage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -175,7 +180,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/commentmanage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -184,7 +190,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/notice',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -193,7 +200,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/notice/:id',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -202,7 +210,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/support',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -211,7 +220,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/support/partner',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -220,7 +230,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/support/MyInquiry',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -229,30 +240,34 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/support/myinquiry/detail/:id',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MypageLayout >
+            <MypageLayout>
               <SupportInquiryDetail />
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/support/myinquiry/modify/:id',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <SupportWritePage/>
+            <SupportWritePage />
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/support/write',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <SupportWritePage/>
+            <SupportWritePage />
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/terms',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -261,7 +276,8 @@ const router = createBrowserRouter([
             </MypageLayout>
           </LayoutShell>
         ),
-      },{
+      },
+      {
         path: '/index/mypage/terms/:id',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -274,11 +290,11 @@ const router = createBrowserRouter([
       // 로그인 관련
       {
         path: 'auth/login',
-        element:
+        element: (
           <LayoutShell banner={<ServiceBanner />}>
             <SocialSignUp />
           </LayoutShell>
-
+        ),
       },
       {
         path: 'auth/signupcomplete',
@@ -287,12 +303,13 @@ const router = createBrowserRouter([
       // 알림
       {
         path: 'notification',
-        element:
+        element: (
           <LayoutShell banner={<ServiceBanner />}>
             <NotiLayout title="알림">
               <NotificationPage />
             </NotiLayout>
-          </LayoutShell>,
+          </LayoutShell>
+        ),
       },
       {
         path: 'notification/setting',
@@ -304,7 +321,6 @@ const router = createBrowserRouter([
           </LayoutShell>
         ),
       },
-
     ],
   },
   // 노티

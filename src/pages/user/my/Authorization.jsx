@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { Switch } from '@/components/ui/switch.jsx';
 
 export default function Authorization() {
@@ -11,9 +12,7 @@ export default function Authorization() {
       <div className="divide-y">
         {/* 위치 기반 서비스 */}
         <div className="flex items-center justify-between border-t px-4 py-4">
-          <span className="text-[16px]">
-            위치기반 서비스 이용 동의
-          </span>
+          <span className="text-[16px]">위치기반 서비스 이용 동의</span>
           <Switch
             checked={location}
             onCheckedChange={setLocation}
@@ -23,9 +22,7 @@ export default function Authorization() {
 
         {/* 마케팅 활용 */}
         <div className="flex items-center justify-between px-4 py-4">
-          <span className="text-[16px]">
-            마케팅 활용 및 광고성 정보 수신
-          </span>
+          <span className="text-[16px]">마케팅 활용 및 광고성 정보 수신</span>
           <Switch
             checked={marketing}
             onCheckedChange={setMarketing}
@@ -35,9 +32,7 @@ export default function Authorization() {
 
         {/* 카메라 */}
         <div className="flex items-center justify-between border-b px-4 py-4">
-          <span className="text-[16px]">
-            카메라 이용 동의
-          </span>
+          <span className="text-[16px]">카메라 이용 동의</span>
           <Switch
             checked={camera}
             onCheckedChange={setCamera}

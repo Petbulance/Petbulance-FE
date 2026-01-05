@@ -60,9 +60,7 @@ const CONTENT_LOGS = Array.from({ length: 12 }).map((_, i) => ({
   datetime: formatDate(400 + i * 10),
   adminName: pick(admins, i),
   page: '콘텐츠관리',
-  action: `공지사항 ${
-    ['등록', '수정', '삭제'][i % 3]
-  }`,
+  action: `공지사항 ${['등록', '수정', '삭제'][i % 3]}`,
   result: pick(results, i),
 }));
 
@@ -74,10 +72,7 @@ const SYSTEM_LOGS = Array.from({ length: 12 }).map((_, i) => ({
   datetime: formatDate(600 + i * 10),
   adminName: '시스템',
   page: '자동처리',
-  action: pick(
-    ['배치 작업 실행', '통계 집계', '로그 정리'],
-    i
-  ),
+  action: pick(['배치 작업 실행', '통계 집계', '로그 정리'], i),
   result: '성공',
 }));
 

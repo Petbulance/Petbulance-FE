@@ -1,14 +1,8 @@
+import { LogOut } from 'lucide-react';
+
 import logo from '@/assets/images/logo/pet_logo.svg';
-import {
-LogOut
-} from 'lucide-react';
-export default function AdminSidebar({
-                                       menus,
-                                       isOpen,
-                                       currentPath,
-                                       onChange,
-                                       onToggle,
-                                     }) {
+
+export default function AdminSidebar({ menus, isOpen, currentPath, onChange }) {
   return (
     <aside
       className={`${isOpen ? 'w-64' : 'w-20'} z-20 flex flex-col border-r border-gray-200 bg-white shadow-sm transition-all duration-300`}
@@ -52,8 +46,8 @@ export default function AdminSidebar({
       </nav>
 
       {/* 토글 */}
-      <div className="p-4 border-t border-gray-100">
-        <button className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:text-red-600 w-full rounded-lg hover:bg-red-50 transition-colors">
+      <div className="border-t border-gray-100 p-4">
+        <button className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600">
           <LogOut size={20} />
           로그아웃
         </button>

@@ -1,4 +1,6 @@
 import Autoplay from 'embla-carousel-autoplay';
+import { Star } from 'lucide-react';
+
 import {
   Carousel,
   CarouselContent,
@@ -48,8 +50,7 @@ const REVIEWS = [
     rating: 4.5,
     count: 87,
     image: 'https://picsum.photos/seed/hospital5/200/200',
-    content:
-      '강아지 예방접종으로 방문했는데 친절하고 비용도 합리적이었어요.',
+    content: '강아지 예방접종으로 방문했는데 친절하고 비용도 합리적이었어요.',
   },
   {
     id: 6,
@@ -66,8 +67,7 @@ const REVIEWS = [
     rating: 4.3,
     count: 65,
     image: 'https://picsum.photos/seed/hospital7/200/200',
-    content:
-      '도마뱀 진료가 가능한 병원이라 방문했습니다. 전문성이 느껴졌어요.',
+    content: '도마뱀 진료가 가능한 병원이라 방문했습니다. 전문성이 느껴졌어요.',
   },
   {
     id: 8,
@@ -75,8 +75,7 @@ const REVIEWS = [
     rating: 4.6,
     count: 143,
     image: 'https://picsum.photos/seed/hospital8/200/200',
-    content:
-      '대기시간은 조금 있었지만 진료가 꼼꼼해서 충분히 만족했습니다.',
+    content: '대기시간은 조금 있었지만 진료가 꼼꼼해서 충분히 만족했습니다.',
   },
   {
     id: 9,
@@ -84,8 +83,7 @@ const REVIEWS = [
     rating: 4.2,
     count: 54,
     image: 'https://picsum.photos/seed/hospital9/200/200',
-    content:
-      '동네 병원이라 편하게 방문했어요. 전반적으로 무난했습니다.',
+    content: '동네 병원이라 편하게 방문했어요. 전반적으로 무난했습니다.',
   },
   {
     id: 10,
@@ -93,12 +91,9 @@ const REVIEWS = [
     rating: 4.8,
     count: 189,
     image: 'https://picsum.photos/seed/hospital10/200/200',
-    content:
-      '시설이 최신식이고 의료진이 정말 전문적이라는 느낌을 받았습니다.',
+    content: '시설이 최신식이고 의료진이 정말 전문적이라는 느낌을 받았습니다.',
   },
 ];
-
-import { Star } from 'lucide-react';
 
 function RatingStars({ rating }) {
   const filledStars = Math.floor(rating); // 4.8 → 4
@@ -142,10 +137,7 @@ export default function LatestReceiptReview() {
       >
         <CarouselContent className="-ml-4">
           {REVIEWS.map((review) => (
-            <CarouselItem
-              key={review.id}
-              className="basis-[70%] pl-4"
-            >
+            <CarouselItem key={review.id} className="basis-[70%] pl-4">
               {/* 카드 */}
               <div className="flex gap-3 rounded-xl bg-gray-100 p-3 shadow-sm">
                 {/* 좌측 이미지 */}
@@ -165,12 +157,11 @@ export default function LatestReceiptReview() {
                     <span>· 후기 {review.count}</span>
                   </div>
 
-                  <p className="mt-1 text-xs text-gray-500 line-clamp-2">
+                  <p className="mt-1 line-clamp-2 text-xs text-gray-500">
                     {review.content}
                   </p>
                 </div>
               </div>
-
             </CarouselItem>
           ))}
         </CarouselContent>

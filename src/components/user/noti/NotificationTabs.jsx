@@ -1,4 +1,4 @@
-export default  function NotificationTabs({ active, onChange }) {
+export default function NotificationTabs({ active, onChange }) {
   return (
     <div className="flex border-b border-gray-200 bg-white">
       {['공지사항', '내 활동'].map((tab) => (

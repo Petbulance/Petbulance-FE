@@ -5,11 +5,11 @@ import ConfirmDangerModal from '@/components/commons/layout/ConfirmDangerModal.j
 import ReviewItem from '@/components/user/my/reviewManage/ReviewItem.jsx';
 
 export default function ReviewList({
-                                     reviews,
-                                     setReviews,
-                                     backupReviews,
-                                     setBackupReviews,
-                                   }) {
+  reviews,
+  setReviews,
+  backupReviews,
+  setBackupReviews,
+}) {
   const [openConfirm, setOpenConfirm] = useState(false);
 
   const handleConfirmDelete = () => {
@@ -85,10 +85,7 @@ export default function ReviewList({
       {/* 상단 바 */}
       <div className="flex h-[48px] items-center justify-between border-b px-[24px]">
         <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            className="h-[18px] w-[18px]"
-          />
+          <input type="checkbox" className="h-[18px] w-[18px]" />
           <p className="text-[18px] font-medium">전체선택</p>
         </label>
 
@@ -103,10 +100,7 @@ export default function ReviewList({
 
       {/* 리뷰 리스트 */}
       {reviews.map((review) => (
-        <ReviewItem
-          key={review.id}
-          review={review}
-        />
+        <ReviewItem key={review.id} review={review} />
       ))}
 
       {/* 삭제 확인 모달 */}

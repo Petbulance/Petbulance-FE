@@ -21,8 +21,8 @@ export const CONTENTS = Array.from({ length: 50 }).map((_, i) => {
       i % 3 === 0
         ? '상시게시'
         : `24.10.${String((i % 28) + 1).padStart(2, '0')} ~ 24.11.${String(
-          (i % 28) + 1
-        ).padStart(2, '0')}`,
+            (i % 28) + 1
+          ).padStart(2, '0')}`,
     createdAt: `2024.10.${String((i % 28) + 1).padStart(2, '0')}`,
   };
 });

@@ -1,49 +1,44 @@
+import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useSupportWriteStore } from '@/stores/useSupportWriteStore.js';
+
+import ConfirmSupportModal from '@/components/commons/layout/ConfirmSupportModal.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import SupportWrite from '@/components/user/my/SupportWrite.jsx';
 import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore.js';
-import ConfirmSupportModal from '@/components/commons/layout/ConfirmSupportModal.jsx';
-import { X } from 'lucide-react';
+import { useSupportWriteStore } from '@/stores/useSupportWriteStore.js';
 
 export default function SupportWritePage() {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const {
-    title,
-    content,
-    reset,
-    setFromInquiry,
-  } = useSupportWriteStore()
+  const { title, content, reset, setFromInquiry } = useSupportWriteStore();
 
-  const [modalOpen, setModalOpen] = useState(false)
-  const [createdInquiry, setCreatedInquiry] = useState(null)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [createdInquiry, setCreatedInquiry] = useState(null);
 
-  const { currentInquiry, setInquiry } = useSupportInquiryStore()
+  const { currentInquiry, setInquiry } = useSupportInquiryStore();
 
-  const inquiryFromState = location.state?.inquiry
+  const inquiryFromState = location.state?.inquiry;
 
-  const isWrite = location.pathname.includes('/write')
-  const isModify = location.pathname.includes('/modify')
+  const isWrite = location.pathname.includes('/write');
+  const isModify = location.pathname.includes('/modify');
 
-  const canSubmit =
-    title.trim().length > 0 && content.trim().length > 0
+  const canSubmit = title.trim().length > 0 && content.trim().length > 0;
 
   useEffect(() => {
-    if (!isModify) return
+    if (!isModify) return;
 
-    const inquiry = inquiryFromState || currentInquiry
+    const inquiry = inquiryFromState || currentInquiry;
 
     if (inquiry) {
-      setFromInquiry(inquiry)
+      setFromInquiry(inquiry);
     }
-  }, [isModify, inquiryFromState, currentInquiry, setFromInquiry])
+  }, [isModify, inquiryFromState, currentInquiry, setFromInquiry]);
 
   const handleSubmit = async () => {
-    if (!canSubmit) return
+    if (!canSubmit) return;
 
     try {
       if (isWrite) {
@@ -54,20 +49,20 @@ export default function SupportWritePage() {
           date: new Date().toISOString().split('T')[0],
           answer: '',
           answerDate: '',
-        }
+        };
 
-        setInquiry(newInquiry)
-        setCreatedInquiry(newInquiry)
-        setModalOpen(true)
-        return
+        setInquiry(newInquiry);
+        setCreatedInquiry(newInquiry);
+        setModalOpen(true);
+        return;
       }
 
       if (isModify) {
         // TODO: 수정 API
-        console.log('UPDATE', { title, content })
+        console.log('UPDATE', { title, content });
 
-        navigate(-1)
-        reset()
+        navigate(-1);
+        reset();
         toast('문의를 수정했어요', {
           position: 'bottom-center',
           duration: 4000,
@@ -81,11 +76,9 @@ export default function SupportWritePage() {
             color: '#ffffff',
           },
           action: {
-            label: (
-              <X className="h-4 w-4 text-white" />
-            ),
+            label: <X className="h-4 w-4 text-white" />,
             onClick: () => {
-              toast.dismiss()
+              toast.dismiss();
               // handleUndoDelete(snapshot);
             },
           },
@@ -96,12 +89,13 @@ export default function SupportWritePage() {
             padding: 0,
             marginLeft: '24px',
           },
-        })
+        });
       }
     } catch (e) {
-      toast('처리 중 오류가 발생했어요')
+      console.error(e);
+      toast('처리 중 오류가 발생했어요');
     }
-  }
+  };
 
   return (
     <>
@@ -118,22 +112,22 @@ export default function SupportWritePage() {
         confirmText="내 문의 확인"
         cancelText="닫기"
         onCancel={() => {
-          reset()
-          setModalOpen(false)
-          navigate('/index/mypage/support/MyInquiry')
+          reset();
+          setModalOpen(false);
+          navigate('/index/mypage/support/MyInquiry');
         }}
         onConfirm={() => {
-          if (!createdInquiry) return
+          if (!createdInquiry) return;
 
           navigate(
             `/index/mypage/support/myinquiry/detail/${createdInquiry.id}`,
-            { state: { inquiry: createdInquiry } },
-          )
+            { state: { inquiry: createdInquiry } }
+          );
 
-          reset()
-          setModalOpen(false)
+          reset();
+          setModalOpen(false);
         }}
       />
     </>
-  )
+  );
 }

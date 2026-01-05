@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Lock, Mail, ArrowRight } from 'lucide-react';
+import { ArrowRight, Lock, Mail } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AdminLogin() {
@@ -20,10 +20,10 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white border border-gray-100 shadow-xl rounded-3xl p-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4">
+      <div className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-8 shadow-xl">
         {/* 헤더 */}
-        <div className="mb-8 text-center space-y-1">
+        <div className="mb-8 space-y-1 text-center">
           <h1 className="text-3xl font-black text-gray-800">
             PETBULANCE 관리자
           </h1>
@@ -32,15 +32,15 @@ export default function AdminLogin() {
         {/* 로그인 폼 */}
         <form className="space-y-6" onSubmit={handleSubmit}>
           {/* 이메일 */}
-          <div className="space-y-2 ">
+          <div className="space-y-2">
             <label className="text-xs font-bold text-gray-500">이메일</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
                 // type=""
                 value={adminId}
                 onChange={(e) => setAdminId(e.target.value)}
-                className="w-full pl-9 pr-3 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-4 focus:ring-blue-100 text-sm"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pr-3 pl-9 text-sm focus:ring-4 focus:ring-blue-100 focus:outline-none"
                 placeholder="admin@example.com"
                 required
               />
@@ -51,17 +51,17 @@ export default function AdminLogin() {
           <div className="space-y-2">
             <label className="text-xs font-bold text-gray-500">비밀번호</label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Lock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-4 focus:ring-blue-100 text-sm"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pr-3 pl-9 text-sm focus:ring-4 focus:ring-blue-100 focus:outline-none"
                 placeholder="비밀번호를 입력하세요"
                 required
               />
             </div>
-           {/* <div className="flex items-center justify-between text-xs text-gray-500">
+            {/* <div className="flex items-center justify-between text-xs text-gray-500">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="w-4 h-4 rounded border-gray-300" defaultChecked />
                 로그인 상태 유지
@@ -76,14 +76,12 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-[#2DA969]  text-white font-black py-3 rounded-xl shadow-lg shadow-blue-100 transition-all disabled:opacity-60 cursor-pointer"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2DA969] py-3 font-black text-white shadow-lg shadow-blue-100 transition-all disabled:opacity-60"
           >
             {loading ? '로그인 중...' : '관리자 로그인'}
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="h-4 w-4" />
           </button>
         </form>
-
-
       </div>
     </div>
   );

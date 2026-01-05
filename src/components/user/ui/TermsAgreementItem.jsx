@@ -1,22 +1,24 @@
 import { useState } from 'react';
-import TermsDetailDialog from './TermsDetailDialog.jsx';
-import grayImg from '@/assets/images/icons/gray_bottom_arrow.svg';
+
 import blueImg from '@/assets/images/icons/blue_bottom_arrow.svg';
+import grayImg from '@/assets/images/icons/gray_bottom_arrow.svg';
+
+import TermsDetailDialog from './TermsDetailDialog.jsx';
 
 export default function TermsAgreementItem({
-                                             label,
-                                             checked,
-                                             onCheckedChange,
-                                             children,
-                                             required = false,
-                                           }) {
+  label,
+  checked,
+  onCheckedChange,
+  children,
+  required = false,
+}) {
   const [openDetail, setOpenDetail] = useState(false);
 
   return (
     <>
-      <div className="flex items-center h-[48px] justify-between py-[14px]">
+      <div className="flex h-[48px] items-center justify-between py-[14px]">
         {/* 좌측 영역 */}
-        <div className="flex items-center gap-3 h-[20px]">
+        <div className="flex h-[20px] items-center gap-3">
           {/* 체크박스 */}
           <div
             className="flex h-5 w-5 cursor-pointer items-center justify-center"
@@ -30,7 +32,7 @@ export default function TermsAgreementItem({
           </div>
 
           {/* 약관명 */}
-          <span className="text-[18px] text-tertiary">
+          <span className="text-tertiary text-[18px]">
             <span className="mr-1 font-semibold">
               [{required ? '필수' : '선택'}]
             </span>
@@ -42,7 +44,7 @@ export default function TermsAgreementItem({
         <button
           type="button"
           onClick={() => setOpenDetail(true)}
-          className="text-[15px] font-medium text-caption"
+          className="text-caption text-[15px] font-medium"
         >
           자세히
         </button>

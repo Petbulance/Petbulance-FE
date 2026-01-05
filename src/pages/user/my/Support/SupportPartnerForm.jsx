@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.jsx';
-import { Input } from '@/components/ui/input.jsx';
-import { Checkbox } from '@/components/ui/checkbox.jsx';
-import { Textarea } from '@/components/ui/textarea.jsx';
-import { Label } from '@/components/ui/label.jsx';
+
 import ConfirmSupportModal from '@/components/commons/layout/ConfirmSupportModal.jsx';
+import { Checkbox } from '@/components/ui/checkbox.jsx';
+import { Input } from '@/components/ui/input.jsx';
+import { Label } from '@/components/ui/label.jsx';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.jsx';
+import { Textarea } from '@/components/ui/textarea.jsx';
 
 export default function SupportPartnerForm() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   /* ================= 상태 ================= */
   const [form, setForm] = useState({
@@ -21,12 +22,12 @@ export default function SupportPartnerForm() {
     interests: [],
     content: '',
     agree: false,
-  })
-  const [modal, setModal] = useState(false)
+  });
+  const [modal, setModal] = useState(false);
   /* ================= handlers ================= */
   const updateField = (key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }))
-  }
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const toggleInterest = (value) => {
     setForm((prev) => ({
@@ -34,44 +35,44 @@ export default function SupportPartnerForm() {
       interests: prev.interests.includes(value)
         ? prev.interests.filter((v) => v !== value)
         : [...prev.interests, value],
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = () => {
-    if (!form.agree) return
+    if (!form.agree) return;
 
     const payload = {
-      inquiryType: form.type,          // ad | partner
+      inquiryType: form.type, // ad | partner
       companyName: form.companyName,
       managerName: form.managerName,
       position: form.position,
       phone: form.phone,
       email: form.email,
-      interests: form.interests,        // array
+      interests: form.interests, // array
       content: form.content,
-    }
+    };
 
-    console.log('📦 API Payload:', payload)
+    console.log('📦 API Payload:', payload);
 
     // TODO: API 연동
     // await api.post('/support/partner', payload)
 
     // 성공 시
     // navigate(-1)
-    setModal(true)
-  }
+    setModal(true);
+  };
 
   const isSubmitDisabled =
     !form.companyName ||
     !form.managerName ||
     !form.phone ||
     !form.content ||
-    !form.agree
+    !form.agree;
 
   return (
     <div className="flex h-full flex-col bg-white">
       {/* ================= Content ================= */}
-      <main className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+      <main className="flex-1 space-y-6 overflow-y-auto px-4 py-5">
         {/* 문의 유형 */}
         <section>
           <p className="mb-2 text-[14px] font-medium text-[#1e1e1e]">
@@ -86,12 +87,12 @@ export default function SupportPartnerForm() {
             onValueChange={(v) => updateField('type', v)}
             className="flex gap-6"
           >
-            <Label className="flex items-center gap-2 cursor-pointer text-[14px]">
+            <Label className="flex cursor-pointer items-center gap-2 text-[14px]">
               <RadioGroupItem value="ad" />
               광고 문의
             </Label>
 
-            <Label className="flex items-center gap-2 cursor-pointer text-[14px]">
+            <Label className="flex cursor-pointer items-center gap-2 text-[14px]">
               <RadioGroupItem value="partner" />
               병원 제휴 문의
             </Label>
@@ -159,7 +160,7 @@ export default function SupportPartnerForm() {
             {['배너 광고', '병원 등록', '이벤트 협업', '기타'].map((item) => (
               <Label
                 key={item}
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex cursor-pointer items-center gap-2"
               >
                 <Checkbox
                   checked={form.interests.includes(item)}
@@ -183,7 +184,7 @@ export default function SupportPartnerForm() {
         </section>
 
         {/* 동의 */}
-        <Label className="flex items-start gap-2 text-[13px] text-[#424242] cursor-pointer">
+        <Label className="flex cursor-pointer items-start gap-2 text-[13px] text-[#424242]">
           <Checkbox
             checked={form.agree}
             onCheckedChange={(v) => updateField('agree', v)}
@@ -198,22 +199,20 @@ export default function SupportPartnerForm() {
         <button
           disabled={isSubmitDisabled}
           onClick={handleSubmit}
-          className={`
-            w-full rounded-lg py-3 text-[15px] font-medium text-white
-            ${isSubmitDisabled ? 'bg-[#E0E0E0]' : 'bg-[#27BE69]'}
-          `}
+          className={`w-full rounded-lg py-3 text-[15px] font-medium text-white ${isSubmitDisabled ? 'bg-[#E0E0E0]' : 'bg-[#27BE69]'} `}
         >
           문의 제출
         </button>
       </footer>
-      <ConfirmSupportModal open={modal} title="문의 제출이 완료되었습니다."
-                           content="담당자 확인 후 연락드릴게요." confirmText="홈으로"
-                           cancelText="닫기"
-                           onCancel={() => setModal(false)}
-                           onConfirm={() => navigate('/index/home')}
-      >
-
-      </ConfirmSupportModal>
+      <ConfirmSupportModal
+        open={modal}
+        title="문의 제출이 완료되었습니다."
+        content="담당자 확인 후 연락드릴게요."
+        confirmText="홈으로"
+        cancelText="닫기"
+        onCancel={() => setModal(false)}
+        onConfirm={() => navigate('/index/home')}
+      ></ConfirmSupportModal>
     </div>
-  )
+  );
 }

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import api from '@/apis/api.jsx';
 
 export default function KakaoCallback() {
@@ -18,7 +19,7 @@ export default function KakaoCallback() {
           provider: 'KAKAO',
           authCode,
         });
-        console.log('로구',res)
+        console.log('로구', res);
         /**
          * ⬇️ 서버 응답 예시
          * {

@@ -13,11 +13,8 @@ export default function MypageLeftHeader({ title }) {
         </button>
 
         {/* 왼쪽 정렬 타이틀 */}
-        <h1 className="text-[25px] font-semibold text-gray-900">
-          {title}
-        </h1>
+        <h1 className="text-[25px] font-semibold text-gray-900">{title}</h1>
       </div>
     </header>
-
   );
 }

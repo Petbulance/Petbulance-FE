@@ -2,7 +2,7 @@ import communityComingSoon from '@/assets/images/pageImages/community-coming-soo
 
 export default function CommunityPage() {
   return (
-    <div className="flex mt-50 flex-col px-6 text-center">
+    <div className="mt-50 flex flex-col px-6 text-center">
       <div className="flex items-center justify-center">
         <img
           src={communityComingSoon}
@@ -12,13 +12,11 @@ export default function CommunityPage() {
       </div>
 
       <div className="mt-5">
-        <h2 className="text-base font-semibold text-tertiary">
+        <h2 className="text-tertiary text-base font-semibold">
           커뮤니티 기능 준비중이에요!
         </h2>
 
-        <p className=" mt-3 text-sm text-tertiary">
-          빠른 시일 내에 찾아뵐게요.
-        </p>
+        <p className="text-tertiary mt-3 text-sm">빠른 시일 내에 찾아뵐게요.</p>
       </div>
     </div>
   );

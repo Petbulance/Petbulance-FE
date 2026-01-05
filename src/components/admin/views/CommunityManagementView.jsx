@@ -1,15 +1,10 @@
-import {
-  Flag,
-  Slash,
-  AlertTriangle,
-  Plus,
-  XCircle,
-} from 'lucide-react';
-import React, { useState } from 'react';
+import { AlertTriangle, Plus, XCircle } from 'lucide-react';
+import { useState } from 'react';
+
+import { COMMUNITY_REPORTS } from '@/components/admin/mock/communityReports.mock';
+import Pagination from '@/components/admin/Pagination.jsx';
 
 import { Badge } from '../ui/Badge';
-import Pagination from '@/components/admin/Pagination.jsx';
-import { COMMUNITY_REPORTS } from '@/components/admin/mock/communityReports.mock';
 
 const PAGE_SIZE = 10;
 
@@ -23,19 +18,12 @@ export default function CommunityManagementView() {
     page * PAGE_SIZE
   );
 
-  const forbiddenWords = [
-    '바보',
-    '멍청이',
-    '비추천',
-    '광고글',
-    '스팸단어',
-  ];
+  const forbiddenWords = ['바보', '멍청이', '비추천', '광고글', '스팸단어'];
 
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
-
       {/* 탭 */}
-    {/*  <div className="flex border-b border-gray-200">
+      {/*  <div className="flex border-b border-gray-200">
         <button
           onClick={() => setActiveTab('reports')}
           className={`flex items-center gap-2 px-8 py-4 text-sm font-bold ${
@@ -62,96 +50,82 @@ export default function CommunityManagementView() {
       {/* ================= 신고 관리 ================= */}
       {activeTab === 'reports' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-800">
-              커뮤니티 관리
-            </h2>
-         {/*   <span className="text-xs text-gray-500">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-800">커뮤니티 관리</h2>
+            {/*   <span className="text-xs text-gray-500">
               최신순 10개씩 보기
             </span>*/}
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full text-sm text-left table-fixed ">
-              <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="w-[8%] px-6 py-3">유형</th>
-                <th className="w-[32%] px-6 py-3">
-                  콘텐츠 (제목/내용)
-                </th>
-                <th className="w-[15%] px-6 py-3">신고 사유</th>
-                <th className="w-[15%] px-6 py-3">신고일</th>
-                <th className="w-[10%] px-6 py-3">상태</th>
-                <th className="w-[20%] px-6 py-3">
-                  판단 및 조치
-                </th>
-              </tr>
+          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <table className="w-full table-fixed text-left text-sm">
+              <thead className="border-b border-gray-100 bg-gray-50">
+                <tr>
+                  <th className="w-[8%] px-6 py-3">유형</th>
+                  <th className="w-[32%] px-6 py-3">콘텐츠 (제목/내용)</th>
+                  <th className="w-[15%] px-6 py-3">신고 사유</th>
+                  <th className="w-[15%] px-6 py-3">신고일</th>
+                  <th className="w-[10%] px-6 py-3">상태</th>
+                  <th className="w-[20%] px-6 py-3">판단 및 조치</th>
+                </tr>
               </thead>
 
               <tbody className="divide-y border-gray-100">
-              {pagedList.map((item) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-blue-50 border-gray-100"
-                >
-                  <td className="px-6 py-4">
-                    <Badge
-                      color={
-                        item.type === '게시글'
-                          ? 'purple'
-                          : 'blue'
-                      }
-                    >
-                      {item.type}
-                    </Badge>
-                  </td>
+                {pagedList.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-gray-100 hover:bg-blue-50"
+                  >
+                    <td className="px-6 py-4">
+                      <Badge color={item.type === '게시글' ? 'purple' : 'blue'}>
+                        {item.type}
+                      </Badge>
+                    </td>
 
-                  <td className="px-6 py-4 ">
-                    <div className="font-medium truncate text-blue-600 hover:underline cursor-pointer">
-                      {item.content}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {item.author} | {item.date}
-                    </div>
-                  </td>
+                    <td className="px-6 py-4">
+                      <div className="cursor-pointer truncate font-medium text-blue-600 hover:underline">
+                        {item.content}
+                      </div>
+                      <div className="mt-1 text-xs text-gray-500">
+                        {item.author} | {item.date}
+                      </div>
+                    </td>
 
-                  <td className="px-6 py-4 text-sm text-red-600 font-semibold">
-                    {item.caseType}
-                  </td>
+                    <td className="px-6 py-4 text-sm font-semibold text-red-600">
+                      {item.caseType}
+                    </td>
 
-                  <td className="px-6 py-4">
-                    {item.reportDate}
-                  </td>
+                    <td className="px-6 py-4">{item.reportDate}</td>
 
-                  <td className="px-6 py-4">
-                    <Badge
-                      color={
-                        item.status === '대기'
-                          ? 'yellow'
-                          : item.status === '완료'
-                            ? 'green'
-                            : 'gray'
-                      }
-                    >
-                      {item.status}
-                    </Badge>
-                  </td>
+                    <td className="px-6 py-4">
+                      <Badge
+                        color={
+                          item.status === '대기'
+                            ? 'yellow'
+                            : item.status === '완료'
+                              ? 'green'
+                              : 'gray'
+                        }
+                      >
+                        {item.status}
+                      </Badge>
+                    </td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex gap-1">
-                      <button className="px-2 py-1 bg-yellow-50 text-yellow-700 text-xs rounded hover:bg-yellow-100">
-                        경고
-                      </button>
-                      <button className="px-2 py-1 bg-red-50 text-red-700 text-xs rounded hover:bg-red-100">
-                        정지
-                      </button>
-                      <button className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded hover:bg-green-100">
-                        게시
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <td className="px-6 py-4">
+                      <div className="flex gap-1">
+                        <button className="rounded bg-yellow-50 px-2 py-1 text-xs text-yellow-700 hover:bg-yellow-100">
+                          경고
+                        </button>
+                        <button className="rounded bg-red-50 px-2 py-1 text-xs text-red-700 hover:bg-red-100">
+                          정지
+                        </button>
+                        <button className="rounded bg-green-50 px-2 py-1 text-xs text-green-700 hover:bg-green-100">
+                          게시
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -198,7 +172,7 @@ export default function CommunityManagementView() {
                   className="flex items-center gap-2 rounded-2xl bg-gray-50 px-4 py-2"
                 >
                   <span className="text-sm">{word}</span>
-                  <XCircle className="h-4 w-4 text-gray-400 hover:text-red-500 cursor-pointer" />
+                  <XCircle className="h-4 w-4 cursor-pointer text-gray-400 hover:text-red-500" />
                 </div>
               ))}
             </div>

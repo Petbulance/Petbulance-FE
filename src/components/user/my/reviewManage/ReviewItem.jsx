@@ -11,48 +11,28 @@ export default function ReviewItem({ review }) {
         <div className="flex items-center gap-2">
           {/* 상태 뱃지 */}
           <span
-            className={`
-        inline-flex items-center justify-center
-        h-[20px]
-        rounded-[16px]
-        border border-[0.5px]
-        px-[8px] py-[2px]
-        text-[12px]
-        ${
+            className={`inline-flex h-[20px] items-center justify-center rounded-[16px] border border-[0.5px] px-[8px] py-[2px] text-[12px] ${
               review.status === '검수중'
-                ? 'w-[54px] bg-white text-caption border-caption'
-                : 'w-[66px] bg-white text-[#1C334B] border-[#1C334B]'
-            }
-      `}
+                ? 'text-caption border-caption w-[54px] bg-white'
+                : 'w-[66px] border-[#1C334B] bg-white text-[#1C334B]'
+            } `}
           >
-      {review.status}
-    </span>
+            {review.status}
+          </span>
 
-          <span className="text-[19px] font-medium">
-      {review.hospitalName}
-    </span>
+          <span className="text-[19px] font-medium">{review.hospitalName}</span>
         </div>
 
         {review.hasReceipt && (
-          <button
-            className="
-        inline-flex items-center justify-center gap-[2px]
-        w-[122px] h-[24px]
-        rounded-[4px]
-        border border-[0.5px] border-[#1C334B]
-        px-[8px] py-[4px]
-        text-[12px] text-[#1C334B]
-      "
-          >
+          <button className="inline-flex h-[24px] w-[122px] items-center justify-center gap-[2px] rounded-[4px] border border-[0.5px] border-[#1C334B] px-[8px] py-[4px] text-[12px] text-[#1C334B]">
             영수증 인증 완료
             <img src={reviewsCheck} className="h-3 w-3" />
           </button>
         )}
       </div>
 
-
       {/* 날짜 / 좋아요 */}
-      <p className="mb-4 flex items-center gap-1 text-[14px] text-caption">
+      <p className="text-caption mb-4 flex items-center gap-1 text-[14px]">
         <span>{review.date}</span>
         <span>·</span>
         <img src={thumbsUpDouble} alt="like" className="h-3 w-3" />
@@ -65,10 +45,10 @@ export default function ReviewItem({ review }) {
           <div className="h-[72px] w-[72px] flex-shrink-0 rounded bg-gray-200" />
         )}
 
-        <p className="text-[14px] text-[#1e1e1e] line-clamp-3">
+        <p className="line-clamp-3 text-[14px] text-[#1e1e1e]">
           {review.content}
         </p>
       </div>
     </div>
   );
-  }
+}

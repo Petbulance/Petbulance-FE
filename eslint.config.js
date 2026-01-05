@@ -1,18 +1,22 @@
-import js from "@eslint/js";
-import globals from "globals";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
-import { defineConfig, globalIgnores } from "eslint/config";
-import importPlugin from "eslint-plugin-import";
-import prettierPlugin from "eslint-plugin-prettier";
-import eslintConfigPrettier from "eslint-config-prettier";
-import stylistic from "@stylistic/eslint-plugin";
+import js from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import importPlugin from 'eslint-plugin-import';
+import prettierPlugin from 'eslint-plugin-prettier';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import globals from 'globals';
 
 export default defineConfig([
-  globalIgnores(["dist", "node_modules"]),
+  /* ================= 글로벌 ignore ================= */
+  globalIgnores(['dist', 'node_modules']),
 
   {
-    files: ["**/*.{js,jsx}"],
+    /* ================= JS / JSX 공통 ================= */
+    files: ['**/*.{js,jsx}'],
+
     extends: [
       js.configs.recommended,
       reactHooks.configs.flat.recommended,
@@ -22,66 +26,83 @@ export default defineConfig([
     ],
 
     plugins: {
+      react, // ⭐ JSX unused-vars 해결의 핵심
       prettier: prettierPlugin,
-      "@stylistic": stylistic,
+      '@stylistic': stylistic,
     },
 
     settings: {
-      "import/resolver": {
+      react: {
+        version: 'detect',
+      },
+      'import/resolver': {
         node: {
-          extensions: [".js", ".jsx", ".json"],
+          extensions: ['.js', '.jsx', '.json'],
         },
         alias: {
-          map: [["@", "./src"]],
-          extensions: [".js", ".jsx", ".json"],
+          map: [['@', './src']],
+          extensions: ['.js', '.jsx', '.json'],
         },
       },
     },
 
     rules: {
-      // Prettier 규칙 위반을 ESLint 에러로
-      "prettier/prettier": [
-        "error",
+      /* ===== Prettier ===== */
+      'prettier/prettier': [
+        'error',
         {
           bracketSpacing: true,
-          endOfLine: "lf",
-          htmlWhitespaceSensitivity: "css",
+          endOfLine: 'lf',
+          htmlWhitespaceSensitivity: 'css',
           singleAttributePerLine: false,
           bracketSameLine: false,
           printWidth: 80,
-          proseWrap: "preserve",
-          quoteProps: "as-needed",
+          proseWrap: 'preserve',
+          quoteProps: 'as-needed',
           semi: true,
           singleQuote: true,
           tabWidth: 2,
-          trailingComma: "es5",
+          trailingComma: 'es5',
           useTabs: false,
-          embeddedLanguageFormatting: "auto",
+          embeddedLanguageFormatting: 'auto',
         },
       ],
 
-      // ✅ 세미콜론 누락 시 무조건 에러 (stylistic)
-      "@stylistic/semi": ["error", "always"],
+      /* ===== 스타일 ===== */
+      '@stylistic/semi': ['error', 'always'],
 
-      "no-unused-vars": "warn",
-      "import/no-dynamic-require": "warn",
-      "import/no-nodejs-modules": "warn",
+      /* ===== JSX unused-vars 문제 해결 핵심 ===== */
+      'react/jsx-uses-vars': 'error',
+      'react/jsx-uses-react': 'off', // React 17+ automatic runtime
 
-      "import/order": [
-        "error",
+      /* ===== 기본 규칙 ===== */
+      'no-unused-vars': 'warn',
+      'import/no-dynamic-require': 'warn',
+      'import/no-nodejs-modules': 'warn',
+
+      /* ===== import 정렬 ===== */
+      'import/order': [
+        'error',
         {
-          groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
-          pathGroups: [{ pattern: "@/**", group: "internal" }],
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
+          pathGroups: [{ pattern: '@/**', group: 'internal' }],
           pathGroupsExcludedImportTypes: [],
-          alphabetize: { order: "asc", caseInsensitive: true },
-          "newlines-between": "always",
+          alphabetize: { order: 'asc', caseInsensitive: true },
+          'newlines-between': 'always',
         },
       ],
     },
 
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: "module",
+      sourceType: 'module',
       parserOptions: {
         ecmaFeatures: { jsx: true },
       },

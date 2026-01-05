@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import api from '@/apis/api.jsx';
 
 export default function NaverCallback() {

@@ -14,9 +14,7 @@ export default function NoticeList({ NOTIFICATIONS }) {
   if (notices.length === 0) {
     return (
       <div className="flex h-full items-center justify-center bg-white">
-        <p className="text-[18px] text-[#424242]">
-          공지사항이 없어요
-        </p>
+        <p className="text-[18px] text-[#424242]">공지사항이 없어요</p>
       </div>
     );
   }
@@ -28,13 +26,7 @@ export default function NoticeList({ NOTIFICATIONS }) {
           key={item.id}
           type="button"
           onClick={() => navigate(`/index/mypage/notice/${item.id}`)}
-          className="
-            flex w-full items-center justify-between
-            border-b px-4 py-4
-            text-left
-            hover:bg-gray-50
-            active:bg-gray-100
-          "
+          className="flex w-full items-center justify-between border-b px-4 py-4 text-left hover:bg-gray-50 active:bg-gray-100"
         >
           <div>
             <span
@@ -45,13 +37,9 @@ export default function NoticeList({ NOTIFICATIONS }) {
               {item.type}
             </span>
 
-            <p className="text-[19px] font-medium">
-              {item.title}
-            </p>
+            <p className="text-[19px] font-medium">{item.title}</p>
 
-            <p className="mt-1 text-[15px] text-gray-400">
-              {item.date}
-            </p>
+            <p className="mt-1 text-[15px] text-gray-400">{item.date}</p>
           </div>
 
           <ChevronLeft className="h-8 w-8 rotate-180 text-[#E0E0E0]" />

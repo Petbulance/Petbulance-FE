@@ -1,15 +1,14 @@
 import { ChevronLeft, Settings } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function NotificationHeader({ title }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isNotificationMain =
-    location.pathname === '/index/notification';
+  const isNotificationMain = location.pathname === '/index/notification';
 
   return (
-    <header className="sticky top-0 z-50 bg-white px-4 py-3 ">
+    <header className="sticky top-0 z-50 bg-white px-4 py-3">
       <div className="relative flex items-center justify-between">
         {/* 뒤로 */}
         <button onClick={() => navigate(-1)}>
@@ -23,11 +22,7 @@ export default function NotificationHeader({ title }) {
 
         {/* 설정 (알림 메인에서만) */}
         {isNotificationMain ? (
-          <button
-            onClick={() =>
-              navigate('/index/notification/setting')
-            }
-          >
+          <button onClick={() => navigate('/index/notification/setting')}>
             <Settings className="h-5 w-5" />
           </button>
         ) : (

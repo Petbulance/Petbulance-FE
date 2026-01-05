@@ -11,13 +11,12 @@ export default function EmptyReview() {
         작성한 후기가 없어요.
       </p>
 
-      <p className="mb-6 text-[20px] leading-relaxed text-tertiary">
+      <p className="text-tertiary mb-6 text-[20px] leading-relaxed">
         펫플러스에서 병원을 찾아 방문하고
-        <br />
-        첫 방문 후기를 작성해보세요!
+        <br />첫 방문 후기를 작성해보세요!
       </p>
 
-      <button className="mt-[72px] w-full rounded-xl border border-success py-3 text-[15px] font-medium text-success">
+      <button className="border-success text-success mt-[72px] w-full rounded-xl border py-3 text-[15px] font-medium">
         병원 후기 보러가기
       </button>
     </div>

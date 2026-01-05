@@ -8,7 +8,7 @@ export const REVIEWS = [
     date: '2024.10.01',
     status: '신고',
     rating: 4.5,
-    count :2,
+    count: 2,
     title: '특수동물 진료 정말 잘해요',
     content: '도마뱀 진료를 정말 꼼꼼하게 봐주셨습니다.',
 
@@ -41,7 +41,7 @@ export const REVIEWS = [
 
     title: '앵무새 진료 후기',
     content: '친절하긴 했지만 대기 시간이 길었어요.',
-    count :6,
+    count: 6,
     ratings: {
       result: 4,
       kindness: 4,
@@ -68,7 +68,7 @@ export const REVIEWS = [
     date: `2024.10.${String(i + 3).padStart(2, '0')}`,
     status: i % 2 === 0 ? '신고' : '게시',
     rating: 3 + (i % 3),
-   count : 3+i,
+    count: 3 + i,
     title: '리뷰 제목 예시',
     content: '리뷰 본문 예시입니다.',
 

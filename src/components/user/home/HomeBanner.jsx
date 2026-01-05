@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
 import Autoplay from 'embla-carousel-autoplay';
+import { useEffect, useState } from 'react';
+
 import {
   Carousel,
   CarouselContent,
@@ -69,7 +70,6 @@ const BANNERS = [
   },
 ];
 
-
 export default function HomeBanner() {
   const [api, setApi] = useState(null);
   const [current, setCurrent] = useState(0);
@@ -91,20 +91,20 @@ export default function HomeBanner() {
       {/* ================= 배너 캐러셀 ================= */}
       <Carousel
         setApi={setApi}
-        opts={{ loop: true , align: 'start', }}
+        opts={{ loop: true, align: 'start' }}
         plugins={[
           Autoplay({
             delay: 2500,
             stopOnInteraction: false,
           }),
         ]}
-        className="overflow-hidden "
+        className="overflow-hidden"
       >
         <CarouselContent className="-ml-0">
           {BANNERS.map((banner) => (
             <CarouselItem
               key={banner.id}
-              className="basis-[97%] mr-[10px] pl-0"
+              className="mr-[10px] basis-[97%] pl-0"
             >
               <div className="relative overflow-hidden rounded-lg">
                 <img
@@ -121,7 +121,7 @@ export default function HomeBanner() {
                   </h3>
 
                   {/* 하단 버튼 영역 */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                  <div className="absolute right-3 bottom-3 left-3 flex items-center justify-between">
                     <button className="rounded-md bg-white/90 px-3 py-1 text-xs font-medium text-black">
                       자세히
                     </button>
@@ -135,7 +135,6 @@ export default function HomeBanner() {
             </CarouselItem>
           ))}
         </CarouselContent>
-
       </Carousel>
 
       {/* ================= dot 인디케이터 ================= */}
@@ -145,9 +144,7 @@ export default function HomeBanner() {
             key={index}
             onClick={() => api?.scrollTo(index)}
             className={`h-1 w-1 rounded-full transition-colors ${
-              index === current
-                ? 'bg-black'
-                : 'bg-gray-400'
+              index === current ? 'bg-black' : 'bg-gray-400'
             }`}
           />
         ))}

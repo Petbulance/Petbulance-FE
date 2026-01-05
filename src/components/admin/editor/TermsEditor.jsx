@@ -1,12 +1,12 @@
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { useRef } from 'react';
 
 export default function TermsEditor({ value, onChange }) {
   const editorRef = useRef(null);
 
   return (
-    <div className="rounded-lg border overflow-hidden">
+    <div className="overflow-hidden rounded-lg border">
       <CKEditor
         editor={ClassicEditor}
         data={value}

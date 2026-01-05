@@ -1,42 +1,40 @@
 import { ChevronLeft } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
 import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore';
 import { useSupportWriteStore } from '@/stores/useSupportWriteStore';
 
 export default function MypageHeader({ title, onSubmit }) {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const { currentInquiry } = useSupportInquiryStore()
-  const { title: writeTitle, content } = useSupportWriteStore()
+  const { currentInquiry } = useSupportInquiryStore();
+  const { title: writeTitle, content } = useSupportWriteStore();
 
-  const isWrite = location.pathname.includes('/write')
-  const isDetail = location.pathname.includes('/detail')
-  const isModify = location.pathname.includes('/modify')
+  const isWrite = location.pathname.includes('/write');
+  const isDetail = location.pathname.includes('/detail');
+  const isModify = location.pathname.includes('/modify');
 
-  const hasAnswer = Boolean(currentInquiry?.answer)
+  const hasAnswer = Boolean(currentInquiry?.answer);
 
   // 버튼 표시 조건
-  const showActionButton =
-    (isWrite || isDetail || isModify) && !hasAnswer
+  const showActionButton = (isWrite || isDetail || isModify) && !hasAnswer;
 
-  const canSubmit =
-    writeTitle.trim() && content.trim()
+  const canSubmit = writeTitle.trim() && content.trim();
 
   const handleActionClick = () => {
     if (isWrite || isModify) {
       // 실제 submit은 Page(wrapper)에서
-      onSubmit?.()
-      return
+      onSubmit?.();
+      return;
     }
 
     if (isDetail && currentInquiry) {
-      navigate(
-        `/index/mypage/support/myinquiry/modify/${currentInquiry.id}`,
-        { state: { inquiry: currentInquiry } },
-      )
+      navigate(`/index/mypage/support/myinquiry/modify/${currentInquiry.id}`, {
+        state: { inquiry: currentInquiry },
+      });
     }
-  }
+  };
 
   const actionText = isWrite
     ? '등록'
@@ -44,7 +42,7 @@ export default function MypageHeader({ title, onSubmit }) {
       ? '수정'
       : isModify
         ? '완료'
-        : ''
+        : '';
 
   return (
     <header className="sticky top-0 border-b bg-white px-4 py-3 shadow-sm">
@@ -74,5 +72,5 @@ export default function MypageHeader({ title, onSubmit }) {
         )}
       </div>
     </header>
-  )
+  );
 }

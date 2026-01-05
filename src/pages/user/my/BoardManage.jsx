@@ -1,6 +1,7 @@
-import ReviewList from '@/components/user/my/reviewManage/ReviewList.jsx';
-import EmptyReview from '@/components/user/my/reviewManage/EmptyReview.jsx';
 import { useState } from 'react';
+
+import EmptyReview from '@/components/user/my/reviewManage/EmptyReview.jsx';
+import ReviewList from '@/components/user/my/reviewManage/ReviewList.jsx';
 
 /* ================= 더미 데이터 ================= */
 const DUMMY_REVIEWS = [
@@ -149,7 +150,6 @@ const DUMMY_REVIEWS = [
   },
 ];
 
-
 export default function BoardManage() {
   const [reviews, setReviews] = useState(DUMMY_REVIEWS);
   const [backupReviews, setBackupReviews] = useState([]);
@@ -171,4 +171,3 @@ export default function BoardManage() {
     </div>
   );
 }
-

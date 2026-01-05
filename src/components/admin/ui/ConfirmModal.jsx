@@ -20,7 +20,7 @@ export function ConfirmModal({ open, title, message, onConfirm, onCancel }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-      onClick={onCancel}   // 🔥 외부 클릭 시 닫기
+      onClick={onCancel} // 🔥 외부 클릭 시 닫기
     >
       <div
         className="w-[400px] rounded-xl bg-white p-6 shadow-lg"

@@ -18,4 +18,4 @@ export const useSupportWriteStore = create((set) => ({
       title: '',
       content: '',
     }),
-}))
+}));

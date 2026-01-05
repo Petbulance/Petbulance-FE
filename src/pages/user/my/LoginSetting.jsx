@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Switch } from '@/components/ui/switch';
 
-import kakaoIcon from '@/assets/images/logo/kakaoLogo.svg';
 import googleIcon from '@/assets/images/logo/googleLogo.svg';
+import kakaoIcon from '@/assets/images/logo/kakaoLogo.svg';
 import naverIcon from '@/assets/images/logo/naverLogo.svg';
+import { Switch } from '@/components/ui/switch';
 
 const SNS_ICON = {
   kakao: kakaoIcon,
@@ -48,8 +48,8 @@ export default function LoginSetting() {
   return (
     <div className="h-full bg-white px-[24px]">
       {/* ================= 자동 로그인 ================= */}
-      <div className=" py-4">
-        <div className="flex items-center justify-between h-[72px] border-b">
+      <div className="py-4">
+        <div className="flex h-[72px] items-center justify-between border-b">
           <span className="text-[19px] font-medium">자동 로그인</span>
           <Switch
             checked={autoLogin}
@@ -64,7 +64,7 @@ export default function LoginSetting() {
 
       {/* ================= 현재 로그인된 계정 ================= */}
       <div className="py-4">
-        <p className=" text-[18px] font-semibold h-[36px] border-b">
+        <p className="h-[36px] border-b text-[18px] font-semibold">
           현재 로그인된 계정
         </p>
 
@@ -96,38 +96,37 @@ export default function LoginSetting() {
         {/* 하단 구분선 */}
         <div className="border-b" />
 
-        <p className="mt-3 text-[14px] text-gray-400 h-[48px]">
+        <p className="mt-3 h-[48px] text-[14px] text-gray-400">
           최소 1개의 SNS 계정은 연결되어야 합니다.
         </p>
       </div>
 
       {/* ================= SNS 계정 연결 ================= */}
       <div className="py-4">
-        <p className="mb-3 text-[18px] font-semibold h-[36px] border-b">
+        <p className="mb-3 h-[36px] border-b text-[18px] font-semibold">
           SNS 계정 연결
         </p>
 
         {connectableAccounts.map((account) => (
           <div
             key={account.provider}
-            className="flex items-center justify-between h-[82px] border-b px-0 py-[16px]"
+            className="flex h-[82px] items-center justify-between border-b px-0 py-[16px]"
           >
             {/* 왼쪽 */}
             <div>
-              <div className="flex items-center gap-2 ">
+              <div className="flex items-center gap-2">
                 <img
                   src={SNS_ICON[account.provider]}
                   alt={account.label}
                   className="h-6 w-5"
                 />
-                <span className="text-[20px] font-medium">
-                  {account.label}
-                </span>
+                <span className="text-[20px] font-medium">{account.label}</span>
               </div>
               {account.connected && (
-              <p className="mt-1 text-[18px] text-gray-400">
-                {account.email}
-              </p>)}
+                <p className="mt-1 text-[18px] text-gray-400">
+                  {account.email}
+                </p>
+              )}
             </div>
 
             {account.connected ? (
@@ -142,7 +141,7 @@ export default function LoginSetting() {
           </div>
         ))}
 
-  {/*      <p className="mt-3 text-[12px] text-gray-400">
+        {/*      <p className="mt-3 text-[12px] text-gray-400">
           계정 추가를 위해 본인 명의의 휴대폰 인증이 필요합니다.
         </p>*/}
       </div>

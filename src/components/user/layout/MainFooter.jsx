@@ -1,4 +1,10 @@
-import { Group, HealthCross, Home, OverflowMenuHorizontal, Review } from '@carbon/icons-react';
+import {
+  Group,
+  HealthCross,
+  Home,
+  OverflowMenuHorizontal,
+  Review,
+} from '@carbon/icons-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const MENUS = [
@@ -23,9 +29,7 @@ export default function MainFooter() {
             <li
               key={menu.label}
               onClick={() => navigate(menu.path)}
-              className={`flex cursor-pointer flex-col items-center text-xs transition-colors
-                ${isActive ? 'text-green-600' : 'text-gray-500'}
-              `}
+              className={`flex cursor-pointer flex-col items-center text-xs transition-colors ${isActive ? 'text-green-600' : 'text-gray-500'} `}
             >
               <menu.icon className="h-5 w-5" />
               <p className="mt-1">{menu.label}</p>
@@ -36,4 +40,3 @@ export default function MainFooter() {
     </footer>
   );
 }
-

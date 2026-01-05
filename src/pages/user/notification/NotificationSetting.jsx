@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { Switch } from '@/components/ui/switch';
 
 export default function NotificationSetting() {
@@ -7,14 +8,11 @@ export default function NotificationSetting() {
   const [marketing, setMarketing] = useState(false);
 
   return (
-    <div className="bg-white ">
-
-      <div className="divide-y ">
+    <div className="bg-white">
+      <div className="divide-y">
         {/* 앱 push 알림 */}
         <div className="flex items-center justify-between border-t px-4 py-4">
-          <span className="text-[16px]">
-            앱 push 알림 수신
-          </span>
+          <span className="text-[16px]">앱 push 알림 수신</span>
           <Switch
             checked={push}
             onCheckedChange={setPush}
@@ -24,9 +22,7 @@ export default function NotificationSetting() {
 
         {/* 이벤트 알림 */}
         <div className="flex items-center justify-between px-4 py-4">
-          <span className="text-[16px]">
-            이벤트 알림 수신
-          </span>
+          <span className="text-[16px]">이벤트 알림 수신</span>
           <Switch
             checked={event}
             onCheckedChange={setEvent}
@@ -36,9 +32,7 @@ export default function NotificationSetting() {
 
         {/* 마케팅 알림 */}
         <div className="flex items-center justify-between border-b px-4 py-4">
-          <span className="text-[16px]">
-            마케팅 알림 수신
-          </span>
+          <span className="text-[16px]">마케팅 알림 수신</span>
           <Switch
             checked={marketing}
             onCheckedChange={setMarketing}

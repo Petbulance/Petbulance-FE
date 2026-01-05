@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import api from '@/apis/api.jsx';
 
 export default function GoogleCallback() {
@@ -8,7 +9,7 @@ export default function GoogleCallback() {
   useEffect(() => {
     const code = new URL(window.location.href).searchParams.get('code');
     console.log('카카오', code);
-    alert(code)
+    alert(code);
     if (!code) {
       navigate('/index/auth/login');
       return;

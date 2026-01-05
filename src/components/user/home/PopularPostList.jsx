@@ -46,7 +46,6 @@ const POPULAR_POSTS = [
   },
 ];
 
-
 export default function PopularPostList() {
   return (
     <section>
@@ -58,7 +57,7 @@ export default function PopularPostList() {
 
       {/* 리스트 */}
       <div className="space-y-3">
-        {POPULAR_POSTS.slice(0,5).map((post) => (
+        {POPULAR_POSTS.slice(0, 5).map((post) => (
           <div
             key={post.id}
             className="flex items-center justify-between rounded-xl bg-gray-100 px-4 py-3"
@@ -84,14 +83,11 @@ export default function PopularPostList() {
 
             {/* 우측 댓글 영역 */}
             <div className="flex h-[56px] w-[56px] flex-col items-center justify-center rounded-[12px] bg-white">
-              <span className="text-[19px] font-semibold text-success">
+              <span className="text-success text-[19px] font-semibold">
                 {post.commentCount}
               </span>
-              <span className="text-[14px] text-gray-400">
-                댓글
-              </span>
+              <span className="text-[14px] text-gray-400">댓글</span>
             </div>
-
           </div>
         ))}
       </div>

@@ -1,13 +1,10 @@
-import {
-  Check,
-  ChevronLeft,
-  Upload,
-} from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import { Check, ChevronLeft, Upload } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
-import Pagination from '@/components/admin/Pagination.jsx';
-import { Badge } from '../ui/Badge';
 import { CONTENTS } from '@/components/admin/mock/contents.mock.js';
+import Pagination from '@/components/admin/Pagination.jsx';
+
+import { Badge } from '../ui/Badge';
 
 const PAGE_SIZE = 10;
 
@@ -46,26 +43,26 @@ export default function ContentView() {
           목록으로 돌아가기
         </button>
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-gray-800">
             {subTab === 'banner' ? '배너' : '공지사항'}{' '}
             {selectedItem ? '수정' : '신규 등록'}
           </h2>
           <button
             onClick={() => setIsEditingContent(false)}
-            className="bg-blue-600 text-white px-6 py-2 rounded text-sm hover:bg-blue-700"
+            className="rounded bg-blue-600 px-6 py-2 text-sm text-white hover:bg-blue-700"
           >
             저장
           </button>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium mb-1">분류</label>
+              <label className="mb-1 block text-sm font-medium">분류</label>
               <select
                 defaultValue={selectedItem?.category || '이벤트'}
-                className="w-full border rounded p-2 text-sm border-gray-200"
+                className="w-full rounded border border-gray-200 p-2 text-sm"
               >
                 <option>이벤트</option>
                 <option>공지</option>
@@ -74,8 +71,8 @@ export default function ContentView() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">상태</label>
-              <div className="flex gap-4 items-center h-[38px]">
+              <label className="mb-1 block text-sm font-medium">상태</label>
+              <div className="flex h-[38px] items-center gap-4">
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="radio"
@@ -97,43 +94,47 @@ export default function ContentView() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">제목</label>
+            <label className="mb-1 block text-sm font-medium">제목</label>
             <input
               type="text"
               defaultValue={selectedItem?.title || ''}
               placeholder="제목을 입력하세요"
-              className="w-full border rounded p-2 text-sm border-gray-200"
+              className="w-full rounded border border-gray-200 p-2 text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
-              게시 기간
-            </label>
+            <label className="mb-1 block text-sm font-medium">게시 기간</label>
             <div className="flex items-center gap-2">
-              <input type="date" className="border rounded p-2 text-sm border-gray-200" />
+              <input
+                type="date"
+                className="rounded border border-gray-200 p-2 text-sm"
+              />
               <span>~</span>
-              <input type="date" className="border rounded p-2 text-sm border-gray-200" />
+              <input
+                type="date"
+                className="rounded border border-gray-200 p-2 text-sm"
+              />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="mb-1 block text-sm font-medium">
               사진 및 파일 첨부
             </label>
-            <div className="border-2  rounded-lg p-6 flex flex-col items-center text-gray-400 bg-gray-50 hover:bg-gray-100 cursor-pointer">
+            <div className="flex cursor-pointer flex-col items-center rounded-lg border-2 bg-gray-50 p-6 text-gray-400 hover:bg-gray-100">
               <Upload size={24} className="mb-2" />
               <span className="text-xs">클릭하여 파일 업로드</span>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">본문 내용</label>
+            <label className="mb-1 block text-sm font-medium">본문 내용</label>
             <textarea
               rows={8}
               defaultValue={selectedItem?.content || ''}
               placeholder="내용을 입력하세요"
-              className="w-full border rounded p-2 text-sm border-gray-200"
+              className="w-full rounded border border-gray-200 p-2 text-sm"
             />
           </div>
         </div>
@@ -146,20 +147,20 @@ export default function ContentView() {
   ========================= */
   return (
     <div className="animate-in fade-in space-y-4 duration-500">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">콘텐츠 관리</h2>
         <button
           onClick={() => {
             setSelectedItem(null);
             setIsEditingContent(true);
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center gap-2"
+          className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
         >
           <Check size={16} /> 신규 등록
         </button>
       </div>
 
-      <div className="flex  border-gray-200">
+      <div className="flex border-gray-200">
         <button
           onClick={() => {
             setSubTab('banner');
@@ -188,49 +189,45 @@ export default function ContentView() {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden border-gray-100">
-        <table className="w-full text-sm border-gray-100">
-          <thead className="bg-gray-50 border-gray-100">
-          <tr>
-            <th className="px-6 py-3">분류</th>
-            <th className="px-6 py-3">제목</th>
-            <th className="px-6 py-3">상태</th>
-            <th className="px-6 py-3">관리</th>
-          </tr>
-          </thead>
-          <tbody className="divide-y ">
-          {list.map((item) => (
-            <tr key={item.id} className="hover:bg-gray-50 border-gray-100">
-              <td className="px-6 py-4">{item.category}</td>
-              <td className="px-6 py-4 font-medium">{item.title}</td>
-              <td className="px-6 py-4">
-                <Badge color={item.status === '게시' ? 'green' : 'red'}>
-                  {item.status}
-                </Badge>
-              </td>
-              <td className="px-6 py-4">
-                <button
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setIsEditingContent(true);
-                  }}
-                  className="text-blue-600 hover:underline"
-                >
-                  수정
-                </button>
-              </td>
+      <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
+        <table className="w-full border-gray-100 text-sm">
+          <thead className="border-gray-100 bg-gray-50">
+            <tr>
+              <th className="px-6 py-3">분류</th>
+              <th className="px-6 py-3">제목</th>
+              <th className="px-6 py-3">상태</th>
+              <th className="px-6 py-3">관리</th>
             </tr>
-          ))}
+          </thead>
+          <tbody className="divide-y">
+            {list.map((item) => (
+              <tr key={item.id} className="border-gray-100 hover:bg-gray-50">
+                <td className="px-6 py-4">{item.category}</td>
+                <td className="px-6 py-4 font-medium">{item.title}</td>
+                <td className="px-6 py-4">
+                  <Badge color={item.status === '게시' ? 'green' : 'red'}>
+                    {item.status}
+                  </Badge>
+                </td>
+                <td className="px-6 py-4">
+                  <button
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setIsEditingContent(true);
+                    }}
+                    className="text-blue-600 hover:underline"
+                  >
+                    수정
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
       <div className="flex justify-center">
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onChange={setPage}
-        />
+        <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       </div>
     </div>
   );

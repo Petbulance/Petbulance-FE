@@ -11,8 +11,7 @@ export default function MainHeader({ title }) {
   const notificationCount = 2;
 
   // 99 초과 시 99+ 처리
-  const displayCount =
-    notificationCount > 99 ? '99+' : notificationCount;
+  const displayCount = notificationCount > 99 ? '99+' : notificationCount;
 
   return (
     <header
@@ -23,7 +22,7 @@ export default function MainHeader({ title }) {
       <div className="flex items-center justify-between">
         {/* 타이틀 */}
         <h1
-          className={`text-[25px] font-semibold pl-[8px] ${
+          className={`pl-[8px] text-[25px] font-semibold ${
             isHome ? 'text-[#2DA969]' : 'text-gray-900'
           }`}
         >
@@ -31,13 +30,13 @@ export default function MainHeader({ title }) {
         </h1>
         <div className="relative">
           <Notification
-            className="h-5 w-5 text-gray-600 cursor-pointer"
+            className="h-5 w-5 cursor-pointer text-gray-600"
             onClick={() => navigate('/index/notification')}
           />
 
           {/* 알림 뱃지 */}
           {notificationCount > 0 && (
-            <span className="absolute -right-2 -top-2 flex min-w-[18px] items-center justify-center rounded-full bg-success px-1 text-[10px] font-semibold text-white">
+            <span className="bg-success absolute -top-2 -right-2 flex min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white">
               {displayCount}
             </span>
           )}

@@ -1,5 +1,5 @@
-import MainHeader from '@/components/user/layout/MainHeader.jsx';
 import MainFooter from '@/components/user/layout/MainFooter.jsx';
+import MainHeader from '@/components/user/layout/MainHeader.jsx';
 
 export default function MainLayout({ title, children }) {
   return (
@@ -8,9 +8,7 @@ export default function MainLayout({ title, children }) {
       <MainHeader title={title} />
 
       {/* Content */}
-      <main className="flex-1 min-h-0 overflow-y-auto">
-        {children}
-      </main>
+      <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
 
       {/* Footer */}
       <MainFooter />

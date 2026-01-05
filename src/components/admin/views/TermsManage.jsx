@@ -1,8 +1,10 @@
 import { ChevronLeft, Plus } from 'lucide-react';
 import { useState } from 'react';
-import Pagination from '@/components/admin/Pagination.jsx';
-import { Badge } from '../ui/Badge';
+
 import TermsEditor from '@/components/admin/editor/TermsEditor.jsx';
+import Pagination from '@/components/admin/Pagination.jsx';
+
+import { Badge } from '../ui/Badge';
 
 const PAGE_SIZE = 10;
 // mock/terms.mock.js
@@ -91,31 +93,25 @@ export default function TermsManage() {
           {isNew ? '약관 등록' : '약관 수정'}
         </h2>
 
-        <div className="bg-white p-6 rounded-lg border space-y-4">
+        <div className="space-y-4 rounded-lg border bg-white p-6">
           {/* 약관명 */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              약관명
-            </label>
+            <label className="mb-1 block text-sm font-medium">약관명</label>
             <input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               placeholder="약관명을 입력하세요"
-              className="w-full border rounded p-2 text-sm"
+              className="w-full rounded border p-2 text-sm"
             />
           </div>
 
           {/* 필수 여부 */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              필수 여부
-            </label>
+            <label className="mb-1 block text-sm font-medium">필수 여부</label>
             <select
               value={editRequired ? '필수' : '선택'}
-              onChange={(e) =>
-                setEditRequired(e.target.value === '필수')
-              }
-              className="w-full border rounded p-2 text-sm"
+              onChange={(e) => setEditRequired(e.target.value === '필수')}
+              className="w-full rounded border p-2 text-sm"
             >
               <option>필수</option>
               <option>선택</option>
@@ -124,13 +120,8 @@ export default function TermsManage() {
 
           {/* 약관 내용 */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              약관 내용
-            </label>
-            <TermsEditor
-              value={editContent}
-              onChange={setEditContent}
-            />
+            <label className="mb-1 block text-sm font-medium">약관 내용</label>
+            <TermsEditor value={editContent} onChange={setEditContent} />
           </div>
 
           {/* 저장 */}
@@ -150,7 +141,7 @@ export default function TermsManage() {
 
                 setIsEditing(false);
               }}
-              className="bg-blue-600 text-white px-6 py-2 rounded text-sm"
+              className="rounded bg-blue-600 px-6 py-2 text-sm text-white"
             >
               저장
             </button>
@@ -166,7 +157,7 @@ export default function TermsManage() {
   return (
     <div className="space-y-4">
       {/* 헤더 */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">약관 관리</h2>
 
         <button
@@ -177,7 +168,7 @@ export default function TermsManage() {
             setEditContent('');
             setIsEditing(true);
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2 hover:bg-blue-700"
+          className="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
         >
           <Plus size={16} />
           등록
@@ -185,63 +176,58 @@ export default function TermsManage() {
       </div>
 
       {/* 테이블 */}
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className="overflow-hidden rounded-lg border bg-white">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-center align-middle">no</th>
-            <th className="px-6 py-3 text-center align-middle">약관명</th>
-            <th className="px-6 py-3 text-center align-middle">필수 여부</th>
-            <th className="px-6 py-3 text-center align-middle">버전</th>
-            <th className="px-6 py-3 text-center align-middle">관리</th>
-          </tr>
+            <tr>
+              <th className="px-6 py-3 text-center align-middle">no</th>
+              <th className="px-6 py-3 text-center align-middle">약관명</th>
+              <th className="px-6 py-3 text-center align-middle">필수 여부</th>
+              <th className="px-6 py-3 text-center align-middle">버전</th>
+              <th className="px-6 py-3 text-center align-middle">관리</th>
+            </tr>
           </thead>
 
           <tbody className="divide-y">
-          {list.map((item) => (
-            <tr key={item.id} className="h-[56px]">
-              <td className="px-6 py-4 text-center align-middle font-medium">
-                {item.id}
-              </td>
-              <td className="px-6 py-4 text-center align-middle font-medium">
-                {item.title}
-              </td>
-              <td className="px-6 py-4 text-center align-middle">
-                <Badge color={item.required ? 'blue' : 'gray'}>
-                  {item.required ? '필수' : '선택'}
-                </Badge>
-              </td>
-              <td className="px-6 py-4 text-center align-middle">
-                {item.version}
-              </td>
-              <td className="px-6 py-4 text-center align-middle">
-                <button
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setEditTitle(item.title);
-                    setEditRequired(item.required);
-                    setEditContent(item.content);
-                    setIsEditing(true);
-                  }}
-                  className="text-blue-600 hover:underline"
-                >
-                  수정
-                </button>
-              </td>
-            </tr>
-          ))}
+            {list.map((item) => (
+              <tr key={item.id} className="h-[56px]">
+                <td className="px-6 py-4 text-center align-middle font-medium">
+                  {item.id}
+                </td>
+                <td className="px-6 py-4 text-center align-middle font-medium">
+                  {item.title}
+                </td>
+                <td className="px-6 py-4 text-center align-middle">
+                  <Badge color={item.required ? 'blue' : 'gray'}>
+                    {item.required ? '필수' : '선택'}
+                  </Badge>
+                </td>
+                <td className="px-6 py-4 text-center align-middle">
+                  {item.version}
+                </td>
+                <td className="px-6 py-4 text-center align-middle">
+                  <button
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setEditTitle(item.title);
+                      setEditRequired(item.required);
+                      setEditContent(item.content);
+                      setIsEditing(true);
+                    }}
+                    className="text-blue-600 hover:underline"
+                  >
+                    수정
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
-
       {/* 페이징 (정중앙) */}
       <div className="flex justify-center">
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onChange={setPage}
-        />
+        <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       </div>
     </div>
   );
