@@ -51,9 +51,8 @@ export default function SupportWritePage() {
         // TODO: 수정 API
         console.log('UPDATE', { title, content })
       }
-      const toastMessage = isWrite
-        ? '작성한 문의를 등록했어요'
-        : '문의 내용을 수정했어요'
+      const toastMessage = 
+      '문의 내용을 수정했어요'
 
       navigate(-1)
       reset()
