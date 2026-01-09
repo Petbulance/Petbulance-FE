@@ -23,7 +23,7 @@ export default function AdminHeader({ currentMenu, menus }) {
             <p className="text-xs font-black">김대표</p>
             <p className="text-[10px] text-gray-400">Master Admin</p>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 font-bold text-white shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-tr from-blue-600 to-indigo-600 font-bold text-white shadow-sm">
             K
           </div>
         </div>
