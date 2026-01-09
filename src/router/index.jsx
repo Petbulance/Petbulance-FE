@@ -26,7 +26,9 @@ import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
 import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
 import Home from '@/pages/user/Home.jsx';
-import Hospitals from '@/pages/user/Hospitals.jsx';
+import Hospitals from '@/pages/user/Hospitals/Hospitals';
+import { HospitalsList } from '@/pages/user/Hospitals/HospitalsList';
+import HospitalsMap from '@/pages/user/Hospitals/HospitalsMap';
 import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
@@ -92,13 +94,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'hospitals',
-        element: (
-          <LayoutShell banner={<ServiceBanner />}>
-            <MainLayout title="병원 검색">
-              <Hospitals />
-            </MainLayout>
-          </LayoutShell>
-        ),
+        element: <Hospitals />,
+        children: [
+          { index: true, element: <HospitalsMap /> },
+          { path: 'list', element: <HospitalsList /> },
+        ],
       },
       {
         path: 'reviews',
