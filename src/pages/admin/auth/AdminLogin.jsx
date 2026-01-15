@@ -2,6 +2,8 @@ import { ArrowRight, Lock, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
+
 export default function AdminLogin() {
   const [adminId, setAdminId] = useState('');
   const [password, setPassword] = useState('');
@@ -9,14 +11,30 @@ export default function AdminLogin() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
-    setTimeout(() => {
-      // onLogin();
-      navigate('/admin');
-    }, 500);
+    const payload = {
+      username: adminId,
+      password: password,
+    };
+    console.log(payload);
+    try {
+      const response = await api.post('/admin/login', payload);
+      console.log(response);
+      const token = response?.data.data.access_token;
+
+      if (token) {
+        localStorage.setItem('access_token', token);
+      }
+
+      setTimeout(() => navigate('/admin'), 500);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

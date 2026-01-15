@@ -64,6 +64,13 @@ export default function AdminLayout() {
     return () => document.body.classList.remove('admin');
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      navigate('/admin/auth/login', { replace: true });
+    }
+  }, [navigate, location.pathname]);
+
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-[#1E293B]">
       <AdminSidebar
