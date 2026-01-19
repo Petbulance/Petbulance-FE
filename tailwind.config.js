@@ -1,15 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  content: ['./index.html', './src/**/*.{js,jsx}'],
   theme: {
     extend: {
       screens: {
-        bp360: "360px",
-        bp620: "620px",
-        bp1194: "1194px",
+        bp360: '360px',
+        bp620: '620px',
+        bp1194: '1194px',
       },
       maxWidth: {
-        phone: "620px",
+        phone: '620px',
       },
     },
     colors: {
@@ -37,5 +37,4 @@ export default {
     },
   },
   plugins: [],
-
 };
