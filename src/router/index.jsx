@@ -4,6 +4,8 @@ import App from '@/App.jsx';
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import CommunityManagementView from '@/components/admin/views/CommunityManagementView.jsx';
+import ContentCreate from '@/components/admin/views/Content/ContentCreate.jsx';
+import ContentModify from '@/components/admin/views/Content/ContentModify.jsx';
 import ContentView from '@/components/admin/views/Content/ContentView.jsx';
 import CustomerCenterDetail from '@/components/admin/views/CustomerCenter/CustomerCenterDetail.jsx';
 import CustomerCenterView from '@/components/admin/views/CustomerCenter/CustomerCenterView.jsx';
@@ -71,6 +73,8 @@ const router = createBrowserRouter([
       { path: 'cs', element: <CustomerCenterView /> },
       { path: 'cs/:id', element: <CustomerCenterDetail /> },
       { path: 'content', element: <ContentView /> },
+      { path: 'content/create', element: <ContentCreate /> },
+      { path: 'content/:id', element: <ContentModify /> },
       { path: 'admins', element: <SettingsView /> },
       { path: 'logs', element: <ActivityLogs /> },
       { path: 'terms', element: <TermsManage /> },
