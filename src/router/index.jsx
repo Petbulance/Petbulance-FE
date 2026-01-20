@@ -14,7 +14,9 @@ import HospitalView from '@/components/admin/views/Hosptial/HospitalView.jsx';
 import ReviewDetail from '@/components/admin/views/Review/ReviewDetail.jsx';
 import ReviewView from '@/components/admin/views/Review/ReviewView.jsx';
 import SettingsView from '@/components/admin/views/SettingsView.jsx';
-import TermsManage from '@/components/admin/views/TermsManage.jsx';
+import TermsCreate from '@/components/admin/views/terms/TermsCreate.jsx';
+import TermsManage from '@/components/admin/views/terms/TermsManage.jsx';
+import TermsModify from '@/components/admin/views/terms/TermsModify.jsx';
 import UserManagementDetail from '@/components/admin/views/usermanagement/UserManagementDetail.jsx';
 import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
@@ -78,6 +80,8 @@ const router = createBrowserRouter([
       { path: 'admins', element: <SettingsView /> },
       { path: 'logs', element: <ActivityLogs /> },
       { path: 'terms', element: <TermsManage /> },
+      { path: 'terms/create', element: <TermsCreate /> },
+      { path: 'terms/:id', element: <TermsModify /> },
     ],
   },
   {
