@@ -17,6 +17,7 @@ export default function ActivityLogs() {
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
       {/* 테이블 */}
+      <h2 className="text-2xl font-bold text-gray-800">관리자 행동 로그</h2>
       <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
         <table className="w-full table-fixed text-left text-sm">
           <thead className="border-b border-gray-100 bg-gray-50">

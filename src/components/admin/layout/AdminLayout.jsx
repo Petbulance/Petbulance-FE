@@ -54,9 +54,9 @@ export default function AdminLayout() {
       icon: FileText,
       path: '/admin/content',
     },
+    { id: 'terms', label: '약관 관리', icon: ScrollText, path: '/admin/terms' },
     { id: 'admins', label: '관리자 계정', icon: Shield, path: '/admin/admins' },
     { id: 'logs', label: '행동 로그', icon: Activity, path: '/admin/logs' },
-    { id: 'terms', label: '약관 관리', icon: ScrollText, path: '/admin/terms' },
   ];
 
   useEffect(() => {
