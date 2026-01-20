@@ -21,7 +21,7 @@ export default function KakaoCallback() {
         });
         console.log('로구', res);
         /**
-         * ⬇️ 서버 응답 예시
+         * 서버 응답 예시
          * {
          *   accessToken: 'xxx',
          *   refreshToken: 'yyy'

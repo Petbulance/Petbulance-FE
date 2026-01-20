@@ -47,16 +47,12 @@ export default function SettingsView() {
         <table className="w-full table-fixed text-left text-sm">
           <thead className="border-b border-gray-100 bg-gray-50">
             <tr>
-              <th className="w-[80px] px-6 py-4 text-center font-semibold text-gray-600">
+              <th className="w-[80px] px-6 py-4 text-center font-semibold">
                 No
               </th>
-              <th className="w-[30%] px-6 py-4 font-semibold text-gray-600">
-                성함 / 아이디
-              </th>
-              <th className="px-6 py-4 font-semibold text-gray-600">
-                이메일 주소
-              </th>
-              <th className="w-[120px] px-6 py-4 text-center font-semibold text-gray-600">
+              <th className="w-[30%] px-6 py-4 font-semibold">성함 / 아이디</th>
+              <th className="px-6 py-4 font-semibold">이메일 주소</th>
+              <th className="w-[120px] px-6 py-4 text-center font-semibold">
                 계정 관리
               </th>
             </tr>
@@ -65,12 +61,12 @@ export default function SettingsView() {
           <tbody className="divide-y divide-gray-50">
             {pagedAccounts.map((adm, i) => (
               <tr key={adm.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-center font-bold">
+                <td className="px-6 py-4 text-center font-bold text-gray-700">
                   {(page - 1) * PAGE_SIZE + i + 1}
                 </td>
 
                 <td className="px-6 py-4">
-                  <div className="font-bold">{adm.name}</div>
+                  <div className="font-bold text-gray-700">{adm.name}</div>
                   <div className="font-mono text-xs text-gray-400">
                     ({adm.id})
                   </div>
@@ -83,9 +79,9 @@ export default function SettingsView() {
                 <td className="px-6 py-4 text-center">
                   <button
                     onClick={() => openDeleteConfirm(adm)}
-                    className="inline-flex items-center gap-1 rounded-md bg-red-50 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
+                    className="rounded bg-red-50 px-3 py-1 text-red-500 hover:bg-red-100"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    삭제
                   </button>
                 </td>
               </tr>
