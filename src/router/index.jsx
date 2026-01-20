@@ -21,6 +21,7 @@ import UserManagementDetail from '@/components/admin/views/usermanagement/UserMa
 import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
+import { HospitalDetailLayout } from '@/components/hosiptals/layout/hospitalDetailLayout';
 import MainLayout from '@/components/user/layout/MainLayout.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
@@ -33,10 +34,14 @@ import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
 import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
 import Home from '@/pages/user/Home.jsx';
-import Hospitals from '@/pages/user/Hospitals/Hospitals';
-import { HospitalsList } from '@/pages/user/Hospitals/HospitalsList';
-import HospitalsMap from '@/pages/user/Hospitals/HospitalsMap';
-import HosptialsReviews from '@/pages/user/HosptialsReviews.jsx';
+import HosptialsReviews from '@/pages/user/hospitalReview/HosptialsReviews.jsx';
+import { ReviewMain } from '@/pages/user/hospitalReview/ReviewMain';
+import { ReviewSerch } from '@/pages/user/hospitalReview/ReviewSearch';
+import { HospitalDetail } from '@/pages/user/hospitals/HospitalDetail';
+import Hospitals from '@/pages/user/hospitals/Hospitals';
+import { HospitalSearch } from '@/pages/user/hospitals/HospitalSearch';
+import { HospitalsList } from '@/pages/user/hospitals/HospitalsList';
+import HospitalsMap from '@/pages/user/hospitals/HospitalsMap';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
 import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
@@ -112,17 +117,26 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <HospitalsMap /> },
           { path: 'list', element: <HospitalsList /> },
+          { path: 'search', element: <HospitalSearch /> },
         ],
       },
       {
-        path: 'reviews',
+        path: 'hospitals/detail',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MainLayout title="병원 후기">
-              <HosptialsReviews />
-            </MainLayout>
+            <HospitalDetailLayout>
+              <HospitalDetail />
+            </HospitalDetailLayout>
           </LayoutShell>
         ),
+      },
+      {
+        path: 'reviews',
+        element: <HosptialsReviews />,
+        children: [
+          { index: true, element: <ReviewMain /> },
+          { path: 'search', element: <ReviewSerch /> },
+        ],
       },
       {
         path: 'community',

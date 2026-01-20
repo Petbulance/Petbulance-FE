@@ -1,7 +1,11 @@
+import { useNavigate } from 'react-router-dom';
+
 import placeholder from '@/assets/images/pageImages/placeholder.svg';
 import { HospitalCard } from '@/components/hosiptals/ui/HospitalCard/HospitalCard';
 
 export function HospitalCardList() {
+  const navigate = useNavigate();
+
   const mockHospitals = Array.from({ length: 12 }, (_, i) => ({
     id: i + 1,
     img: placeholder,
@@ -30,6 +34,7 @@ export function HospitalCardList() {
             rating={h.rating}
             reviews={h.reviews}
             kinds={h.kinds}
+            onClick={() => navigate('/index/hospitals/detail')}
           />
         ))}
       </div>
