@@ -1,8 +1,12 @@
+import { useNavigate } from 'react-router-dom';
+
 import placeholder from '@/assets/images/pageImages/placeholder.svg';
 
 import { HospitalCard } from './HospitalCard';
 
 export function HospitalInfoSlide() {
+  const navigate = useNavigate();
+
   const hospitalData = [
     {
       img: placeholder,
@@ -42,6 +46,7 @@ export function HospitalInfoSlide() {
           rating={card.rating}
           reviews={card.reviews}
           kinds={card.kinds}
+          onClick={() => navigate('detail')}
         />
       ))}
     </div>

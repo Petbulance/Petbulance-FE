@@ -11,9 +11,10 @@ export function HospitalCard({
   rating,
   reviews,
   kinds = [],
+  onClick,
 }) {
   return (
-    <HosipitalDetailWrap>
+    <HosipitalDetailWrap onClick={onClick}>
       <HosipitalDetail
         img={img}
         name={name}
