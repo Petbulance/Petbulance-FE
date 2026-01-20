@@ -2,13 +2,41 @@ import { ChevronLeft, Upload, Image as ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function ContentForm({ mode = 'create', initialData, onBack }) {
-  const [isBannerEnabled, setIsBannerEnabled] = useState(
-    initialData?.isBanner ?? false
-  );
+  /* =========================
+     Banner State
+  ========================= */
+  const [isBannerEnabled, setIsBannerEnabled] = useState(false);
+  const [bannerStartDate, setBannerStartDate] = useState('');
+  const [bannerEndDate, setBannerEndDate] = useState('');
+  const [bannerFile, setBannerFile] = useState(null); // 새로 업로드한 파일
+  const [bannerPreview, setBannerPreview] = useState(''); // 미리보기 URL
 
   useEffect(() => {
-    setIsBannerEnabled(initialData?.isBanner ?? false);
+    if (initialData?.bannerInfo) {
+      setIsBannerEnabled(true);
+      setBannerStartDate(initialData.bannerInfo.startDate ?? '');
+      setBannerEndDate(initialData.bannerInfo.endDate ?? '');
+      setBannerPreview(initialData.bannerInfo.imageUrl ?? '');
+      setBannerFile(null);
+    } else {
+      setIsBannerEnabled(false);
+      setBannerStartDate('');
+      setBannerEndDate('');
+      setBannerPreview('');
+      setBannerFile(null);
+    }
   }, [initialData]);
+
+  /* =========================
+     배너 파일 선택
+  ========================= */
+  const handleBannerFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setBannerFile(file);
+    setBannerPreview(URL.createObjectURL(file));
+  };
 
   return (
     <div className="animate-in fade-in space-y-4">
@@ -77,6 +105,9 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
           />
         </div>
 
+        {/* =========================
+           메인 배너 설정
+        ========================= */}
         <div className="rounded-lg border bg-gray-50 p-4">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -108,11 +139,15 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
                   <div className="flex items-center gap-2">
                     <input
                       type="date"
+                      value={bannerStartDate}
+                      onChange={(e) => setBannerStartDate(e.target.value)}
                       className="w-full rounded border p-2 text-sm"
                     />
                     <span>~</span>
                     <input
                       type="date"
+                      value={bannerEndDate}
+                      onChange={(e) => setBannerEndDate(e.target.value)}
                       className="w-full rounded border p-2 text-sm"
                     />
                   </div>
@@ -122,12 +157,26 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
                   <label className="mb-1 block text-xs text-gray-500">
                     배너 이미지
                   </label>
-                  <div className="flex h-[38px] cursor-pointer items-center justify-center rounded border border-dashed bg-white text-xs text-gray-400 hover:bg-gray-50">
+                  <label className="flex h-[38px] cursor-pointer items-center justify-center rounded border border-dashed bg-white text-xs text-gray-400 hover:bg-gray-50">
                     <Upload size={14} className="mr-1" />
                     파일 선택
-                  </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleBannerFileChange}
+                    />
+                  </label>
                 </div>
               </div>
+
+              {bannerPreview && (
+                <img
+                  src={bannerPreview}
+                  alt="배너 미리보기"
+                  className="h-40 w-full rounded object-cover"
+                />
+              )}
 
               <p className="text-xs text-blue-600">
                 * 메인 홈 최상단 배너에 노출되며 클릭 시 본 공지로 이동합니다.
@@ -148,6 +197,7 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
             className="w-full rounded border p-2 text-sm"
           />
         </div>
+
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
             첨부 파일

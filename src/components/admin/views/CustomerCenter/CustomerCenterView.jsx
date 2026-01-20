@@ -1,21 +1,37 @@
 import { Handshake, MessageSquare } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { MOCK_CS } from '@/components/admin/mock/customerCenter.mock.js';
+import api from '@/apis/api.jsx';
 import Pagination from '@/components/admin/Pagination.jsx';
+import { Badge } from '@/components/admin/ui/Badge.jsx';
 
-import { Badge } from '../../ui/Badge.jsx';
-
-const PAGE_SIZE = 10;
+const TAB_CONFIG = {
+  oneonone: {
+    label: '1:1 고객 문의',
+    apiType: 'ONE_ON_ONE',
+    apiUrl: '/admin/qna',
+  },
+  partnership: {
+    label: '기업 제휴 문의',
+    apiType: 'PARTNERSHIP',
+    apiUrl: '/admin/inquiries',
+  },
+};
 
 export default function CustomerCenterView() {
-  const [subTab, setSubTab] = useState('oneonone'); // oneonone | partnership
+  const [subTab, setSubTab] = useState('oneonone');
   const [page, setPage] = useState(1);
+
+  const [list, setList] = useState([]);
+  const [pageSize, setPageSize] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   /* =========================
-     상태 → Badge 색상 분기
+     상태 → Badge 색상
   ========================= */
   const getStatusColor = (status) => {
     switch (status) {
@@ -27,30 +43,73 @@ export default function CustomerCenterView() {
         return 'gray';
     }
   };
+  const mapQna = (item) => ({
+    id: item.qnaId,
+    status: item.status === 'ANSWER_WAITING' ? '대기' : '완료',
+    author: item.writerNickname,
+    title: item.title,
+    content: item.content,
+    date: item.createdAt,
+  });
+
+  const mapInquiry = (item, label) => ({
+    id: item.inquiryId,
+    status: item.inquiryAnswerType === 'ANSWER_WAITING' ? '대기' : '완료',
+    author: item.companyName ?? item.managerName,
+    title: label,
+    content: item.content,
+    date: item.createdAt,
+  });
+
+  const TAB_CONFIG = {
+    oneonone: {
+      label: '1:1 고객 문의',
+      apiUrl: '/admin/qna',
+      mapper: mapQna,
+    },
+    partnership: {
+      label: '기업 제휴 문의',
+      apiUrl: '/admin/inquiries',
+      mapper: mapInquiry,
+    },
+  };
 
   /* =========================
-     탭별 필터
+     서버 데이터 조회 (탭 + 서버 페이징)
   ========================= */
-  const filteredList = useMemo(
-    () =>
-      MOCK_CS.filter((item) =>
-        subTab === 'oneonone' ? item.type === '1:1' : item.type === '제휴'
-      ),
-    [subTab]
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const config = TAB_CONFIG[subTab];
+
+        const response = await api.get(config.apiUrl, {
+          params: { page },
+        });
+        console.log(response);
+        const data = response.data.data;
+
+        const mapped = data.content.map((item) =>
+          subTab === 'oneonone'
+            ? config.mapper(item)
+            : config.mapper(item, config.label)
+        );
+
+        setList(mapped);
+        setPageSize(data.size);
+        setTotalPages(data.totalPages);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [subTab, page]);
 
   /* =========================
-     페이징 처리
-  ========================= */
-  const totalPages = Math.ceil(filteredList.length / PAGE_SIZE);
-
-  const pagedList = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return filteredList.slice(start, start + PAGE_SIZE);
-  }, [filteredList, page]);
-
-  /* =========================
-     목록 화면
+     렌더링
   ========================= */
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
@@ -72,6 +131,7 @@ export default function CustomerCenterView() {
           <MessageSquare className="mr-1 inline h-4 w-4" />
           1:1 고객 문의
         </button>
+
         <button
           onClick={() => {
             setSubTab('partnership');
@@ -93,41 +153,58 @@ export default function CustomerCenterView() {
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-100">
             <tr>
-              <th className="w-20 px-6 py-3">no</th>
+              <th className="w-20 px-6 py-3">NO</th>
               <th className="w-24 px-6 py-3">상태</th>
               <th className="w-32 px-6 py-3">작성자</th>
               <th className="w-32 px-6 py-3">작성일</th>
               <th className="px-6 py-3">제목 및 내용</th>
             </tr>
           </thead>
+
           <tbody className="divide-y">
-            {pagedList.map((item, i) => (
-              <tr
-                key={item.id}
-                className="cursor-pointer border-gray-100 hover:bg-gray-50"
-                onClick={() => navigate(`/admin/cs/${item.id}`)}
-              >
-                <td className="px-6 py-4">{(page - 1) * PAGE_SIZE + i + 1}</td>
-                <td className="px-6 py-4">
-                  <Badge color={getStatusColor(item.status)}>
-                    {item.status}
-                  </Badge>
-                </td>
-                <td className="px-6 py-4 font-medium">{item.author}</td>
-                <td className="px-6 py-4 text-gray-500">{item.date}</td>
-                <td className="px-6 py-4">
-                  <div className="font-medium text-gray-900">{item.title}</div>
-                  <div className="max-w-lg truncate text-xs text-gray-500">
-                    {item.content}
-                  </div>
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="py-10 text-center text-gray-400">
+                  불러오는 중...
                 </td>
               </tr>
-            ))}
+            ) : list.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-10 text-center text-gray-400">
+                  데이터가 없습니다.
+                </td>
+              </tr>
+            ) : (
+              list.map((item, i) => (
+                <tr
+                  key={item.id}
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => navigate(`/admin/cs/${item.id}`)}
+                >
+                  <td className="px-6 py-4">{(page - 1) * pageSize + i + 1}</td>
+                  <td className="px-6 py-4">
+                    <Badge color={getStatusColor(item.status)}>
+                      {item.status}
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-4 font-medium">{item.author}</td>
+                  <td className="px-6 py-4 text-gray-500">{item.date}</td>
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-900">
+                      {item.title}
+                    </div>
+                    <div className="max-w-lg truncate text-xs text-gray-500">
+                      {item.content}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
-        {/* Pagination  */}
-        <div className="flex justify-center border-gray-100 bg-gray-50 py-4">
+        {/* Pagination */}
+        <div className="flex justify-center bg-gray-50 py-4">
           <Pagination page={page} totalPages={totalPages} onChange={setPage} />
         </div>
       </div>

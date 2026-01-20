@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
 import { REVIEWS } from '@/components/admin/mock/reviews.mock.js';
 import Pagination from '@/components/admin/Pagination.jsx';
 import { Badge } from '@/components/admin/ui/Badge.jsx';
@@ -17,7 +18,17 @@ export default function ReviewView() {
     const start = (page - 1) * PAGE_SIZE;
     return REVIEWS.slice(start, start + PAGE_SIZE);
   }, [page]);
-
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await api.get('/admin/review');
+        console.log(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchReviews();
+  }, []);
   return (
     <div className="animate-in fade-in space-y-4 duration-500">
       <div className="flex items-center justify-between">

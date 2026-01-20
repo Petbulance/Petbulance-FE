@@ -1,6 +1,7 @@
 import { Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
+import api from '@/apis/api.jsx';
 import { HOSPITALS } from '@/components/admin/mock/hospitals.mock.js';
 import Pagination from '@/components/admin/Pagination.jsx';
 import HospitalDetail from '@/components/admin/views/Hosptial/HospitalDetail.jsx';
@@ -25,7 +26,17 @@ export default function HospitalView() {
     () => HOSPITALS.find((h) => h.id === selectedHospitalId),
     [selectedHospitalId]
   );
-
+  useEffect(() => {
+    const fetchHospitals = async () => {
+      try {
+        const response = await api.get('/admin/hospital');
+        console.log(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchHospitals();
+  }, []);
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
       <div className="flex h-[calc(100vh-180px)] gap-6">
