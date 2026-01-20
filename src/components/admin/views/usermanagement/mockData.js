@@ -1,0 +1,71 @@
+export const MOCK_USERS = [
+  {
+    id: 1,
+    nickname: '멍멍이좋아',
+    email: 'doglover@naver.com',
+    path: '네이버',
+    date: '2024.10.01',
+    status: '정상',
+    warnings: 0,
+  },
+  {
+    id: 2,
+    nickname: '냥냥펀치',
+    email: 'catpunch@kakao.com',
+    path: '카카오',
+    date: '2024.10.05',
+    status: '후기정지',
+    warnings: 1,
+  },
+  {
+    id: 3,
+    nickname: '펫사랑',
+    email: 'petlove@gmail.com',
+    path: '구글',
+    date: '2024.10.12',
+    status: '정상',
+    warnings: 0,
+  },
+  {
+    id: 4,
+    nickname: '악플러1',
+    email: 'bad@naver.com',
+    path: '네이버',
+    date: '2024.10.15',
+    status: '커뮤정지',
+    warnings: 3,
+  },
+  {
+    id: 5,
+    nickname: '트러블메이커',
+    email: 'trouble@kakao.com',
+    path: '카카오',
+    date: '2024.10.18',
+    status: '후기+커뮤정지',
+    warnings: 6,
+  },
+];
+
+export const MOCK_USER_HISTORY = [
+  {
+    id: 1,
+    date: '2024.10.18 14:30',
+    action: '커뮤니티 정지(7일)',
+    reason: '욕설/비방 반복',
+    admin: '김영욱',
+  },
+  {
+    id: 2,
+    date: '2024.10.15 09:15',
+    action: '경고 1회',
+    reason: '댓글 도배',
+    admin: '시스템',
+  },
+  {
+    id: 3,
+    date: '2024.10.01 10:00',
+    action: '회원가입',
+    reason: '신규 가입',
+    admin: '시스템',
+  },
+];
