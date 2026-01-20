@@ -1,26 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-/* =====================
-   Components
-===================== */
-
-const StatusBadge = ({ status }) => {
-  const styles = {
-    정상: 'bg-green-100 text-green-800',
-    후기정지: 'bg-purple-100 text-purple-800',
-    커뮤정지: 'bg-purple-100 text-purple-800',
-    '후기+커뮤정지': 'bg-gray-800 text-white',
-  };
-
-  return (
-    <span
-      className={`rounded-full px-2 py-1 text-xs font-semibold ${styles[status] || 'bg-gray-100 text-gray-700'}`}
-    >
-      {status}
-    </span>
-  );
-};
+import { StatusBadge } from '@/components/admin/ui/StatusBadge.jsx';
 
 export default function UserManagementList({ users = [] }) {
   const navigate = useNavigate();

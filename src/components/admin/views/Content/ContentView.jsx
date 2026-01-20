@@ -4,41 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { CONTENTS } from '@/components/admin/mock/contents.mock.js';
 import Pagination from '@/components/admin/Pagination.jsx';
-
-import { Badge } from '../../ui/Badge.jsx';
+import { StatusBadge } from '@/components/admin/ui/StatusBadge.jsx';
 
 const PAGE_SIZE = 10;
-
-const StatusBadge = ({ status }) => {
-  const styles = {
-    정상: 'bg-green-100 text-green-800',
-    게시: 'bg-green-100 text-green-800',
-    처리: 'bg-green-100 text-green-800',
-    성공: 'bg-blue-100 text-blue-800',
-    대기: 'bg-yellow-100 text-yellow-800',
-    신고: 'bg-orange-100 text-orange-800',
-    삭제: 'bg-red-100 text-red-800',
-    중단: 'bg-red-100 text-red-800',
-    실패: 'bg-red-100 text-red-800',
-    후기정지: 'bg-purple-100 text-purple-800',
-    커뮤정지: 'bg-purple-100 text-purple-800',
-    '후기+커뮤정지': 'bg-gray-800 text-white',
-    시행중: 'bg-green-100 text-green-800',
-    예정: 'bg-blue-100 text-blue-800',
-    만료: 'bg-gray-200 text-gray-500',
-    이벤트: 'bg-pink-100 text-pink-800',
-    공지: 'bg-gray-100 text-gray-800',
-    광고: 'bg-blue-100 text-blue-800',
-  };
-  const defaultStyle = 'bg-gray-100 text-gray-800';
-  return (
-    <span
-      className={`rounded-full px-2 py-1 text-xs font-semibold ${styles[status] || defaultStyle}`}
-    >
-      {status}
-    </span>
-  );
-};
 
 export default function ContentView() {
   const [subTab, setSubTab] = useState('banner');
@@ -121,9 +89,7 @@ export default function ContentView() {
                 </td>
                 <td className="px-6 py-4 text-gray-500">{item.createdAt}</td>
                 <td className="px-6 py-4">
-                  <Badge color={item.status === '게시' ? 'green' : 'red'}>
-                    {item.status}
-                  </Badge>
+                  <StatusBadge status={item.status} />
                 </td>
                 <td className="px-6 py-4">
                   <button

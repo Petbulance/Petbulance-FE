@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { REVIEWS } from '@/components/admin/mock/reviews.mock.js';
+import { StatusBadge } from '@/components/admin/ui/StatusBadge.jsx';
 
 const MOCK_REVIEW_HISTORY = [
   {
@@ -27,18 +28,6 @@ const MOCK_REVIEW_HISTORY = [
     admin: '시스템',
   },
 ];
-
-const StatusBadge = ({ status }) => {
-  const style =
-    status === '신고'
-      ? 'bg-red-50 text-red-700'
-      : 'bg-green-50 text-green-700';
-  return (
-    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${style}`}>
-      {status}
-    </span>
-  );
-};
 
 export default function ReviewDetail() {
   const navigate = useNavigate();

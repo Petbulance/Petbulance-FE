@@ -3,23 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { MOCK_USERS, MOCK_USER_HISTORY } from '@/components/admin/views/usermanagement/mockData.js';
-
-const StatusBadge = ({ status }) => {
-  const styles = {
-    정상: 'bg-green-100 text-green-800',
-    후기정지: 'bg-purple-100 text-purple-800',
-    커뮤정지: 'bg-purple-100 text-purple-800',
-    '후기+커뮤정지': 'bg-gray-800 text-white',
-  };
-
-  return (
-    <span
-      className={`rounded-full px-2 py-1 text-xs font-semibold ${styles[status] || 'bg-gray-100 text-gray-700'}`}
-    >
-      {status}
-    </span>
-  );
-};
+import { StatusBadge } from '@/components/admin/ui/StatusBadge.jsx';
 
 export default function UserManagementDetail() {
   const navigate = useNavigate();
