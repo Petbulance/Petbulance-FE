@@ -7,12 +7,12 @@ import CommunityManagementView from '@/components/admin/views/CommunityManagemen
 import ContentView from '@/components/admin/views/ContentView.jsx';
 import CustomerCenterView from '@/components/admin/views/CustomerCenterView.jsx';
 import DashboardView from '@/components/admin/views/DashboardView.jsx';
-import HospitalView from '@/components/admin/views/HospitalView.jsx';
+import HospitalView from '@/components/admin/views/Hosptial/HospitalView.jsx';
 import ReviewView from '@/components/admin/views/ReviewView.jsx';
 import SettingsView from '@/components/admin/views/SettingsView.jsx';
 import TermsManage from '@/components/admin/views/TermsManage.jsx';
-import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
 import UserManagementDetail from '@/components/admin/views/usermanagement/UserManagementDetail.jsx';
+import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 import MainLayout from '@/components/user/layout/MainLayout.jsx';
