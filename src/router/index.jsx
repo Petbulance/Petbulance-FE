@@ -8,7 +8,8 @@ import ContentView from '@/components/admin/views/ContentView.jsx';
 import CustomerCenterView from '@/components/admin/views/CustomerCenterView.jsx';
 import DashboardView from '@/components/admin/views/DashboardView.jsx';
 import HospitalView from '@/components/admin/views/Hosptial/HospitalView.jsx';
-import ReviewView from '@/components/admin/views/ReviewView.jsx';
+import ReviewDetail from '@/components/admin/views/Review/ReviewDetail.jsx';
+import ReviewView from '@/components/admin/views/Review/ReviewView.jsx';
 import SettingsView from '@/components/admin/views/SettingsView.jsx';
 import TermsManage from '@/components/admin/views/TermsManage.jsx';
 import UserManagementDetail from '@/components/admin/views/usermanagement/UserManagementDetail.jsx';
@@ -64,6 +65,7 @@ const router = createBrowserRouter([
       { path: 'users/:id', element: <UserManagementDetail /> },
       { path: 'hospitals', element: <HospitalView /> },
       { path: 'reviews', element: <ReviewView /> },
+      { path: 'reviews/:id', element: <ReviewDetail /> },
       { path: 'community', element: <CommunityManagementView /> },
       { path: 'cs', element: <CustomerCenterView /> },
       { path: 'content', element: <ContentView /> },
