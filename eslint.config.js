@@ -26,7 +26,7 @@ export default defineConfig([
     ],
 
     plugins: {
-      react, // ⭐ JSX unused-vars 해결의 핵심
+      react,
       prettier: prettierPlugin,
       '@stylistic': stylistic,
     },
@@ -37,11 +37,11 @@ export default defineConfig([
       },
       'import/resolver': {
         node: {
-          extensions: ['.js', '.jsx', '.json'],
+          extensions: ['.js', '.jsx', '.json', '.svg'],
         },
         alias: {
           map: [['@', './src']],
-          extensions: ['.js', '.jsx', '.json'],
+          extensions: ['.js', '.jsx', '.json', '.svg'],
         },
       },
     },
@@ -73,12 +73,14 @@ export default defineConfig([
 
       /* ===== JSX unused-vars 문제 해결 핵심 ===== */
       'react/jsx-uses-vars': 'error',
-      'react/jsx-uses-react': 'off', // React 17+ automatic runtime
+      'react/jsx-uses-react': 'off',
 
       /* ===== 기본 규칙 ===== */
       'no-unused-vars': 'warn',
       'import/no-dynamic-require': 'warn',
       'import/no-nodejs-modules': 'warn',
+
+      'import/no-unresolved': ['error', { ignore: ['\\.svg\\?react$'] }],
 
       /* ===== import 정렬 ===== */
       'import/order': [
