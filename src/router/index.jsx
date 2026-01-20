@@ -11,7 +11,8 @@ import HospitalView from '@/components/admin/views/HospitalView.jsx';
 import ReviewView from '@/components/admin/views/ReviewView.jsx';
 import SettingsView from '@/components/admin/views/SettingsView.jsx';
 import TermsManage from '@/components/admin/views/TermsManage.jsx';
-import UserManagementView from '@/components/admin/views/UserManagementView.jsx';
+import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
+import UserManagementDetail from '@/components/admin/views/usermanagement/UserManagementDetail.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 import MainLayout from '@/components/user/layout/MainLayout.jsx';
@@ -60,6 +61,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardView /> },
       { path: 'users', element: <UserManagementView /> },
+      { path: 'users/:id', element: <UserManagementDetail /> },
       { path: 'hospitals', element: <HospitalView /> },
       { path: 'reviews', element: <ReviewView /> },
       { path: 'community', element: <CommunityManagementView /> },
