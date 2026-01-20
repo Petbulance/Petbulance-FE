@@ -4,8 +4,9 @@ import App from '@/App.jsx';
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import CommunityManagementView from '@/components/admin/views/CommunityManagementView.jsx';
-import ContentView from '@/components/admin/views/ContentView.jsx';
-import CustomerCenterView from '@/components/admin/views/CustomerCenterView.jsx';
+import ContentView from '@/components/admin/views/Content/ContentView.jsx';
+import CustomerCenterDetail from '@/components/admin/views/CustomerCenter/CustomerCenterDetail.jsx';
+import CustomerCenterView from '@/components/admin/views/CustomerCenter/CustomerCenterView.jsx';
 import DashboardView from '@/components/admin/views/DashboardView.jsx';
 import HospitalView from '@/components/admin/views/Hosptial/HospitalView.jsx';
 import ReviewDetail from '@/components/admin/views/Review/ReviewDetail.jsx';
@@ -68,6 +69,7 @@ const router = createBrowserRouter([
       { path: 'reviews/:id', element: <ReviewDetail /> },
       { path: 'community', element: <CommunityManagementView /> },
       { path: 'cs', element: <CustomerCenterView /> },
+      { path: 'cs/:id', element: <CustomerCenterDetail /> },
       { path: 'content', element: <ContentView /> },
       { path: 'admins', element: <SettingsView /> },
       { path: 'logs', element: <ActivityLogs /> },

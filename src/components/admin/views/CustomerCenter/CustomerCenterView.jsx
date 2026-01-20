@@ -1,17 +1,18 @@
-import { ChevronLeft, Handshake, MessageSquare } from 'lucide-react';
+import { Handshake, MessageSquare } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { MOCK_CS } from '@/components/admin/mock/customerCenter.mock.js';
 import Pagination from '@/components/admin/Pagination.jsx';
 
-import { Badge } from '../ui/Badge';
+import { Badge } from '../../ui/Badge.jsx';
 
 const PAGE_SIZE = 10;
 
 export default function CustomerCenterView() {
   const [subTab, setSubTab] = useState('oneonone'); // oneonone | partnership
-  const [selectedItem, setSelectedItem] = useState(null);
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
 
   /* =========================
      상태 → Badge 색상 분기
@@ -47,57 +48,6 @@ export default function CustomerCenterView() {
     const start = (page - 1) * PAGE_SIZE;
     return filteredList.slice(start, start + PAGE_SIZE);
   }, [filteredList, page]);
-
-  /* =========================
-     상세 화면
-  ========================= */
-  if (selectedItem) {
-    return (
-      <div className="animate-in fade-in space-y-4 duration-300">
-        <button
-          onClick={() => setSelectedItem(null)}
-          className="flex items-center text-sm text-gray-500 hover:text-gray-800"
-        >
-          <ChevronLeft size={16} className="mr-1" />
-          목록으로 돌아가기
-        </button>
-
-        <h2 className="text-2xl font-bold text-gray-800">
-          문의 상세 ({subTab === 'oneonone' ? '1:1 문의' : '제휴 문의'})
-        </h2>
-
-        <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="border-b pb-4">
-            <h3 className="mb-2 text-xl font-bold">{selectedItem.title}</h3>
-            <p className="text-sm text-gray-500">
-              작성자: {selectedItem.author} | 작성일: {selectedItem.date} |
-              상태:{' '}
-              <Badge color={getStatusColor(selectedItem.status)}>
-                {selectedItem.status}
-              </Badge>
-            </p>
-          </div>
-
-          <div className="min-h-[100px] rounded bg-gray-50 p-4 text-sm leading-relaxed">
-            {selectedItem.content}
-          </div>
-
-          <div className="pt-4">
-            <h4 className="mb-2 text-sm font-bold">관리자 답변 작성</h4>
-            <textarea
-              className="mb-3 h-32 w-full rounded border border-gray-300 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="답변을 입력하세요..."
-            />
-            <div className="flex justify-end">
-              <button className="rounded bg-blue-600 px-6 py-2 text-sm text-white hover:bg-blue-700">
-                답변 전송 및 처리 완료
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   /* =========================
      목록 화면
@@ -155,7 +105,7 @@ export default function CustomerCenterView() {
               <tr
                 key={item.id}
                 className="cursor-pointer border-gray-100 hover:bg-gray-50"
-                onClick={() => setSelectedItem(item)}
+                onClick={() => navigate(`/admin/cs/${item.id}`)}
               >
                 <td className="px-6 py-4">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4">
