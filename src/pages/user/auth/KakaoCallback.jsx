@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,24 +16,17 @@ export default function KakaoCallback() {
 
     const sendCode = async () => {
       try {
-        const res = await api.post('/auth/social/login', {
-          provider: 'KAKAO',
-          authCode,
-        });
-        console.log('로구', res);
-        /**
-         * 서버 응답 예시
-         * {
-         *   accessToken: 'xxx',
-         *   refreshToken: 'yyy'
-         * }
-         */
-        // const { accessToken, refreshToken } = res.data;
-        // 토큰 저장 (예: localStorage)
-        // localStorage.setItem('accessToken', accessToken);
-        // localStorage.setItem('refreshToken', refreshToken);
-
-        // 메인 페이지 이동
+        const res = await axios.post(
+          'https://kauth.kakao.com/oauth/token',
+          {
+            grant_type: 'authorization_code',
+            client_id: `${import.meta.env.VITE_KAKAO_REST_API_KEY}`,
+            redirect_uri: `${import.meta.env.VITE_KAKAO_REDIRECT_URI}`,
+            code: authCode,
+          },
+          { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+        );
+        localStorage.setItem('access_token', res.data.access_token);
         navigate('/');
       } catch (e) {
         console.error('카카오 로그인 실패', e);
