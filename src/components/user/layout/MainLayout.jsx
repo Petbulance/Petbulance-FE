@@ -3,7 +3,7 @@ import MainHeader from '@/components/user/layout/MainHeader.jsx';
 
 export default function MainLayout({ title, children }) {
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-gray-100">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
       {/* Header */}
       <MainHeader title={title} />
 

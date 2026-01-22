@@ -9,7 +9,7 @@ export default function Home() {
       <NearbyHospitalShortcut />
       <HomeBanner />
       <LatestReceiptReview />
-      <PopularPostList />
+      {/*<PopularPostList />*/}
     </div>
   );
 }
