@@ -1,6 +1,11 @@
 import { ChevronLeft, Handshake, MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import { Badge } from '@/components/admin/ui/Badge.jsx';
@@ -22,9 +27,9 @@ const getStatusColor = (status) => {
 export default function CustomerCenterDetail() {
   const navigate = useNavigate();
   const { id } = useParams(); // inquiryId or qnaId
-  const [searchParams] = useSearchParams();
-  const type = searchParams.get('type'); // oneonone | partnership
-
+  const location = useLocation();
+  const type = location.state?.type; // oneonone | partnership
+  console.log('타입은', type);
   const [data, setData] = useState(null);
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,21 +44,23 @@ export default function CustomerCenterDetail() {
         let response;
 
         if (type === 'oneonone') {
+          console.log('1:1');
           // 🔁 QNA (현재 롤백 상태)
-          response = await api.get(`/admin/qna/${id}`);
+          response = await api.get(`/qna/${id}`);
           const detail = response.data.data;
-
+          console.log('1:1 데이터 받아와', detail);
           setData({
             title: detail.title,
             content: detail.content,
             createdAt: detail.createdAt,
             status: detail.status,
-            answer: detail.answer,
+            answer: detail?.answer.content,
             writer: detail.writerNickname,
           });
-
-          setAnswer(detail.answer?.content ?? '');
+          setAnswer(detail.answer?.content ?? 'aaaㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴㄴ');
         } else {
+          console.log('기업');
+
           // ✅ 기업 제휴 문의
           response = await api.get(`/admin/inquiries/${id}`);
           const detail = response.data.data;
@@ -77,10 +84,11 @@ export default function CustomerCenterDetail() {
   const handleSubmitAnswer = async () => {
     try {
       if (type === 'oneonone') {
-        // TODO: QNA 답변 API
-        // await api.post(`/admin/qna/${id}/answer`, { content: answer });
+        console.log('1:1 답', answer);
+        console.log('타입', type);
+        await api.patch(`/admin/qna/${id}`, { content: answer });
       } else {
-        await api.post(`/admin/inquiries/${id}/answer`, {
+        await api.patch(`/admin/inquiries/${id}`, {
           content: answer,
         });
       }

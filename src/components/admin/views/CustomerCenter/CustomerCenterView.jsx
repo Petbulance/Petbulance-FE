@@ -179,7 +179,11 @@ export default function CustomerCenterView() {
                 <tr
                   key={item.id}
                   className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => navigate(`/admin/cs/${item.id}`)}
+                  onClick={() =>
+                    navigate(`/admin/cs/${item.id}`, {
+                      state: { type: subTab }, // oneonone | partnership
+                    })
+                  }
                 >
                   <td className="px-6 py-4">{(page - 1) * pageSize + i + 1}</td>
                   <td className="px-6 py-4">

@@ -11,6 +11,21 @@ export default function ActivityLogs() {
   const [logs, setLogs] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '-';
+
+    const date = new Date(dateString);
+
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+  };
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -73,7 +88,9 @@ export default function ActivityLogs() {
                   {totalElements - ((page - 1) * PAGE_SIZE + i)}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap">{log.datetime}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {formatDateTime(log.createdAt)}
+                </td>
 
                 <td className="px-6 py-4 whitespace-nowrap">{log.adminName}</td>
 
