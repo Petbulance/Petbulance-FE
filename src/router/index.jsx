@@ -4,14 +4,21 @@ import App from '@/App.jsx';
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import CommunityManagementView from '@/components/admin/views/CommunityManagementView.jsx';
-import ContentView from '@/components/admin/views/ContentView.jsx';
-import CustomerCenterView from '@/components/admin/views/CustomerCenterView.jsx';
+import ContentCreate from '@/components/admin/views/Content/ContentCreate.jsx';
+import ContentModify from '@/components/admin/views/Content/ContentModify.jsx';
+import ContentView from '@/components/admin/views/Content/ContentView.jsx';
+import CustomerCenterDetail from '@/components/admin/views/CustomerCenter/CustomerCenterDetail.jsx';
+import CustomerCenterView from '@/components/admin/views/CustomerCenter/CustomerCenterView.jsx';
 import DashboardView from '@/components/admin/views/DashboardView.jsx';
-import HospitalView from '@/components/admin/views/HospitalView.jsx';
-import ReviewView from '@/components/admin/views/ReviewView.jsx';
+import HospitalView from '@/components/admin/views/Hosptial/HospitalView.jsx';
+import ReviewDetail from '@/components/admin/views/Review/ReviewDetail.jsx';
+import ReviewView from '@/components/admin/views/Review/ReviewView.jsx';
 import SettingsView from '@/components/admin/views/SettingsView.jsx';
-import TermsManage from '@/components/admin/views/TermsManage.jsx';
-import UserManagementView from '@/components/admin/views/UserManagementView.jsx';
+import TermsCreate from '@/components/admin/views/terms/TermsCreate.jsx';
+import TermsManage from '@/components/admin/views/terms/TermsManage.jsx';
+import TermsModify from '@/components/admin/views/terms/TermsModify.jsx';
+import UserManagementDetail from '@/components/admin/views/usermanagement/UserManagementDetail.jsx';
+import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
 import { HospitalDetailLayout } from '@/components/hosiptals/layout/hospitalDetailLayout';
@@ -65,14 +72,21 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardView /> },
       { path: 'users', element: <UserManagementView /> },
+      { path: 'users/:id', element: <UserManagementDetail /> },
       { path: 'hospitals', element: <HospitalView /> },
       { path: 'reviews', element: <ReviewView /> },
+      { path: 'reviews/:id', element: <ReviewDetail /> },
       { path: 'community', element: <CommunityManagementView /> },
       { path: 'cs', element: <CustomerCenterView /> },
+      { path: 'cs/:id', element: <CustomerCenterDetail /> },
       { path: 'content', element: <ContentView /> },
+      { path: 'content/create', element: <ContentCreate /> },
+      { path: 'content/:id', element: <ContentModify /> },
       { path: 'admins', element: <SettingsView /> },
       { path: 'logs', element: <ActivityLogs /> },
       { path: 'terms', element: <TermsManage /> },
+      { path: 'terms/create', element: <TermsCreate /> },
+      { path: 'terms/:id', element: <TermsModify /> },
     ],
   },
   {

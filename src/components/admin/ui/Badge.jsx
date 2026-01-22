@@ -7,6 +7,9 @@ export function Badge({ children, color = 'gray' }) {
     gray: 'bg-gray-100 text-gray-800 border-gray-200',
     purple: 'bg-purple-100 text-purple-800 border-purple-200',
     indigo: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    orange: 'bg-orange-100 text-orange-800 border-orange-200',
+    pink: 'bg-pink-100 text-pink-800 border-pink-200',
+    dark: 'bg-gray-800 text-white border-gray-900',
   };
 
   return (

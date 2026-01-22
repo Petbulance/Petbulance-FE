@@ -54,15 +54,22 @@ export default function AdminLayout() {
       icon: FileText,
       path: '/admin/content',
     },
+    { id: 'terms', label: '약관 관리', icon: ScrollText, path: '/admin/terms' },
     { id: 'admins', label: '관리자 계정', icon: Shield, path: '/admin/admins' },
     { id: 'logs', label: '행동 로그', icon: Activity, path: '/admin/logs' },
-    { id: 'terms', label: '약관 관리', icon: ScrollText, path: '/admin/terms' },
   ];
 
   useEffect(() => {
     document.body.classList.add('admin');
     return () => document.body.classList.remove('admin');
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      navigate('/admin/auth/login', { replace: true });
+    }
+  }, [navigate, location.pathname]);
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-[#1E293B]">

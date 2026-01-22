@@ -7,7 +7,7 @@ const api = axios.create({
 console.log(import.meta.env.VITE_API_URL);
 api.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem('ACCESS_TOKEN');
+    const accessToken = localStorage.getItem('access_token');
     try {
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;

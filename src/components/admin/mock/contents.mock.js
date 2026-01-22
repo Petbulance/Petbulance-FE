@@ -24,5 +24,6 @@ export const CONTENTS = Array.from({ length: 50 }).map((_, i) => {
             (i % 28) + 1
           ).padStart(2, '0')}`,
     createdAt: `2024.10.${String((i % 28) + 1).padStart(2, '0')}`,
+    isBanner: true,
   };
 });
