@@ -58,6 +58,7 @@ import TermsPage from '@/pages/user/my/TermsPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
+import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
 
 const router = createBrowserRouter([
   /* ================= 루트 리다이렉트 ================= */
@@ -136,6 +137,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <ReviewMain /> },
           { path: 'search', element: <ReviewSerch /> },
+          { path: 'write', element: <WriteReview /> },
         ],
       },
       {
