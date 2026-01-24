@@ -48,12 +48,14 @@ export default function HospitalDetail({ hospital }) {
   const hours = currentHospital.hours || DEFAULT_HOURS;
 
   const tagText = useMemo(() => {
-    if (Array.isArray(currentHospital.tags)) return currentHospital.tags.join(', ');
+    if (Array.isArray(currentHospital.tags))
+      return currentHospital.tags.join(', ');
     return currentHospital.tags || '';
   }, [currentHospital.tags]);
 
   const speciesText = useMemo(() => {
-    if (Array.isArray(currentHospital.species)) return currentHospital.species.join(', ');
+    if (Array.isArray(currentHospital.species))
+      return currentHospital.species.join(', ');
     return currentHospital.species || '';
   }, [currentHospital.species]);
 
@@ -65,7 +67,9 @@ export default function HospitalDetail({ hospital }) {
             <h3 className="text-xl font-bold text-gray-800">
               {currentHospital.name || '병원을 선택하세요'}
             </h3>
-            <span className="text-sm text-gray-500">DB ID: {currentHospital.id || '-'}</span>
+            <span className="text-sm text-gray-500">
+              DB ID: {currentHospital.id || '-'}
+            </span>
           </div>
           {hospitalTab === 'info' && (
             <button className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
@@ -102,7 +106,9 @@ export default function HospitalDetail({ hospital }) {
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">병원명</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  병원명
+                </label>
                 <input
                   type="text"
                   defaultValue={currentHospital.name}
@@ -110,7 +116,9 @@ export default function HospitalDetail({ hospital }) {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">전화번호</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  전화번호
+                </label>
                 <input
                   type="text"
                   defaultValue={currentHospital.phone}
@@ -118,7 +126,9 @@ export default function HospitalDetail({ hospital }) {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">주소</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  주소
+                </label>
                 <input
                   type="text"
                   defaultValue={currentHospital.address}
@@ -126,7 +136,9 @@ export default function HospitalDetail({ hospital }) {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">위도/경도</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  위도/경도
+                </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -143,14 +155,18 @@ export default function HospitalDetail({ hospital }) {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">운영시간</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  운영시간
+                </label>
                 <div className="grid grid-cols-2 gap-2">
                   {days.map((day, idx) => (
                     <div key={day} className="flex items-center gap-2">
                       <span className="w-4 text-xs text-gray-500">{day}</span>
                       <input
                         type="text"
-                        defaultValue={hours?.[dayKeys[idx]] || DEFAULT_HOURS[dayKeys[idx]]}
+                        defaultValue={
+                          hours?.[dayKeys[idx]] || DEFAULT_HOURS[dayKeys[idx]]
+                        }
                         className="w-full rounded border p-1 text-xs"
                       />
                     </div>
@@ -158,7 +174,9 @@ export default function HospitalDetail({ hospital }) {
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">진료가능종 (태그)</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  진료가능종 (태그)
+                </label>
                 <input
                   type="text"
                   defaultValue={speciesText}
@@ -167,7 +185,9 @@ export default function HospitalDetail({ hospital }) {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">태그 (쉼표 구분)</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  태그 (쉼표 구분)
+                </label>
                 <input
                   type="text"
                   defaultValue={tagText}
@@ -175,7 +195,9 @@ export default function HospitalDetail({ hospital }) {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">병원 소개글</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  병원 소개글
+                </label>
                 <textarea
                   rows={2}
                   defaultValue={currentHospital.intro}
@@ -189,7 +211,8 @@ export default function HospitalDetail({ hospital }) {
             <div className="mb-4 flex items-start gap-2 rounded bg-blue-50 p-4 text-sm text-blue-800">
               <Activity size={16} className="mt-0.5 shrink-0" />
               <p>
-                해당 병원 정보의 수정 이력입니다. 데이터 무결성을 위해 모든 변경 사항이 기록됩니다.
+                해당 병원 정보의 수정 이력입니다. 데이터 무결성을 위해 모든 변경
+                사항이 기록됩니다.
               </p>
             </div>
             <table className="w-full overflow-hidden rounded-lg border text-left text-sm">
@@ -207,8 +230,12 @@ export default function HospitalDetail({ hospital }) {
                   <tr key={history.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-gray-500">{history.date}</td>
                     <td className="px-4 py-3 font-medium">{history.field}</td>
-                    <td className="px-4 py-3 text-xs text-red-500 line-through">{history.oldValue}</td>
-                    <td className="px-4 py-3 font-medium text-green-600">{history.newValue}</td>
+                    <td className="px-4 py-3 text-xs text-red-500 line-through">
+                      {history.oldValue}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-green-600">
+                      {history.newValue}
+                    </td>
                     <td className="px-4 py-3">{history.admin}</td>
                   </tr>
                 ))}

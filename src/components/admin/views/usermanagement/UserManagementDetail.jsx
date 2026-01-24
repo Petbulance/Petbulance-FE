@@ -2,7 +2,10 @@ import { ChevronLeft, Clock } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { MOCK_USERS, MOCK_USER_HISTORY } from '@/components/admin/views/usermanagement/mockData.js';
+import {
+  MOCK_USERS,
+  MOCK_USER_HISTORY,
+} from '@/components/admin/views/usermanagement/mockData.js';
 import { StatusBadge } from '@/components/admin/ui/StatusBadge.jsx';
 
 export default function UserManagementDetail() {
@@ -12,7 +15,7 @@ export default function UserManagementDetail() {
 
   const user = useMemo(
     () => MOCK_USERS.find((item) => String(item.id) === String(id)),
-    [id],
+    [id]
   );
 
   if (!user) {
@@ -43,7 +46,9 @@ export default function UserManagementDetail() {
         <div className="border-b px-6 pt-6 pb-0">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold text-gray-800">{user.nickname}</h3>
+              <h3 className="text-xl font-bold text-gray-800">
+                {user.nickname}
+              </h3>
               <span className="text-sm text-gray-500">{user.email}</span>
             </div>
             <StatusBadge status={user.status} />
@@ -157,8 +162,12 @@ export default function UserManagementDetail() {
                 <tbody className="divide-y">
                   {MOCK_USER_HISTORY.map((history) => (
                     <tr key={history.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-gray-500">{history.date}</td>
-                      <td className="px-4 py-3 font-medium text-red-600">{history.action}</td>
+                      <td className="px-4 py-3 text-gray-500">
+                        {history.date}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-red-600">
+                        {history.action}
+                      </td>
                       <td className="px-4 py-3">{history.reason}</td>
                       <td className="px-4 py-3">{history.admin}</td>
                     </tr>

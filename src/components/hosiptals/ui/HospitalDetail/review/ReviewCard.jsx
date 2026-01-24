@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import circle_check from '@/assets/images/icons/circle_check.svg';
 import gray_dot from '@/assets/images/icons/gray_dot.svg';
 import see_more from '@/assets/images/icons/see_more.svg';
@@ -7,8 +9,18 @@ import thumbsUp from '@/assets/images/icons/thumsUp.svg';
 import { CategoryButton } from '@/components/hosiptals/ui/HospitalCard/CategoryButton';
 
 export function ReviewCard({ review }) {
+  const navigate = useNavigate();
+
+  const handleDetailClick = () => {
+    navigate(`${review.id}`);
+  };
+
   return (
-    <div key={review.id} className="border-b border-[#EEEEEE] p-6">
+    <div
+      key={review.id}
+      onClick={handleDetailClick}
+      className="border-b border-[#EEEEEE] p-6"
+    >
       {/* 1. 상단 정보 (태그, 유저, 날짜, 더보기) */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
