@@ -41,14 +41,17 @@ import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
 import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
 import Home from '@/pages/user/Home.jsx';
+import { EditReview } from '@/pages/user/hospitalReview/EditReview';
 import HosptialsReviews from '@/pages/user/hospitalReview/HosptialsReviews.jsx';
+import ReviewDetailPage from '@/pages/user/hospitalReview/ReviewDetailPage';
 import { ReviewMain } from '@/pages/user/hospitalReview/ReviewMain';
 import { ReviewSerch } from '@/pages/user/hospitalReview/ReviewSearch';
-import { HospitalDetail } from '@/pages/user/hospitals/HospitalDetail';
-import Hospitals from '@/pages/user/hospitals/Hospitals';
-import { HospitalSearch } from '@/pages/user/hospitals/HospitalSearch';
-import { HospitalsList } from '@/pages/user/hospitals/HospitalsList';
-import HospitalsMap from '@/pages/user/hospitals/HospitalsMap';
+import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
+import { HospitalDetail } from '@/pages/user/Hospitals/HospitalDetail';
+import Hospitals from '@/pages/user/Hospitals/Hospitals';
+import { HospitalSearch } from '@/pages/user/Hospitals/HospitalSearch';
+import { HospitalsList } from '@/pages/user/Hospitals/HospitalsList';
+import HospitalsMap from '@/pages/user/Hospitals/HospitalsMap';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
 import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
@@ -141,6 +144,9 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <ReviewMain /> },
           { path: 'search', element: <ReviewSerch /> },
+          { path: 'write', element: <WriteReview /> },
+          { path: ':reviewId', element: <ReviewDetailPage /> },
+          { path: ':reviewId/edit', element: <EditReview /> },
         ],
       },
       {

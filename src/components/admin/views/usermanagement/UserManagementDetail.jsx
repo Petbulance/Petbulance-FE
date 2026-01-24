@@ -164,7 +164,6 @@ export default function UserManagementDetail() {
                   자료로 활용될 수 있습니다.
                 </p>
               </div>
-
               <table className="w-full overflow-hidden rounded-lg border text-left text-sm">
                 <thead className="border-b bg-gray-50">
                   <tr>

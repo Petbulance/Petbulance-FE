@@ -30,7 +30,7 @@ export function ReviewMain() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative bg-white">
       <ReviewFilterBar />
       <ReviewContent />
 
