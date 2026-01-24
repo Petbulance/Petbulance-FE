@@ -102,7 +102,7 @@ export default function ReviewForm_2({ data, setData, onNext }) {
   );
 }
 
-const InputField = ({ label, value, onChange, placeholder }) => (
+export const InputField = ({ label, value, onChange, placeholder }) => (
   <div className="mb-10">
     <label className="mb-2 block text-[19px] font-medium text-[#424242]">
       {label}
