@@ -1,42 +1,55 @@
 import { Search } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import api from '@/apis/api.jsx';
-import { HOSPITALS } from '@/components/admin/mock/hospitals.mock.js';
 import Pagination from '@/components/admin/Pagination.jsx';
 import HospitalDetail from '@/components/admin/views/Hosptial/HospitalDetail.jsx';
-/* 병원 샘플 데이터 35개 */
 
 export default function HospitalView() {
-  /* 페이징 */
-  const PAGE_SIZE = 10;
-  const [page, setPage] = useState(1);
+  /* =========================
+     상태
+  ========================= */
+  const PAGE_SIZE = 20;
 
-  /* 선택된 병원 */
-  const [selectedHospitalId, setSelectedHospitalId] = useState(HOSPITALS[0].id);
+  const [page, setPage] = useState(1); // UI는 1-base
+  const [totalPages, setTotalPages] = useState(0);
+  const [hospitals, setHospitals] = useState([]);
+  const [selectedHospitalId, setSelectedHospitalId] = useState(null);
+  const [keyword, setKeyword] = useState('');
 
-  const totalPages = Math.ceil(HOSPITALS.length / PAGE_SIZE);
-
-  const pagedHospitals = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return HOSPITALS.slice(start, start + PAGE_SIZE);
-  }, [page]);
-
-  const selectedHospital = useMemo(
-    () => HOSPITALS.find((h) => h.id === selectedHospitalId),
-    [selectedHospitalId]
-  );
+  /* =========================
+     병원 목록 조회 (서버 페이징)
+  ========================= */
   useEffect(() => {
     const fetchHospitals = async () => {
       try {
-        const response = await api.get('/admin/hospital');
-        console.log(response);
+        const res = await api.get('/admin/hospital', {
+          params: {
+            page: page - 1, // 서버는 0-base
+            size: PAGE_SIZE,
+            keyword,
+          },
+        });
+
+        const data = res.data.data;
+
+        setHospitals(data.content || []);
+        setTotalPages(data.totalPages || 0);
+
+        // 첫 진입 또는 페이지 변경 시 첫 병원 자동 선택
+        if (data.content?.length > 0) {
+          setSelectedHospitalId(data.content[0].id);
+        }
       } catch (error) {
         console.error(error);
+        setHospitals([]);
+        setTotalPages(0);
       }
     };
+
     fetchHospitals();
-  }, []);
+  }, [page, keyword]);
+
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
       <div className="flex h-[calc(100vh-180px)] gap-6">
@@ -49,6 +62,11 @@ export default function HospitalView() {
               <input
                 className="w-full rounded-lg border border-gray-200 py-2 pr-4 pl-9 text-sm outline-none focus:border-blue-500"
                 placeholder="병원명 검색..."
+                value={keyword}
+                onChange={(e) => {
+                  setPage(1); // 검색 시 첫 페이지
+                  setKeyword(e.target.value);
+                }}
               />
             </div>
           </div>
@@ -64,7 +82,7 @@ export default function HospitalView() {
               </thead>
 
               <tbody className="divide-y divide-gray-50">
-                {pagedHospitals.map((h) => (
+                {hospitals.map((h) => (
                   <tr
                     key={h.id}
                     onClick={() => setSelectedHospitalId(h.id)}
@@ -77,7 +95,7 @@ export default function HospitalView() {
                     <td className="px-4 py-3">
                       <div className="font-semibold">{h.name}</div>
                       <div className="mt-0.5 text-xs text-gray-400">
-                        {h.address}
+                        {h.address || '주소 없음'}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{h.id}</td>
@@ -100,7 +118,7 @@ export default function HospitalView() {
         </div>
 
         {/* ================= 우측 병원 상세 ================= */}
-        <HospitalDetail hospital={selectedHospital} />
+        <HospitalDetail hospitalId={selectedHospitalId} />
       </div>
     </div>
   );

@@ -42,18 +42,6 @@ export default function SocialSignUp() {
     window.location.href = NAVER_AUTH_URL;
   };
 
-  useEffect(() => {
-    const test = async () => {
-      try {
-        const res = await api.get('/terms');
-        console.log('ssssssss', res);
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    test();
-  }, []);
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-6">
       {/* 앱 아이콘 */}

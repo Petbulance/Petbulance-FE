@@ -1,6 +1,13 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
+/* ================= 도메인 판별 ================= */
+const isAdminDomain = window.location.hostname.startsWith('admin.');
+const isServiceDomain = !isAdminDomain;
+
+/* ================= 공통 ================= */
 import App from '@/App.jsx';
+
+/* ================= 관리자 ================= */
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import CommunityManagementView from '@/components/admin/views/CommunityManagementView.jsx';
@@ -63,7 +70,7 @@ import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
 
 const router = createBrowserRouter([
-  /* ================= 루트 리다이렉트 ================= */
+  /* ================= 루트 ================= */
   {
     path: '/',
     element: <Navigate to="/index/home" replace />,
@@ -71,7 +78,7 @@ const router = createBrowserRouter([
   /* ================= 관리자 ================= */
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: isAdminDomain ? <AdminLayout /> : <Navigate to="/" replace />,
     children: [
       { index: true, element: <DashboardView /> },
       { path: 'users', element: <UserManagementView /> },
@@ -89,7 +96,7 @@ const router = createBrowserRouter([
       { path: 'logs', element: <ActivityLogs /> },
       { path: 'terms', element: <TermsManage /> },
       { path: 'terms/create', element: <TermsCreate /> },
-      { path: 'terms/:id', element: <TermsModify /> },
+      { path: 'terms/:termsType', element: <TermsModify /> },
     ],
   },
   {
@@ -100,10 +107,8 @@ const router = createBrowserRouter([
   /* ================= 사용자 서비스 ================= */
   {
     path: '/index',
-    element: <App />, // Provider / Outlet
+    element: isServiceDomain ? <App /> : <Navigate to="/admin" replace />,
     children: [
-      { index: true, element: <Home /> },
-
       {
         path: 'home',
         element: (

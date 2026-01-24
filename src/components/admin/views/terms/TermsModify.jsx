@@ -7,19 +7,19 @@ import TermsForm from './TermsForm.jsx';
 
 export default function TermsModify() {
   const navigate = useNavigate();
-  const { type } = useParams(); // SERVICE / PRIVACY ...
-
+  const { termsType } = useParams(); // SERVICE / PRIVACY ...
+  console.log(termsType);
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTerms = async () => {
       try {
-        const res = await api.get(`/terms/${type}`);
+        const res = await api.get(`/terms/${termsType}`);
         const data = res.data.data;
 
         setItem({
-          termsType: type,
+          termsType: termsType,
           version: data.version,
           isRequired: data.required,
           content: data.summary,
@@ -33,7 +33,7 @@ export default function TermsModify() {
     };
 
     fetchTerms();
-  }, [type]);
+  }, [termsType]);
 
   if (loading) {
     return <div className="text-sm text-gray-500">로딩 중...</div>;
