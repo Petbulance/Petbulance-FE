@@ -11,4 +11,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  server: {
+    host: true,      // 중요 ⭐
+    port: 5173,
+    allowedHosts: [
+      'petbulance.local',
+      'admin.petbulance.local',
+    ],
+  },
 });
