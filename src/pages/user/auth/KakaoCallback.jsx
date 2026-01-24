@@ -27,7 +27,7 @@ export default function KakaoCallback() {
           { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
         localStorage.setItem('access_token', res.data.access_token);
-        navigate('/');
+        navigate('/index/auth/signupcomplete');
       } catch (e) {
         console.error('카카오 로그인 실패', e);
         navigate('/index/auth/login');

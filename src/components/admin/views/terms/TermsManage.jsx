@@ -100,7 +100,7 @@ export default function TermsManage() {
                   <td className="px-6 py-4 text-xs text-gray-500">-</td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => navigate(`/admin/terms/${term.id}`)}
+                      onClick={() => navigate(`/admin/terms/${term.termsType}`)}
                       className="text-blue-600 hover:underline"
                     >
                       수정

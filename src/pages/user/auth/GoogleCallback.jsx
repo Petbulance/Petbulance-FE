@@ -1,38 +1,44 @@
+import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import api from '@/apis/api.jsx';
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
     const code = new URL(window.location.href).searchParams.get('code');
-    console.log('카카오', code);
-    alert(code);
+
     if (!code) {
       navigate('/index/auth/login');
       return;
     }
 
-    const sendCode = async () => {
+    const fetchToken = async () => {
       try {
-        const res = await api.post('/auth/social/login', {
+        const params = new URLSearchParams({
+          grant_type: 'authorization_code',
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET, // ⚠️ 노출 주의
+          redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
           code,
         });
 
-        /**
-         * 서버 응답 예시
-         * {
-         *   accessToken: 'xxx',
-         *   refreshToken: 'yyy'
-         * }
-         */
-        const { accessToken, refreshToken } = res.data;
+        const res = await axios.post(
+          'https://oauth2.googleapis.com/token',
+          params,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        );
 
-        // 토큰 저장
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+        const { access_token, refresh_token } = res.data;
+
+        localStorage.setItem('accessToken', access_token);
+        if (refresh_token) {
+          localStorage.setItem('refreshToken', refresh_token);
+        }
 
         navigate('/');
       } catch (e) {
@@ -41,7 +47,7 @@ export default function GoogleCallback() {
       }
     };
 
-    sendCode();
+    fetchToken();
   }, [navigate]);
 
   return (

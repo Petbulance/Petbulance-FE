@@ -1,78 +1,191 @@
 import { Activity } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+import api from '@/apis/api.jsx';
 
 const days = ['월', '화', '수', '목', '금', '토', '일'];
-const dayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const dayMap = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-const DEFAULT_HOURS = {
-  mon: '09:00~18:00',
-  tue: '09:00~18:00',
-  wed: '09:00~18:00',
-  thu: '09:00~18:00',
-  fri: '09:00~18:00',
-  sat: '10:00~17:00',
-  sun: '휴무',
-};
-
-const MOCK_HOSPITAL_HISTORY = [
-  {
-    id: 1,
-    date: '2024-08-01 14:20',
-    field: '주소',
-    oldValue: '서울 강남구 역삼로 101',
-    newValue: '서울 강남구 역삼로 123',
-    admin: '관리자A',
-  },
-  {
-    id: 2,
-    date: '2024-07-20 09:45',
-    field: '전화번호',
-    oldValue: '02-1234-5678',
-    newValue: '02-9876-5432',
-    admin: '관리자B',
-  },
-  {
-    id: 3,
-    date: '2024-07-05 18:10',
-    field: '소개글',
-    oldValue: '반려동물의 건강을 최우선',
-    newValue: '24시간 응급 진료 가능',
-    admin: '관리자C',
-  },
-];
-
-export default function HospitalDetail({ hospital }) {
+export default function HospitalDetail({ hospitalId }) {
   const [hospitalTab, setHospitalTab] = useState('info');
+  const [hospital, setHospital] = useState(null);
+  const [form, setForm] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  /* =========================
+     병원 상세 조회
+  ========================= */
+  useEffect(() => {
+    if (!hospitalId) return;
+
+    const fetchDetail = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/admin/hospital/detail/${hospitalId}`);
+        setHospital(res.data.data);
+        console.log(res.data.data);
+        setForm(res.data.data);
+      } catch (e) {
+        console.error(e);
+        setHospital(null);
+        setForm(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetail();
+  }, [hospitalId]);
 
   const currentHospital = hospital ?? {};
-  const hours = currentHospital.hours || DEFAULT_HOURS;
 
-  const tagText = useMemo(() => {
-    if (Array.isArray(currentHospital.tags)) return currentHospital.tags.join(', ');
-    return currentHospital.tags || '';
-  }, [currentHospital.tags]);
+  /* =========================
+     운영시간 가공 (UI 유지)
+  ========================= */
+  const hours = useMemo(() => {
+    const map = {};
+    currentHospital.worktimes?.forEach((w) => {
+      const idx = dayMap.indexOf(w.dayOfWeek);
+      if (idx !== -1) {
+        map[idx] = w.isOpen
+          ? `${w.openTime ?? ''}~${w.closeTime ?? ''}`
+          : '휴무';
+      }
+    });
+    return map;
+  }, [currentHospital.worktimes]);
 
-  const speciesText = useMemo(() => {
-    if (Array.isArray(currentHospital.species)) return currentHospital.species.join(', ');
-    return currentHospital.species || '';
-  }, [currentHospital.species]);
+  const tagText = useMemo(
+    () => currentHospital.tag ?? '미작성',
+    [currentHospital.tag]
+  );
+
+  const speciesText = useMemo(
+    () =>
+      currentHospital.treatmentAnimalType
+        ? currentHospital.treatmentAnimalType.split(',').join(', ')
+        : '미작성',
+    [currentHospital.treatmentAnimalType]
+  );
+
+  /* =========================
+     공통 변경 처리
+  ========================= */
+  const updateField = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const updateWorkTime = (idx, value) => {
+    setForm((prev) => {
+      const next = [...(prev.worktimes ?? [])];
+
+      const [openTime, closeTime] =
+        value === '휴무' || value === '미작성'
+          ? [null, null]
+          : value.split('~');
+
+      next[idx] = {
+        dayOfWeek: dayMap[idx],
+        openTime,
+        closeTime,
+        isOpen: !!openTime,
+      };
+
+      return { ...prev, worktimes: next };
+    });
+  };
+
+  /* =========================
+     저장
+  ========================= */
+  const handleSave = async () => {
+    const payload = {
+      hospitalName: form.name,
+      phoneNumber: form.phoneNumber,
+
+      // ✅ 문자열 → 배열
+      tags: form.tag ? form.tag.split(',').map((t) => t.trim()) : [],
+
+      information: form.information,
+
+      address: form.address,
+      streetAddress: form.streetAddress ?? form.address,
+
+      // ✅ 숫자 보정
+      lat: form.lat !== null ? Number(form.lat) : 0,
+      lon: form.lng !== null ? Number(form.lng) : 0,
+
+      url: form.url ?? null,
+      image: form.image ?? null,
+
+      // ✅ Boolean 절대 null 금지
+      night: form.night ?? false,
+      twentyFour: form.twentyFour ?? false,
+
+      // ✅ string → enum 배열
+      animalTypes: form.treatmentAnimalType
+        ? form.treatmentAnimalType.split(',').map((v) => v.trim())
+        : [],
+
+      // ✅ worktimes → operationTimes
+      operationTimes: (form.worktimes ?? []).map((w) => ({
+        dayOfWeek: w.dayOfWeek,
+        isOpen: w.isOpen ?? false,
+        openTime: w.openTime,
+        closeTime: w.closeTime,
+        startBreakTime: w.startBreakTime ?? null,
+        endBreakTime: w.endBreakTime ?? null,
+        deadLineTime: w.deadLineTime ?? null,
+      })),
+    };
+
+    console.log('PUT payload', payload);
+
+    try {
+      await api.put(`/admin/hospital/update/${hospitalId}`, payload);
+      alert('병원 정보가 저장되었습니다.');
+    } catch (e) {
+      console.error(e);
+      alert('저장 중 오류가 발생했습니다.');
+    }
+  };
+  if (!hospitalId) {
+    return (
+      <div className="flex w-2/3 items-center justify-center rounded-lg border bg-white text-gray-400">
+        병원을 선택하세요
+      </div>
+    );
+  }
+
+  if (loading || !form) {
+    return (
+      <div className="flex w-2/3 items-center justify-center rounded-lg border bg-white text-gray-400">
+        불러오는 중...
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-2/3 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+      {/* ===== 헤더 (UI 동일) ===== */}
       <div className="border-b px-6 pt-6 pb-0">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold text-gray-800">
               {currentHospital.name || '병원을 선택하세요'}
             </h3>
-            <span className="text-sm text-gray-500">DB ID: {currentHospital.id || '-'}</span>
+            <span className="text-sm text-gray-500">DB ID: {hospitalId}</span>
           </div>
           {hospitalTab === 'info' && (
-            <button className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
+            <button
+              onClick={handleSave}
+              className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+            >
               변경사항 저장
             </button>
           )}
         </div>
+
         <div className="flex gap-6">
           <button
             onClick={() => setHospitalTab('info')}
@@ -97,91 +210,55 @@ export default function HospitalDetail({ hospital }) {
         </div>
       </div>
 
+      {/* ===== 콘텐츠 ===== */}
       <div className="flex-1 overflow-y-auto p-6">
         {hospitalTab === 'info' ? (
           <div className="grid grid-cols-2 gap-6">
+            {/* 좌측 */}
             <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">병원명</label>
-                <input
-                  type="text"
-                  defaultValue={currentHospital.name}
-                  className="w-full rounded border p-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">전화번호</label>
-                <input
-                  type="text"
-                  defaultValue={currentHospital.phone}
-                  className="w-full rounded border p-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">주소</label>
-                <input
-                  type="text"
-                  defaultValue={currentHospital.address}
-                  className="w-full rounded border p-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">위도/경도</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="37.12345"
-                    className="w-full rounded border p-2 text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="127.12345"
-                    className="w-full rounded border p-2 text-sm"
-                  />
-                </div>
-              </div>
+              <Input
+                label="병원명"
+                value={form.name}
+                onChange={(v) => updateField('name', v)}
+              />
+              <Input
+                label="전화번호"
+                value={form.phoneNumber}
+                onChange={(v) => updateField('phoneNumber', v)}
+              />
+              <Input
+                label="주소"
+                value={form.address}
+                onChange={(v) => updateField('address', v)}
+              />
+              <LatLng
+                lat={form.lat}
+                lng={form.lng}
+                onChangeLat={(v) => updateField('lat', v)}
+                onChangeLng={(v) => updateField('lng', v)}
+              />
             </div>
+
+            {/* 우측 */}
             <div className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">운영시간</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {days.map((day, idx) => (
-                    <div key={day} className="flex items-center gap-2">
-                      <span className="w-4 text-xs text-gray-500">{day}</span>
-                      <input
-                        type="text"
-                        defaultValue={hours?.[dayKeys[idx]] || DEFAULT_HOURS[dayKeys[idx]]}
-                        className="w-full rounded border p-1 text-xs"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">진료가능종 (태그)</label>
-                <input
-                  type="text"
-                  defaultValue={speciesText}
-                  className="w-full rounded border p-2 text-sm"
-                  placeholder="쉼표(,)로 구분하여 입력"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">태그 (쉼표 구분)</label>
-                <input
-                  type="text"
-                  defaultValue={tagText}
-                  className="w-full rounded border p-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">병원 소개글</label>
-                <textarea
-                  rows={2}
-                  defaultValue={currentHospital.intro}
-                  className="w-full rounded border p-2 text-sm"
-                ></textarea>
-              </div>
+              <WorkTimes hours={hours} onChange={updateWorkTime} />
+              <Input
+                label="진료가능종 (태그)"
+                value={form.treatmentAnimalType}
+                onChange={(v) =>
+                  updateField('treatmentAnimalType', v.replaceAll(' ', ''))
+                }
+              />
+              <Input
+                label="태그 (쉼표 구분)"
+                value={form.tag}
+                onChange={(v) => updateField('tag', v)}
+              />
+              <Textarea
+                label="병원 소개글"
+                value={form.information}
+                onChange={(v) => updateField('information', v)}
+              />
             </div>
           </div>
         ) : (
@@ -189,34 +266,90 @@ export default function HospitalDetail({ hospital }) {
             <div className="mb-4 flex items-start gap-2 rounded bg-blue-50 p-4 text-sm text-blue-800">
               <Activity size={16} className="mt-0.5 shrink-0" />
               <p>
-                해당 병원 정보의 수정 이력입니다. 데이터 무결성을 위해 모든 변경 사항이 기록됩니다.
+                해당 병원 정보의 수정 이력입니다. 데이터 무결성을 위해 모든 변경
+                사항이 기록됩니다.
               </p>
             </div>
-            <table className="w-full overflow-hidden rounded-lg border text-left text-sm">
-              <thead className="border-b bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3">수정 일시</th>
-                  <th className="px-4 py-3">수정 항목</th>
-                  <th className="px-4 py-3">변경 전</th>
-                  <th className="px-4 py-3">변경 후</th>
-                  <th className="px-4 py-3">작업자</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {MOCK_HOSPITAL_HISTORY.map((history) => (
-                  <tr key={history.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-500">{history.date}</td>
-                    <td className="px-4 py-3 font-medium">{history.field}</td>
-                    <td className="px-4 py-3 text-xs text-red-500 line-through">{history.oldValue}</td>
-                    <td className="px-4 py-3 font-medium text-green-600">{history.newValue}</td>
-                    <td className="px-4 py-3">{history.admin}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+            <div className="rounded border p-4 text-sm text-gray-400">
+              변경 이력 API 연동 예정
+            </div>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+/* ===== UI 보조 컴포넌트 (UI 동일) ===== */
+
+const Input = ({ label, value, onChange }) => (
+  <div>
+    <label className="mb-1 block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <input
+      type="text"
+      defaultValue={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full rounded border p-2 text-sm"
+    />
+  </div>
+);
+
+const Textarea = ({ label, value, onChange }) => (
+  <div>
+    <label className="mb-1 block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <textarea
+      rows={10}
+      defaultValue={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full rounded border p-2 text-sm"
+    />
+  </div>
+);
+
+const LatLng = ({ lat, lng, onChangeLat, onChangeLng }) => (
+  <div>
+    <label className="mb-1 block text-sm font-medium text-gray-700">
+      위도/경도
+    </label>
+    <div className="flex gap-2">
+      <input
+        type="text"
+        defaultValue={lat}
+        onChange={(e) => onChangeLat(e.target.value)}
+        className="w-full rounded border p-2 text-sm"
+      />
+      <input
+        type="text"
+        defaultValue={lng}
+        onChange={(e) => onChangeLng(e.target.value)}
+        className="w-full rounded border p-2 text-sm"
+      />
+    </div>
+  </div>
+);
+
+const WorkTimes = ({ hours, onChange }) => (
+  <div>
+    <label className="mb-1 block text-sm font-medium text-gray-700">
+      운영시간
+    </label>
+    <div className="grid grid-cols-2 gap-2">
+      {days.map((day, idx) => (
+        <div key={day} className="flex items-center gap-2">
+          <span className="w-4 text-xs text-gray-500">{day}</span>
+          <input
+            type="text"
+            defaultValue={hours[idx] || '미작성'}
+            onBlur={(e) => onChange(idx, e.target.value)}
+            className="w-full rounded border p-1 text-xs"
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+);
