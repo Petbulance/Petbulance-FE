@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 /* ================= 도메인 판별 ================= */
+// const isAdminDomain = window.location.hostname.startsWith('localhost');
 const isAdminDomain = window.location.hostname.startsWith('admin.');
 const isServiceDomain = !isAdminDomain;
 
