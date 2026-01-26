@@ -1,14 +1,28 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import api from '@/apis/api.jsx';
 import googleLogo from '@/assets/images/logo/google-color-svgrepo-com.svg';
 import kakaoLogo from '@/assets/images/logo/kakao-svgrepo-com.svg';
 import naverLogo from '@/assets/images/logo/NAVER_LOGO.png';
 import logo from '@/assets/images/logo/pet_logo.svg';
 
+// ✅ 샘플 데이터 (나중에 API로 대체)
+const MOCK_RECENT_LOGIN = {
+  provider: 'GOOGLE', // KAKAO | GOOGLE | NAVER
+  profileImage: 'https://i.pravatar.cc/100?img=12',
+  name: '민규',
+};
+
 export default function SocialSignUp() {
   const stateRef = useRef(Math.random().toString(36).substring(2));
   const state = stateRef.current;
+
+  const [recentLogin, setRecentLogin] = useState(null);
+
+  const providerLabel = {
+    KAKAO: '카카오',
+    GOOGLE: '구글',
+    NAVER: '네이버',
+  };
 
   const KAKAO_AUTH_URL =
     `https://kauth.kakao.com/oauth/authorize` +
@@ -29,18 +43,33 @@ export default function SocialSignUp() {
     `https://nid.naver.com/oauth2.0/authorize` +
     `?response_type=code` +
     `&client_id=${import.meta.env.VITE_NAVER_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(import.meta.env.VITE_NAVER_REDIRECT_URI)}` +
+    `&redirect_uri=${encodeURIComponent(
+      import.meta.env.VITE_NAVER_REDIRECT_URI
+    )}` +
     `&state=${state}`;
 
   const handleKakaoLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
   };
+
   const handleGoogleLogin = () => {
     window.location.href = GOOGLE_AUTH_URL;
   };
+
   const handleNaverLogin = () => {
     window.location.href = NAVER_AUTH_URL;
   };
+
+  // 샘플
+  useEffect(() => {
+    // mock
+    setRecentLogin(MOCK_RECENT_LOGIN);
+
+    // 나중에 이렇게 교체하면 됨
+    // api.get('/auth/recent-login').then(res => {
+    //   setRecentLogin(res.data);
+    // });
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-6">
@@ -92,6 +121,15 @@ export default function SocialSignUp() {
           </span>
           네이버로 시작하기
         </button>
+
+        {recentLogin && (
+          <div className="flex items-center justify-center gap-2 pt-2 text-sm text-green-600">
+            <span>
+              최근에 {providerLabel[recentLogin.provider]} 계정으로 로그인
+              했어요
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
