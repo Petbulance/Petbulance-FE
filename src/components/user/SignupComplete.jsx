@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
 import partyIcon from '@/assets/images/pageImages/partyImg.svg';
 import TermsBottomSheet from '@/components/user/ui/TermsBottomSheet.jsx';
 
@@ -8,6 +9,19 @@ export default function SignupComplete() {
   const [open, setOpen] = useState(true);
 
   const navigate = useNavigate();
+
+  // todo 유저 정보 가져오기
+  // useEffect(() => {
+  //   const getMyProfile = async () => {
+  //     try {
+  //       const response = await api.get('/users/me');
+  //       console.log(response);
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //   };
+  //   getMyProfile();
+  // }, []);
   return (
     <div className="flex min-h-screen flex-col bg-white px-6">
       {/* 상단 여백 + 콘텐츠 */}
