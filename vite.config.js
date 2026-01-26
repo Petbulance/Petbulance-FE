@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   server: {
-    host: true,      // 중요 ⭐
+    host: true,
     port: 5173,
     allowedHosts: [
       'petbulance.local',
