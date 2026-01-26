@@ -112,7 +112,7 @@ export default function SettingsView() {
                     onClick={() => openDeleteConfirm(adm)}
                     className="rounded bg-red-50 px-3 py-1 text-red-500 hover:bg-red-100"
                   >
-                    삭제ㅇ
+                    삭제
                   </button>
                 </td>
               </tr>
