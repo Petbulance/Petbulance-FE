@@ -118,7 +118,7 @@ function RatingStars({ rating }) {
 
 export default function LatestReceiptReview() {
   return (
-    <section>
+    <section className="bg-white px-[24px] py-[24px]">
       {/* 타이틀 */}
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-[19px] font-semibold">최신 영수증 후기</h2>
@@ -126,46 +126,49 @@ export default function LatestReceiptReview() {
       </div>
 
       {/* 캐러셀 */}
-      <Carousel
-        opts={{ loop: true, align: 'start' }}
-        plugins={[
-          Autoplay({
-            delay: 2500,
-            stopOnInteraction: false,
-          }),
-        ]}
-      >
-        <CarouselContent className="-ml-4">
-          {REVIEWS.map((review) => (
-            <CarouselItem key={review.id} className="basis-[70%] pl-4">
-              {/* 카드 */}
-              <div className="flex gap-3 rounded-xl bg-gray-100 p-3 shadow-sm">
-                {/* 좌측 이미지 */}
-                <img
-                  src={review.image}
-                  alt={review.hospital}
-                  className="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
-                />
+      <div className="-mr-[24px]">
+        <Carousel
+          opts={{ loop: true, align: 'start' }}
+          plugins={[
+            Autoplay({
+              delay: 2500,
+              stopOnInteraction: false,
+            }),
+          ]}
+          className="pr-[-24px]"
+        >
+          <CarouselContent className="-ml-4">
+            {REVIEWS.map((review) => (
+              <CarouselItem key={review.id} className="basis-[70%] pl-4">
+                {/* 카드 */}
+                <div className="flex gap-3 rounded-xl bg-gray-100 p-3 shadow-sm">
+                  {/* 좌측 이미지 */}
+                  <img
+                    src={review.image}
+                    alt={review.hospital}
+                    className="h-20 w-20 flex-shrink-0 rounded-lg object-cover"
+                  />
 
-                {/* 우측 내용 */}
-                <div className="flex flex-1 flex-col">
-                  <p className="text-sm font-semibold">{review.hospital}</p>
+                  {/* 우측 내용 */}
+                  <div className="flex flex-1 flex-col">
+                    <p className="text-sm font-semibold">{review.hospital}</p>
 
-                  <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
-                    <RatingStars rating={review.rating} />
-                    <span>({review.rating})</span>
-                    <span>· 후기 {review.count}</span>
+                    <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                      <RatingStars rating={review.rating} />
+                      <span>({review.rating})</span>
+                      <span>· 후기 {review.count}</span>
+                    </div>
+
+                    <p className="mt-1 line-clamp-2 text-xs text-gray-500">
+                      {review.content}
+                    </p>
                   </div>
-
-                  <p className="mt-1 line-clamp-2 text-xs text-gray-500">
-                    {review.content}
-                  </p>
                 </div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
     </section>
   );
 }

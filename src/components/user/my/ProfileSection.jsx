@@ -10,7 +10,7 @@ export default function ProfileSection({ isLoggedIn, user }) {
   if (!isLoggedIn) {
     return (
       <>
-        <section className="rounded-xl bg-white p-4">
+        <section className="mb-[30px] rounded-xl bg-white p-4">
           <div className="flex justify-between">
             <div>
               <h1 className="text-sm font-semibold">로그인 해주세요</h1>
@@ -47,7 +47,7 @@ export default function ProfileSection({ isLoggedIn, user }) {
 
   // 로그인
   return (
-    <section className="rounded-xl bg-white p-4">
+    <section className="mb-[30px] rounded-xl bg-white p-4">
       <div className="flex items-center justify-between">
         {/* 좌측 프로필 */}
         <div className="flex items-center gap-3">

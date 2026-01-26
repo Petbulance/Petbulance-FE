@@ -7,11 +7,11 @@ export default function MainHeader({ title }) {
   const isMyPage = title === '마이페이지';
   const isHome = location.pathname === '/index/home';
 
-  // 알림 개수
-  const notificationCount = 2;
-
-  // 99 초과 시 99+ 처리
+  // 알림 개수 예시
+  const notificationCount = 1; // 예시
+  // 99+ 분기
   const displayCount = notificationCount > 99 ? '99+' : notificationCount;
+  const isSingleDigit = String(notificationCount).length === 1;
 
   return (
     <header
@@ -36,7 +36,13 @@ export default function MainHeader({ title }) {
 
           {/* 알림 뱃지 */}
           {notificationCount > 0 && (
-            <span className="bg-success absolute -top-2 -right-2 flex min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white">
+            <span
+              className={`absolute -top-2 -right-2 flex items-center justify-center bg-[#27BE69] text-[10px] font-semibold text-white ${
+                isSingleDigit
+                  ? 'h-[16px] w-[16px] rounded-full'
+                  : 'h-[16px] min-w-[16px] rounded-full px-1'
+              } `}
+            >
               {displayCount}
             </span>
           )}

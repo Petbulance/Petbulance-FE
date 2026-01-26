@@ -75,7 +75,7 @@ export default function SupportPartnerForm() {
       <main className="flex-1 space-y-6 overflow-y-auto px-4 py-5">
         {/* 문의 유형 */}
         <section>
-          <p className="mb-2 text-[14px] font-medium text-[#1e1e1e]">
+          <p className="mb-2 text-[16px] font-medium text-[#1e1e1e]">
             문의 유형
           </p>
           <p className="mb-3 text-[13px] text-[#9E9E9E]">

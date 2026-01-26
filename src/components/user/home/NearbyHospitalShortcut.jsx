@@ -26,7 +26,7 @@ export default function NearbyHospitalShortcut() {
         <span className="">{'>'}</span>
       </button>
 
-      <div className="mt-3 flex gap-3 overflow-x-auto">
+      <div className="mt-3 flex gap-2 overflow-x-auto">
         {categories.map((item) => (
           <div
             key={item}

@@ -37,9 +37,9 @@ export default function NoticeList({ NOTIFICATIONS }) {
               {item.type}
             </span>
 
-            <p className="text-[19px] font-medium">{item.title}</p>
+            <p className="text-[17px] font-medium">{item.title}</p>
 
-            <p className="mt-1 text-[15px] text-gray-400">{item.date}</p>
+            <p className="mt-1 text-[13px] text-gray-400">{item.date}</p>
           </div>
 
           <ChevronLeft className="h-8 w-8 rotate-180 text-[#E0E0E0]" />

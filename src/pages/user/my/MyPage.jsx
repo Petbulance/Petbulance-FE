@@ -16,7 +16,7 @@ import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 
 function Group({ title, children }) {
   return (
-    <section className="mb-[20px] rounded-xl bg-white">
+    <section className="mb-[30px] rounded-xl bg-white">
       <h3 className="px-[24px] py-[8px] text-left text-[18px] font-semibold text-[#1e1e1e]">
         {title}
       </h3>

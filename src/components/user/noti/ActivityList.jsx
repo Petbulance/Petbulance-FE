@@ -40,7 +40,7 @@ export default function ActivityList({ NOTIFICATIONS }) {
           <TrashCan className="h-[21px] w-[18px]" />
         </button>
 
-        <button className="text-[18px] text-[#222222] underline underline-offset-2">
+        <button className="text-[16px] text-[#222222] underline underline-offset-2">
           전체읽음
         </button>
       </div>
@@ -59,11 +59,11 @@ export default function ActivityList({ NOTIFICATIONS }) {
             }`}
           >
             <div className="mb-1 flex items-center justify-between">
-              <p className="text-caption text-[18px]">{item.category}</p>
-              <p className="text-caption text-[18px]">{item.time}</p>
+              <p className="text-caption text-[16px]">{item.category}</p>
+              <p className="text-caption text-[16px]">{item.time}</p>
             </div>
 
-            <p className="text-[18px] text-[#1e1e1e]">{item.content}</p>
+            <p className="text-[16px] text-[#1e1e1e]">{item.content}</p>
           </div>
         ))
       )}
