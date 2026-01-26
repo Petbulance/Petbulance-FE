@@ -24,6 +24,7 @@ export default function DashboardView() {
       try {
         const res = await api.get('/admin/dashboard');
         setData(res.data.data);
+        console.log(res.data);
       } catch (e) {
         console.error(e);
       } finally {
