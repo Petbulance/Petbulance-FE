@@ -9,7 +9,7 @@ export default function Home() {
       <div className="space-y-6 bg-white px-[24px] py-[24px]">
         <NearbyHospitalShortcut />
       </div>
-      <div className="space-y-6 bg-white py-[24px] pl-[24px]">
+      <div className="space-y-6 bg-white py-[24px]">
         <HomeBanner />
       </div>
       <div className="space-y-6 bg-white">

@@ -126,20 +126,20 @@ export default function LatestReceiptReview() {
       </div>
 
       {/* 캐러셀 */}
-      <div className="-mr-[24px]">
+      <div className="-mx-[24px]">
         <Carousel
-          opts={{ loop: true, align: 'start' }}
+          opts={{ loop: true, align: 'center' }}
           plugins={[
             Autoplay({
               delay: 2500,
               stopOnInteraction: false,
             }),
           ]}
-          className="pr-[-24px]"
+          className=""
         >
           <CarouselContent className="-ml-4">
             {REVIEWS.map((review) => (
-              <CarouselItem key={review.id} className="basis-[70%] pl-4">
+              <CarouselItem key={review.id} className="basis-[90%] pl-4">
                 {/* 카드 */}
                 <div className="flex gap-3 rounded-xl bg-gray-100 p-3 shadow-sm">
                   {/* 좌측 이미지 */}
