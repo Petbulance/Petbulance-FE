@@ -11,7 +11,7 @@ export default function HospitalView() {
   ========================= */
   const PAGE_SIZE = 20;
 
-  const [page, setPage] = useState(1); // UI는 1-base
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [hospitals, setHospitals] = useState([]);
   const [selectedHospitalId, setSelectedHospitalId] = useState(null);
@@ -25,7 +25,7 @@ export default function HospitalView() {
       try {
         const res = await api.get('/admin/hospital', {
           params: {
-            page: page - 1, // 서버는 0-base
+            page: page - 1,
             size: PAGE_SIZE,
             keyword,
           },
@@ -36,14 +36,17 @@ export default function HospitalView() {
         setHospitals(data.content || []);
         setTotalPages(data.totalPages || 0);
 
-        // 첫 진입 또는 페이지 변경 시 첫 병원 자동 선택
+        // 페이지 변경 / 검색 시 첫 항목 자동 선택
         if (data.content?.length > 0) {
           setSelectedHospitalId(data.content[0].id);
+        } else {
+          setSelectedHospitalId(null);
         }
       } catch (error) {
         console.error(error);
         setHospitals([]);
         setTotalPages(0);
+        setSelectedHospitalId(null);
       }
     };
 
@@ -64,7 +67,7 @@ export default function HospitalView() {
                 placeholder="병원명 검색..."
                 value={keyword}
                 onChange={(e) => {
-                  setPage(1); // 검색 시 첫 페이지
+                  setPage(1);
                   setKeyword(e.target.value);
                 }}
               />
@@ -112,6 +115,7 @@ export default function HospitalView() {
                 page={page}
                 totalPages={totalPages}
                 onChange={setPage}
+                groupSize={5}
               />
             </div>
           </div>
