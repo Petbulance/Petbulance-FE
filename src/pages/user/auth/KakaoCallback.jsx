@@ -31,8 +31,8 @@ export default function KakaoCallback() {
           provider: 'KAKAO',
           authCode: res.data.access_token,
         });
-        console.log('데이터', JWTres);
-        localStorage.setItem('access_token', res.data.access_token);
+        console.log('데이터', JWTres.data.data.accessToken);
+        localStorage.setItem('access_token', JWTres.data.data.accessToken);
         navigate('/index/auth/signupcomplete');
       } catch (e) {
         console.error('카카오 로그인 실패', e);
