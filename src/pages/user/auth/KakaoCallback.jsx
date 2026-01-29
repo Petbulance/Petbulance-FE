@@ -26,6 +26,12 @@ export default function KakaoCallback() {
           },
           { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
+        console.log(res.data.access_token);
+        const JWTres = await api.post('/auth/social/login', {
+          provider: 'KAKAO',
+          authCode: res.data.access_token,
+        });
+        console.log('데이터', JWTres);
         localStorage.setItem('access_token', res.data.access_token);
         navigate('/index/auth/signupcomplete');
       } catch (e) {
