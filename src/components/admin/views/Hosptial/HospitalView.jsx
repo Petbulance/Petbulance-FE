@@ -1,5 +1,6 @@
 import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import Pagination from '@/components/admin/Pagination.jsx';
@@ -16,7 +17,7 @@ export default function HospitalView() {
   const [hospitals, setHospitals] = useState([]);
   const [selectedHospitalId, setSelectedHospitalId] = useState(null);
   const [keyword, setKeyword] = useState('');
-
+  const navigate = useNavigate();
   /* =========================
      병원 목록 조회 (서버 페이징)
   ========================= */
@@ -32,7 +33,7 @@ export default function HospitalView() {
         });
 
         const data = res.data.data;
-
+        console.log(data);
         setHospitals(data.content || []);
         setTotalPages(data.totalPages || 0);
 
@@ -55,10 +56,22 @@ export default function HospitalView() {
 
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
+      {/* ===== 상단 헤더 ===== */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold">병원 관리</h2>
+        <button
+          onClick={() => navigate('/admin/hospitals/create')}
+          className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+        >
+          병원 등록
+        </button>
+      </div>
+
       <div className="flex h-[calc(100vh-180px)] gap-6">
         {/* ================= 좌측 병원 리스트 ================= */}
         <div className="flex w-1/3 flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
           {/* 검색 */}
+
           <div className="border-b border-gray-100 bg-gray-50/50 p-4">
             <div className="relative">
               <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />

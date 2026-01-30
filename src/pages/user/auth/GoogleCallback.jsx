@@ -2,6 +2,8 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
+
 export default function GoogleCallback() {
   const navigate = useNavigate();
 
@@ -17,8 +19,7 @@ export default function GoogleCallback() {
       try {
         const params = new URLSearchParams({
           grant_type: 'authorization_code',
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET, // ⚠️ 노출 주의
+          client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
           redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
           code,
         });
@@ -32,15 +33,15 @@ export default function GoogleCallback() {
             },
           }
         );
-
-        const { access_token, refresh_token } = res.data;
-
-        localStorage.setItem('accessToken', access_token);
-        if (refresh_token) {
-          localStorage.setItem('refreshToken', refresh_token);
-        }
-
-        navigate('/');
+        console.log(res.data);
+        const JWTres = await api.post('/auth/social/login', {
+          provider: 'GOOGLE',
+          authCode: res.data.access_token,
+        });
+        console.log('데이터', JWTres);
+        localStorage.setItem('access_token', res.data.access_token);
+        navigate('/index/auth/signupcomplete');
+        // navigate('/');
       } catch (e) {
         console.error('구글 로그인 실패', e);
         navigate('/index/auth/login');

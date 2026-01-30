@@ -18,6 +18,7 @@ import ContentView from '@/components/admin/views/Content/ContentView.jsx';
 import CustomerCenterDetail from '@/components/admin/views/CustomerCenter/CustomerCenterDetail.jsx';
 import CustomerCenterView from '@/components/admin/views/CustomerCenter/CustomerCenterView.jsx';
 import DashboardView from '@/components/admin/views/DashboardView.jsx';
+import HospitalCreate from '@/components/admin/views/Hosptial/HospitalCreate.jsx';
 import HospitalView from '@/components/admin/views/Hosptial/HospitalView.jsx';
 import ReviewDetail from '@/components/admin/views/Review/ReviewDetail.jsx';
 import ReviewView from '@/components/admin/views/Review/ReviewView.jsx';
@@ -85,6 +86,7 @@ const router = createBrowserRouter([
       { path: 'users', element: <UserManagementView /> },
       { path: 'users/:id', element: <UserManagementDetail /> },
       { path: 'hospitals', element: <HospitalView /> },
+      { path: 'hospitals/create', element: <HospitalCreate /> },
       { path: 'reviews', element: <ReviewView /> },
       { path: 'reviews/:id', element: <ReviewDetail /> },
       { path: 'community', element: <CommunityManagementView /> },
@@ -129,6 +131,7 @@ const router = createBrowserRouter([
           { path: 'search', element: <HospitalSearch /> },
         ],
       },
+
       {
         path: 'hospitals/detail',
         element: (

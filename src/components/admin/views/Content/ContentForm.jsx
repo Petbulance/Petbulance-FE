@@ -14,7 +14,7 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [fileUrls, setFileUrls] = useState(initialData?.fileUrls || []);
-
+  const [filePreviews, setFilePreviews] = useState([]);
   /* =========================
      Banner State
   ========================= */
@@ -27,12 +27,30 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
      초기 데이터 반영 (수정 모드)
   ========================= */
   useEffect(() => {
-    if (initialData?.bannerInfo) {
+    if (!initialData) return;
+
+    //  첨부 이미지 초기 세팅 (URL)
+    if (Array.isArray(initialData.files)) {
+      const urls = initialData.files.map((f) => f.fileUrl);
+      setFileUrls(urls);
+
+      // (미리보기용)
+      const previews = initialData.files.map((f) => ({
+        previewUrl: f.fileUrl,
+        isServerFile: true, // 선택 (구분용)
+      }));
+      setFilePreviews(previews);
+    }
+
+    //  배너 초기 세팅
+    if (initialData.bannerInfo) {
       setIsBannerEnabled(true);
       setBannerStartDate(initialData.bannerInfo.startDate ?? '');
       setBannerEndDate(initialData.bannerInfo.endDate ?? '');
       setBannerPreview(initialData.bannerInfo.imageUrl ?? '');
     }
+
+    console.log('DETAIL DATA', initialData);
   }, [initialData]);
 
   /* =========================
@@ -54,32 +72,36 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
   /* =========================
      presigned URL 발급 + S3 업로드 공통 함수
   ========================= */
-  const uploadFilesWithPresign = async (files) => {
-    // 1️⃣ presigned URL 발급
-    console.log(files);
+  const uploadFilesWithPresign = async (files, usage = 'NOTICE_FILE') => {
+    if (!files || files.length === 0) return [];
+
+    const imageFiles = files.filter((f) => f.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      alert('이미지 파일만 업로드할 수 있습니다.');
+      return [];
+    }
+
     const presignRes = await api.post('/app/image/presign', {
-      files: files.map((file) => ({
+      files: imageFiles.map((file, index) => ({
+        usage, // ✅ 여기
         filename: file.name,
         contentType: file.type,
+        order: index + 1,
       })),
     });
-    console.log(presignRes);
+    console.log('s3 url', presignRes);
     const uploadedFiles = presignRes.data.data.uploadedFiles;
-    console.log('uploadedFiles', uploadedFiles);
-    // // 2️⃣ S3 PUT 업로드
-    // await Promise.all(
-    //   uploadedFiles.map((info, idx) =>
-    //     fetch(info.preSignedUrl, {
-    //       method: 'PUT',
-    //       headers: {
-    //         'Content-Type': files[idx].type,
-    //       },
-    //       body: files[idx],
-    //     })
-    //   )
-    // );
 
-    // 3️⃣ imageUrl 반환
+    const imgUpload = await Promise.all(
+      uploadedFiles.map((fileInfo, index) =>
+        fetch(fileInfo.preSignedUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': imageFiles[index].type },
+          body: imageFiles[index],
+        })
+      )
+    );
+    console.log('s3 업로드', imgUpload);
     return uploadedFiles.map((f) => f.imageUrl);
   };
 
@@ -89,8 +111,16 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
   const handleAttachFiles = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    console.log(files);
+
+    // 미리보기
+    const previews = files.map((file) => ({
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+    setFilePreviews((prev) => [...prev, ...previews]);
+
     try {
+      //  S3 업로드
       const urls = await uploadFilesWithPresign(files);
       setFileUrls((prev) => [...prev, ...urls]);
     } catch (e) {
@@ -107,19 +137,11 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
     if (!file) return;
 
     try {
-      const [imageUrl] = await uploadFilesWithPresign([file]);
+      const [imageUrl] = await uploadFilesWithPresign([file], 'BANNER');
       setBannerPreview(imageUrl);
-    } catch (e) {
-      console.error(e);
+    } catch {
       alert('배너 이미지 업로드 실패');
     }
-  };
-
-  /* =========================
-     첨부 파일 삭제
-  ========================= */
-  const handleRemoveFileUrl = (index) => {
-    setFileUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   /* =========================
@@ -313,7 +335,7 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
         {/* 첨부 파일 */}
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
-            첨부 파일
+            이미지 파일
           </label>
           <label className="flex cursor-pointer items-center justify-center rounded border border-dashed p-2 text-xs text-gray-400">
             <Upload size={14} className="mr-1" />
@@ -326,24 +348,34 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
             />
           </label>
 
-          {fileUrls.length > 0 && (
-            <ul className="mt-2 space-y-1">
-              {fileUrls.map((url, idx) => (
-                <li
+          {filePreviews.length > 0 && (
+            <div className="mt-3 w-full gap-3 md:grid-cols-4">
+              {filePreviews.map((item, idx) => (
+                <div
                   key={idx}
-                  className="flex items-center justify-between rounded bg-gray-50 px-2 py-1 text-xs"
+                  className="relative overflow-hidden rounded border"
                 >
-                  <span className="truncate">{url}</span>
+                  <img
+                    src={item.previewUrl}
+                    alt="미리보기"
+                    className="h-32 w-full object-cover"
+                  />
+
                   <button
                     type="button"
-                    onClick={() => handleRemoveFileUrl(idx)}
-                    className="text-red-500 hover:text-red-700"
+                    onClick={() => {
+                      setFilePreviews((prev) =>
+                        prev.filter((_, i) => i !== idx)
+                      );
+                      setFileUrls((prev) => prev.filter((_, i) => i !== idx));
+                    }}
+                    className="absolute top-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white"
                   >
                     삭제
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </div>
