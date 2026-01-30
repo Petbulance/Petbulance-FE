@@ -6,16 +6,47 @@ import api from '@/apis/api.jsx';
 const days = ['월', '화', '수', '목', '금', '토', '일'];
 const dayMap = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-export default function HospitalDetail({ hospitalId }) {
+export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
+  const isCreateMode = mode === 'create';
+
   const [hospitalTab, setHospitalTab] = useState('info');
   const [hospital, setHospital] = useState(null);
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(false);
 
   /* =========================
-     병원 상세 조회
+     초기화 / 상세 조회
   ========================= */
   useEffect(() => {
+    if (isCreateMode) {
+      setForm({
+        name: '',
+        phoneNumber: '',
+        address: '',
+        streetAddress: '',
+        lat: '',
+        lng: '',
+        tag: '',
+        treatmentAnimalType: '',
+        information: '',
+        url: '',
+        image: '',
+        night: false,
+        twentyFour: false,
+        worktimes: dayMap.map((d) => ({
+          dayOfWeek: d,
+          isOpen: false,
+          openTime: null,
+          closeTime: null,
+          startBreakTime: null,
+          endBreakTime: null,
+          deadLineTime: null,
+        })),
+      });
+      setHospital(null);
+      return;
+    }
+
     if (!hospitalId) return;
 
     const fetchDetail = async () => {
@@ -38,13 +69,14 @@ export default function HospitalDetail({ hospitalId }) {
   }, [hospitalId]);
 
   const currentHospital = hospital ?? {};
+  const histories = currentHospital.hospitalHistories ?? [];
 
   /* =========================
      운영시간 가공 (UI 유지)
   ========================= */
   const hours = useMemo(() => {
     const map = {};
-    currentHospital.worktimes?.forEach((w) => {
+    form?.worktimes?.forEach((w) => {
       const idx = dayMap.indexOf(w.dayOfWeek);
       if (idx !== -1) {
         map[idx] = w.isOpen
@@ -53,20 +85,7 @@ export default function HospitalDetail({ hospitalId }) {
       }
     });
     return map;
-  }, [currentHospital.worktimes]);
-
-  const tagText = useMemo(
-    () => currentHospital.tag ?? '미작성',
-    [currentHospital.tag]
-  );
-
-  const speciesText = useMemo(
-    () =>
-      currentHospital.treatmentAnimalType
-        ? currentHospital.treatmentAnimalType.split(',').join(', ')
-        : '미작성',
-    [currentHospital.treatmentAnimalType]
-  );
+  }, [form?.worktimes]);
 
   /* =========================
      공통 변경 처리
@@ -77,18 +96,17 @@ export default function HospitalDetail({ hospitalId }) {
 
   const updateWorkTime = (idx, value) => {
     setForm((prev) => {
-      const next = [...(prev.worktimes ?? [])];
-
+      const next = [...prev.worktimes];
       const [openTime, closeTime] =
         value === '휴무' || value === '미작성'
           ? [null, null]
           : value.split('~');
 
       next[idx] = {
-        dayOfWeek: dayMap[idx],
-        openTime,
-        closeTime,
+        ...next[idx],
         isOpen: !!openTime,
+        openTime: openTime ? `${openTime}:00` : null,
+        closeTime: closeTime ? `${closeTime}:00` : null,
       };
 
       return { ...prev, worktimes: next };
@@ -96,67 +114,60 @@ export default function HospitalDetail({ hospitalId }) {
   };
 
   /* =========================
-     저장
+     저장 (등록 / 수정)
   ========================= */
   const handleSave = async () => {
     const payload = {
       hospitalName: form.name,
       phoneNumber: form.phoneNumber,
 
-      // ✅ 문자열 → 배열
       tags: form.tag ? form.tag.split(',').map((t) => t.trim()) : [],
-
       information: form.information,
 
       address: form.address,
       streetAddress: form.streetAddress ?? form.address,
 
-      // ✅ 숫자 보정
-      lat: form.lat !== null ? Number(form.lat) : 0,
-      lon: form.lng !== null ? Number(form.lng) : 0,
+      lat: Number(form.lat) || 0,
+      lon: Number(form.lng) || 0,
 
-      url: form.url ?? null,
-      image: form.image ?? null,
+      url: form.url || null,
+      image: form.image || null,
 
-      // ✅ Boolean 절대 null 금지
-      night: form.night ?? false,
-      twentyFour: form.twentyFour ?? false,
+      night: !!form.night,
+      twentyFour: !!form.twentyFour,
 
-      // ✅ string → enum 배열
       animalTypes: form.treatmentAnimalType
         ? form.treatmentAnimalType.split(',').map((v) => v.trim())
         : [],
 
-      // ✅ worktimes → operationTimes
-      operationTimes: (form.worktimes ?? []).map((w) => ({
+      operationTimes: form.worktimes.map((w) => ({
         dayOfWeek: w.dayOfWeek,
-        isOpen: w.isOpen ?? false,
+        isOpen: w.isOpen,
         openTime: w.openTime,
         closeTime: w.closeTime,
-        startBreakTime: w.startBreakTime ?? null,
-        endBreakTime: w.endBreakTime ?? null,
-        deadLineTime: w.deadLineTime ?? null,
+        startBreakTime: w.startBreakTime,
+        endBreakTime: w.endBreakTime,
+        deadLineTime: w.deadLineTime,
       })),
     };
 
-    console.log('PUT payload', payload);
-
     try {
-      await api.put(`/admin/hospital/update/${hospitalId}`, payload);
-      alert('병원 정보가 저장되었습니다.');
+      if (isCreateMode) {
+        await api.post('/admin/hospital/save', payload);
+        alert('병원이 등록되었습니다.');
+      } else {
+        await api.put(`/admin/hospital/update/${hospitalId}`, payload);
+        alert('병원 정보가 저장되었습니다.');
+      }
     } catch (e) {
       console.error(e);
       alert('저장 중 오류가 발생했습니다.');
     }
   };
-  if (!hospitalId) {
-    return (
-      <div className="flex w-2/3 items-center justify-center rounded-lg border bg-white text-gray-400">
-        병원을 선택하세요
-      </div>
-    );
-  }
 
+  /* =========================
+     상태 처리
+  ========================= */
   if (loading || !form) {
     return (
       <div className="flex w-2/3 items-center justify-center rounded-lg border bg-white text-gray-400">
@@ -164,9 +175,12 @@ export default function HospitalDetail({ hospitalId }) {
       </div>
     );
   }
-
   return (
-    <div className="flex w-2/3 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div
+      className={`flex ${
+        isCreateMode ? 'w-full' : 'w-2/3'
+      } flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm`}
+    >
       {/* ===== 헤더 (UI 동일) ===== */}
       <div className="border-b px-6 pt-6 pb-0">
         <div className="mb-4 flex items-center justify-between">
@@ -176,14 +190,13 @@ export default function HospitalDetail({ hospitalId }) {
             </h3>
             <span className="text-sm text-gray-500">DB ID: {hospitalId}</span>
           </div>
-          {hospitalTab === 'info' && (
-            <button
-              onClick={handleSave}
-              className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
-            >
-              변경사항 저장
-            </button>
-          )}
+
+          <button
+            onClick={handleSave}
+            className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+          >
+            {isCreateMode ? '등록' : '변경사항 저장'}
+          </button>
         </div>
 
         <div className="flex gap-6">
@@ -265,15 +278,57 @@ export default function HospitalDetail({ hospitalId }) {
           <div className="space-y-4">
             <div className="mb-4 flex items-start gap-2 rounded bg-blue-50 p-4 text-sm text-blue-800">
               <Activity size={16} className="mt-0.5 shrink-0" />
-              <p>
-                해당 병원 정보의 수정 이력입니다. 데이터 무결성을 위해 모든 변경
-                사항이 기록됩니다.
-              </p>
+              <p>해당 병원 정보에 대한 수정 이력입니다.</p>
             </div>
 
-            <div className="rounded border p-4 text-sm text-gray-400">
-              변경 이력 API 연동 예정
-            </div>
+            <table className="w-full overflow-hidden rounded-lg border text-left text-sm">
+              <thead className="border-b bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3">일시</th>
+                  <th className="px-4 py-3">항목</th>
+                  <th className="px-4 py-3">변경 전</th>
+                  <th className="px-4 py-3">변경 후</th>
+                  <th className="px-4 py-3">담당자</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y">
+                {histories.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-4 py-6 text-center text-gray-400"
+                    >
+                      변경 이력이 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  histories.map((h, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      {/* 일시 */}
+                      <td className="px-4 py-3 text-gray-500">
+                        {new Date(h.createdAt).toLocaleString()}
+                      </td>
+                      {/* 처리 내역 */}
+                      <td className="px-4 py-3 font-medium">
+                        {h.modifySubject}
+                      </td>
+                      {/* 변경 전 */}
+                      <td className="px-4 py-3 text-xs text-red-700">
+                        {h.beforeModify || '-'}
+                      </td>
+                      {/* 변경 후 */}
+                      <td className="px-4 py-3 text-blue-600">
+                        {h.afterModify || '-'}
+                      </td>{' '}
+                      <td className="px-4 py-3 text-gray-600">
+                        {h.actorId ?? '시스템'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
