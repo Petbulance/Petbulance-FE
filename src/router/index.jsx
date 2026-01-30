@@ -130,7 +130,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'hospitals/detail',
+        path: 'hospitals/:id',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <HospitalDetailLayout>
