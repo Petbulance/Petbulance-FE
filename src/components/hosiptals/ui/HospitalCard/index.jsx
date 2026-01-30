@@ -1,54 +1,36 @@
 import { useNavigate } from 'react-router-dom';
 
-import placeholder from '@/assets/images/pageImages/placeholder.svg';
-
 import { HospitalCard } from './HospitalCard';
 
-export function HospitalInfoSlide() {
+export function HospitalInfoSlide({ hospitals, selectedHospital }) {
   const navigate = useNavigate();
 
-  const hospitalData = [
-    {
-      img: placeholder,
-      name: '리틀버드서울 버드앤주클리닉',
-      status: '진료중',
-      time: '20:00',
-      distance: '1.2',
-      phoneNumber: '02-1234-5678',
-      rating: '4.8',
-      reviews: '25',
-      kinds: ['소형동물', '포유류'],
-    },
-    {
-      img: placeholder,
-      name: '리틀버드서울 버드앤주클리닉',
-      status: '진료중',
-      time: '20:00',
-      distance: '1.2',
-      phoneNumber: '02-1234-5678',
-      rating: '4.8',
-      reviews: '25',
-      kinds: ['소형동물', '포유류'],
-    },
-  ];
+  const displayList = selectedHospital ? [selectedHospital] : hospitals;
+
+  if (displayList.length === 0) return null;
+
+  console.log('병원검색 병원카드', hospitals);
 
   return (
-    <div className="no-scrollbar absolute bottom-4 z-50 flex gap-2 overflow-x-auto px-[25.72px]">
-      {hospitalData.map((card, idx) => (
-        <HospitalCard
-          key={`${card.name}-${idx}`}
-          img={card.img}
-          name={card.name}
-          status={card.status}
-          time={card.time}
-          distance={card.distance}
-          phoneNumber={card.phoneNumber}
-          rating={card.rating}
-          reviews={card.reviews}
-          kinds={card.kinds}
-          onClick={() => navigate('detail')}
-        />
-      ))}
+    <div className="absolute right-0 bottom-4 left-0 z-50 flex flex-col items-center gap-2">
+      <div className="no-scrollbar flex w-full gap-3 overflow-x-auto px-[25.72px] pb-2">
+        {displayList.map((card) => (
+          <div key={card.hospitalId} className="flex-shrink-0">
+            <HospitalCard
+              img={card.thumbnailUrl}
+              name={card.name}
+              status={card.isOpenNow}
+              time={card.openHours}
+              distance={(card.distanceMeters / 1000).toFixed(1)}
+              phoneNumber={card.phone}
+              rating={card.rating}
+              reviews={card.reviewCount}
+              kinds={card.types}
+              onClick={() => navigate(`/index/hospitals/${card.hospitalId}`)}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -13,13 +13,25 @@ export function SearchSection({ title, emptyText, items = [], onRemove }) {
         </p>
       ) : (
         <div className="mt-4 flex flex-wrap gap-2">
-          {items.map((item) => (
-            <Chip
-              key={item}
-              label={item}
-              onRemove={onRemove ? () => onRemove(item) : undefined}
-            />
-          ))}
+          {items.map((item) => {
+            const id = item.hospitalId || item.keywordId || item.id;
+            const label = item.name || item.keyword || item;
+
+            return (
+              <Chip
+                key={id}
+                label={label}
+                onRemove={
+                  onRemove
+                    ? (e) => {
+                        e.stopPropagation();
+                        onRemove(id);
+                      }
+                    : undefined
+                }
+              />
+            );
+          })}
         </div>
       )}
     </section>

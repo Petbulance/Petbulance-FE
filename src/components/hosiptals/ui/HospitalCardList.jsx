@@ -1,40 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 
-import placeholder from '@/assets/images/pageImages/placeholder.svg';
 import { HospitalCard } from '@/components/hosiptals/ui/HospitalCard/HospitalCard';
 
-export function HospitalCardList() {
+export function HospitalCardList({ hospitals }) {
   const navigate = useNavigate();
-
-  const mockHospitals = Array.from({ length: 12 }, (_, i) => ({
-    id: i + 1,
-    img: placeholder,
-    name: `병원명 ${i + 1}`,
-    status: i % 3 === 0 ? '진료중' : '진료 종료',
-    time: i % 3 === 0 ? '20:00' : '09:00',
-    distance: (0.6 + i * 0.2).toFixed(1),
-    phoneNumber: `02-1234-56${String(70 + i).slice(-2)}`,
-    rating: (4.2 + (i % 5) * 0.1).toFixed(1),
-    reviews: String(10 + i * 3),
-    kinds: i % 2 === 0 ? ['소형동물', '포유류'] : ['조류', '파충류'],
-  }));
 
   return (
     <div className="h-full min-h-0 bg-gray-100">
       <div className="space-y-4 overflow-y-auto px-8 pt-17 pb-5">
-        {mockHospitals.map((h) => (
+        {hospitals.map((h) => (
           <HospitalCard
-            key={h.id}
-            img={h.img}
+            key={h.hospitalId}
+            img={h.thumbnailUrl}
             name={h.name}
-            status={h.status}
-            time={h.time}
-            distance={h.distance}
-            phoneNumber={h.phoneNumber}
+            status={h.isOpenNow}
+            time={h.openHours}
+            distance={(h.distanceMeters / 1000).toFixed(1)}
+            phoneNumber={h.phone}
             rating={h.rating}
-            reviews={h.reviews}
-            kinds={h.kinds}
-            onClick={() => navigate('/index/hospitals/detail')}
+            reviews={h.reviewCount}
+            kinds={h.types}
+            onClick={() => navigate(`/index/hospitals/${h.hospitalId}`)}
           />
         ))}
       </div>
