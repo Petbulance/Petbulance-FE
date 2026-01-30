@@ -3,18 +3,28 @@ import { useEffect, useState } from 'react';
 
 import api from '@/apis/api.jsx';
 
-export default function ContentForm({ mode = 'create', initialData, onBack }) {
+export default function ContentForm({
+  mode = 'create',
+  noticeId,
+  initialData,
+  onBack,
+}) {
   /* =========================
      기본 폼 State
   ========================= */
-  const [category, setCategory] = useState(initialData?.category || '이벤트');
-  const [postStatus, setPostStatus] = useState(
-    initialData?.postStatus || 'ACTIVE'
-  );
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [content, setContent] = useState(initialData?.content || '');
-  const [fileUrls, setFileUrls] = useState(initialData?.fileUrls || []);
-  const [filePreviews, setFilePreviews] = useState([]);
+  const [category, setCategory] = useState('이벤트');
+  const [postStatus, setPostStatus] = useState('ACTIVE');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+
+  /* =========================
+     파일 State (🔥 수정 핵심)
+  ========================= */
+  const [originFiles, setOriginFiles] = useState([]); // 기존 서버 파일
+  const [addFiles, setAddFiles] = useState([]); // 새로 추가할 파일(URL)
+  const [deleteFileIds, setDeleteFileIds] = useState([]); // 삭제할 fileId
+  const [filePreviews, setFilePreviews] = useState([]); // 화면 미리보기용
+
   /* =========================
      Banner State
   ========================= */
@@ -29,28 +39,36 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
   useEffect(() => {
     if (!initialData) return;
 
-    //  첨부 이미지 초기 세팅 (URL)
-    if (Array.isArray(initialData.files)) {
-      const urls = initialData.files.map((f) => f.fileUrl);
-      setFileUrls(urls);
+    setCategory(
+      initialData.noticeStatus === 'NOTICE'
+        ? '공지'
+        : initialData.noticeStatus === 'ADVERTISING'
+          ? '광고'
+          : '이벤트'
+    );
+    setPostStatus(initialData.postStatus);
+    setTitle(initialData.title);
+    setContent(initialData.content);
 
-      // (미리보기용)
-      const previews = initialData.files.map((f) => ({
-        previewUrl: f.fileUrl,
-        isServerFile: true, // 선택 (구분용)
-      }));
-      setFilePreviews(previews);
+    // 기존 파일 세팅
+    if (Array.isArray(initialData.files)) {
+      setOriginFiles(initialData.files);
+      setFilePreviews(
+        initialData.files.map((f) => ({
+          previewUrl: f.fileUrl,
+          fileId: f.fileId,
+          isServerFile: true,
+        }))
+      );
     }
 
-    //  배너 초기 세팅
+    // 배너 세팅
     if (initialData.bannerInfo) {
       setIsBannerEnabled(true);
-      setBannerStartDate(initialData.bannerInfo.startDate ?? '');
-      setBannerEndDate(initialData.bannerInfo.endDate ?? '');
-      setBannerPreview(initialData.bannerInfo.imageUrl ?? '');
+      setBannerStartDate(initialData.bannerInfo.startDate);
+      setBannerEndDate(initialData.bannerInfo.endDate);
+      setBannerPreview(initialData.bannerInfo.imageUrl);
     }
-
-    console.log('DETAIL DATA', initialData);
   }, [initialData]);
 
   /* =========================
@@ -60,39 +78,37 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
     switch (category) {
       case '공지':
         return 'NOTICE';
-      case '이벤트':
-        return 'EVENT';
       case '광고':
         return 'ADVERTISING';
       default:
-        return 'NOTICE';
+        return 'EVENT';
     }
   };
 
   /* =========================
-     presigned URL 발급 + S3 업로드 공통 함수
+     presigned URL 발급 + S3 업로드
   ========================= */
   const uploadFilesWithPresign = async (files, usage = 'NOTICE_FILE') => {
-    if (!files || files.length === 0) return [];
+    if (!files.length) return [];
 
     const imageFiles = files.filter((f) => f.type.startsWith('image/'));
-    if (imageFiles.length === 0) {
+    if (!imageFiles.length) {
       alert('이미지 파일만 업로드할 수 있습니다.');
       return [];
     }
 
     const presignRes = await api.post('/app/image/presign', {
       files: imageFiles.map((file, index) => ({
-        usage, // ✅ 여기
+        usage,
         filename: file.name,
         contentType: file.type,
         order: index + 1,
       })),
     });
-    console.log('s3 url', presignRes);
+
     const uploadedFiles = presignRes.data.data.uploadedFiles;
 
-    const imgUpload = await Promise.all(
+    await Promise.all(
       uploadedFiles.map((fileInfo, index) =>
         fetch(fileInfo.preSignedUrl, {
           method: 'PUT',
@@ -101,31 +117,40 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
         })
       )
     );
-    console.log('s3 업로드', imgUpload);
+
     return uploadedFiles.map((f) => f.imageUrl);
   };
 
   /* =========================
-     첨부 파일 업로드
+     첨부 파일 추가
   ========================= */
   const handleAttachFiles = async (e) => {
     const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+    if (!files.length) return;
 
     // 미리보기
-    const previews = files.map((file) => ({
-      file,
-      previewUrl: URL.createObjectURL(file),
-    }));
-    setFilePreviews((prev) => [...prev, ...previews]);
+    setFilePreviews((prev) => [
+      ...prev,
+      ...files.map((file) => ({
+        previewUrl: URL.createObjectURL(file),
+        isServerFile: false,
+      })),
+    ]);
 
-    try {
-      //  S3 업로드
-      const urls = await uploadFilesWithPresign(files);
-      setFileUrls((prev) => [...prev, ...urls]);
-    } catch (e) {
-      console.error(e);
-      alert('첨부 파일 업로드 실패');
+    const urls = await uploadFilesWithPresign(files);
+    setAddFiles((prev) => [...prev, ...urls]);
+  };
+
+  /* =========================
+     파일 삭제
+  ========================= */
+  const handleRemoveFile = (item, index) => {
+    setFilePreviews((prev) => prev.filter((_, i) => i !== index));
+
+    if (item.isServerFile) {
+      setDeleteFileIds((prev) => [...prev, item.fileId]);
+    } else {
+      setAddFiles((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -136,12 +161,8 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    try {
-      const [imageUrl] = await uploadFilesWithPresign([file], 'BANNER');
-      setBannerPreview(imageUrl);
-    } catch {
-      alert('배너 이미지 업로드 실패');
-    }
+    const [imageUrl] = await uploadFilesWithPresign([file], 'BANNER');
+    setBannerPreview(imageUrl);
   };
 
   /* =========================
@@ -153,32 +174,33 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
       postStatus,
       title,
       content,
-      fileUrls,
       bannerRegistered: isBannerEnabled,
-      ...(isBannerEnabled && {
-        bannerInfo: {
-          startDate: bannerStartDate,
-          endDate: bannerEndDate,
-          imageUrl: bannerPreview,
-        },
+
+      ...(isBannerEnabled
+        ? {
+            bannerInfo: {
+              startDate: bannerStartDate,
+              endDate: bannerEndDate,
+              imageUrl: bannerPreview,
+            },
+          }
+        : {
+            bannerInfo: {}, // ✅ 이게 핵심
+          }),
+
+      ...(mode === 'edit' && {
+        addFiles,
+        deleteFileIds,
       }),
     };
+
     console.log('저장 이벤트', payload);
+
     try {
       if (mode === 'create') {
         await api.post('/admin/notices', payload);
-      }
-
-      if (mode === 'edit') {
-        /* =========================
-           ✏️ 수정 (샘플)
-           PUT /admin/notices/{noticeId}
-
-           await api.put(
-             `/admin/notices/${initialData.id}`,
-             payload
-           );
-        ========================= */
+      } else {
+        await api.put(`/admin/notices/${noticeId}`, payload);
       }
 
       alert('저장 완료');
@@ -363,12 +385,7 @@ export default function ContentForm({ mode = 'create', initialData, onBack }) {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setFilePreviews((prev) =>
-                        prev.filter((_, i) => i !== idx)
-                      );
-                      setFileUrls((prev) => prev.filter((_, i) => i !== idx));
-                    }}
+                    onClick={() => handleRemoveFile(item, idx)} // ✅ 핵심
                     className="absolute top-1 right-1 rounded bg-black/60 px-2 py-1 text-xs text-white"
                   >
                     삭제
