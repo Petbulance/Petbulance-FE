@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { DefaultHeader } from './DefaultHeader';
 import { SearchHeader } from './SearchHeader';
 
-export function HospitalSearchHeader() {
+export function HospitalSearchHeader({ onSearch }) {
   const navigate = useNavigate();
 
   const [isSearching, setIsSearching] = useState(false);
@@ -16,6 +16,17 @@ export function HospitalSearchHeader() {
     if (isSearching) inputRef.current?.focus();
   }, [isSearching]);
 
+  const handleSearch = () => {
+    if (!keyword.trim()) return;
+    onSearch(keyword);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const openSearch = () => {
     setIsSearching(true);
     navigate('search');
@@ -23,6 +34,7 @@ export function HospitalSearchHeader() {
 
   const closeSearch = () => {
     setKeyword('');
+    onSearch('');
     setIsSearching(false);
     navigate(-1);
   };
@@ -39,6 +51,8 @@ export function HospitalSearchHeader() {
           inputRef={inputRef}
           keyword={keyword}
           onChangeKeyword={onChangeKeyword}
+          onKeyDown={handleKeyDown}
+          onConfirm={handleSearch}
         />
       )}
     </header>

@@ -1,8 +1,8 @@
 import site_icon from '@/assets/images/icons/site_icon.svg';
 
-export function BottomTab() {
+export function BottomTab({ onClick }) {
   return (
-    <div className="absolute right-0 bottom-8 left-0 px-8 pt-4">
+    <div className="sticky right-0 bottom-8 left-0 px-8 pt-4">
       <div className="flex gap-3">
         <button
           type="button"
@@ -16,6 +16,7 @@ export function BottomTab() {
 
         <button
           type="button"
+          onClick={onClick}
           className="flex-1 rounded-3xl bg-[#2DA969] text-[27px] leading-7 font-medium text-white shadow-lg active:bg-green-600"
         >
           병원 보기
