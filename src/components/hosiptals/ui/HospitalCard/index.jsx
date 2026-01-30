@@ -17,7 +17,7 @@ export function HospitalInfoSlide({ hospitals, selectedHospital }) {
         {displayList.map((card) => (
           <div key={card.hospitalId} className="flex-shrink-0">
             <HospitalCard
-              img={card.thumbnailUrl}
+              img={card.image}
               name={card.name}
               status={card.isOpenNow}
               time={card.openHours}
