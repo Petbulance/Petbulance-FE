@@ -47,7 +47,7 @@ import ReviewDetailPage from '@/pages/user/hospitalReview/ReviewDetailPage';
 import { ReviewMain } from '@/pages/user/hospitalReview/ReviewMain';
 import { ReviewSerch } from '@/pages/user/hospitalReview/ReviewSearch';
 import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
-import { HospitalDetail } from '@/pages/user/Hospitals/HospitalDetail';
+import { HospitalDetail } from '@/pages/user/Hospitals/HospitalDetail.jsx';
 import Hospitals from '@/pages/user/Hospitals/Hospitals';
 import { HospitalSearch } from '@/pages/user/Hospitals/HospitalSearch';
 import { HospitalsList } from '@/pages/user/Hospitals/HospitalsList';
