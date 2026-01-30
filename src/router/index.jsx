@@ -7,7 +7,6 @@ const isServiceDomain = !isAdminDomain;
 
 /* ================= 공통 ================= */
 import App from '@/App.jsx';
-
 /* ================= 관리자 ================= */
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
