@@ -18,25 +18,15 @@ export function HospitalsList() {
 
   const {
     filterState,
-
     setFilterState,
-
     hospitals,
-
     activeSheet,
-
     setActiveSheet,
-
     isSortOpen,
-
     setIsSortOpen,
-
     handleSortChange,
-
     handleToggleOpen,
-
     handleApplyFilter,
-
     closeSheet,
   } = useHospitalFilter();
 
