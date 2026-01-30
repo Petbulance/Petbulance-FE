@@ -7,7 +7,6 @@ const isServiceDomain = !isAdminDomain;
 
 /* ================= 공통 ================= */
 import App from '@/App.jsx';
-
 /* ================= 관리자 ================= */
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
@@ -49,11 +48,11 @@ import ReviewDetailPage from '@/pages/user/hospitalReview/ReviewDetailPage';
 import { ReviewMain } from '@/pages/user/hospitalReview/ReviewMain';
 import { ReviewSerch } from '@/pages/user/hospitalReview/ReviewSearch';
 import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
-import { HospitalDetail } from '@/pages/user/Hospitals/HospitalDetail';
-import Hospitals from '@/pages/user/Hospitals/Hospitals';
-import { HospitalSearch } from '@/pages/user/Hospitals/HospitalSearch';
-import { HospitalsList } from '@/pages/user/Hospitals/HospitalsList';
-import HospitalsMap from '@/pages/user/Hospitals/HospitalsMap';
+import { HospitalDetail } from '@/pages/user/hospitals/HospitalDetail.jsx';
+import Hospitals from '@/pages/user/hospitals/Hospitals';
+import { HospitalSearch } from '@/pages/user/hospitals/HospitalSearch';
+import { HospitalsList } from '@/pages/user/hospitals/HospitalsList';
+import HospitalsMap from '@/pages/user/hospitals/HospitalsMap';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
 import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
@@ -133,7 +132,7 @@ const router = createBrowserRouter([
       },
 
       {
-        path: 'hospitals/detail',
+        path: 'hospitals/:id',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <HospitalDetailLayout>

@@ -18,13 +18,13 @@ export function HospitalCard({
       <HosipitalDetail
         img={img}
         name={name}
-        status={status}
+        openNow={status}
         time={time}
-        distance={distance}
-        phoneNumber={phoneNumber}
-        rating={rating}
-        reviews={reviews}
-        kinds={kinds}
+        distanceMeter={distance}
+        phone={phoneNumber}
+        overallRating={rating}
+        reviewCount={reviews}
+        acceptedAnimals={kinds}
       />
     </HosipitalDetailWrap>
   );

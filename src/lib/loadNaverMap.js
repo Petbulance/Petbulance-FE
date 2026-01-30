@@ -1,10 +1,10 @@
 let promise;
 
-export function loadNaverMap(ncpKeyId) {
+export function loadNaverMap(ncpClientId) {
   if (window.naver?.maps) return Promise.resolve(window.naver);
   if (promise) return promise;
 
-  if (!ncpKeyId) {
+  if (!ncpClientId) {
     return Promise.reject(new Error('Naver Map Key가 비어있습니다.'));
   }
 
@@ -46,8 +46,8 @@ export function loadNaverMap(ncpKeyId) {
     script.defer = true;
 
     script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(
-      ncpKeyId
-    )}`;
+      ncpClientId
+    )}&submodules=geocoder`;
 
     //스크립트 로드 완료 후 객체 초기화 대기
     script.onload = () => {

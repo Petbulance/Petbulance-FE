@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { BottomTab } from './BottomTab';
 import { TabMenu } from './TabMenu';
 
 export function HospitalFilterModalContainer({ mode, onClose, children }) {
@@ -72,7 +71,7 @@ export function HospitalFilterModalContainer({ mode, onClose, children }) {
     >
       <div
         className={[
-          'flex max-h-[88dvh] w-full flex-col rounded-t-[55px] bg-white',
+          'flex max-h-[88dvh] w-full flex-col rounded-t-[55px] bg-white pb-5',
           isDragging ? '' : 'transition-transform duration-200 ease-out',
         ].join(' ')}
         style={{ transform: `translateY(${translateY}px)` }}

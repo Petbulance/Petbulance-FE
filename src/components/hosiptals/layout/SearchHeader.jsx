@@ -6,6 +6,8 @@ export function SearchHeader({
   inputRef,
   keyword,
   onChangeKeyword,
+  onKeyDown,
+  onConfirm,
 }) {
   return (
     <div className="flex items-center py-3 pr-5 pl-[14px]">
@@ -18,10 +20,13 @@ export function SearchHeader({
           ref={inputRef}
           value={keyword}
           onChange={onChangeKeyword}
+          onKeyDown={onKeyDown}
           placeholder="검색어를 입력하세요"
           className="w-full bg-transparent text-[20px] font-medium text-[#424242] outline-none placeholder:text-[#BDBDBD]"
         />
-        <img src={SmallMagnifier} alt="search" />
+        <button type="button" onClick={onConfirm}>
+          <img src={SmallMagnifier} alt="search" />
+        </button>
       </div>
 
       <button

@@ -1,21 +1,54 @@
-import { Outlet, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
 import { ServiceBanner } from '@/components/commons/banner';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell';
 import { HospitalSearchLayout } from '@/components/hosiptals/layout/hospitalSearchLayout';
 
 export default function Hospitals() {
-  const [params] = useSearchParams();
-  const sheet = params.get('sheet');
-  const isModalOpen = sheet === 'region' || sheet === 'animal';
+  const [activeSheet, setActiveSheet] = useState(null);
+
+  const [hospitals, setHospitals] = useState([]);
+
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const [filterState, setFilterState] = useState({
+    city: '',
+
+    region: '',
+
+    animal: [],
+
+    sort: 'distance',
+
+    isOpen: false,
+  });
+
+  const hospitalContext = {
+    activeSheet,
+
+    setActiveSheet,
+
+    hospitals,
+
+    setHospitals,
+
+    filterState,
+
+    setFilterState,
+
+    searchKeyword,
+
+    setSearchKeyword,
+  };
 
   return (
     <LayoutShell banner={<ServiceBanner />}>
-      {isModalOpen ? (
-        <Outlet />
+      {activeSheet ? (
+        <Outlet context={hospitalContext} />
       ) : (
-        <HospitalSearchLayout>
-          <Outlet />
+        <HospitalSearchLayout onSearch={setSearchKeyword}>
+          <Outlet context={hospitalContext} />
         </HospitalSearchLayout>
       )}
     </LayoutShell>
