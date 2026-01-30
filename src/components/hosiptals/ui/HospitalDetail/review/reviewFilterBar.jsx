@@ -6,17 +6,21 @@ import gray_check from '@/assets/images/icons/gray_check.svg';
 import navy_camera from '@/assets/images/icons/navy_camera.svg';
 import navy_check from '@/assets/images/icons/navy_check.svg';
 
-export function ReviewFilterBar() {
-  const [isPhotoOnly, setIsPhotoOnly] = useState(false);
+export function ReviewFilterBar({
+  isPhotoOnly,
+  setIsPhotoOnly,
+  currentSortLabel,
+  onOpenSort,
+}) {
   const [isReceiptAuth, setIsReceiptAuth] = useState(true);
 
   return (
     <div className="flex items-center gap-3 bg-white px-6 pt-4 pb-3">
       <button
         className="flex items-center gap-1 text-[18px] font-medium text-[#1E1E1E]"
-        onClick={() => console.log('정렬 모달 오픈')}
+        onClick={onOpenSort}
       >
-        최신순
+        {currentSortLabel}
         <img src={down_arrow} alt="toggle" />
       </button>
 

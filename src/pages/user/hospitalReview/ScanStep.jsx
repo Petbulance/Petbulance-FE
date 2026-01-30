@@ -1,7 +1,8 @@
-import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
-import { ReceiptPreview } from '@/components/reviews/ui/ReceiptPreview';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
+import { ReceiptPreview } from '@/components/reviews/ui/ReceiptPreview';
 
 export default function ScanStep() {
   const fileRef = useRef(null);

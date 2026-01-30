@@ -1,3 +1,13 @@
+const DAY_MAP = {
+  MON: '월요일',
+  TUE: '화요일',
+  WED: '수요일',
+  THU: '목요일',
+  FRI: '금요일',
+  SAT: '토요일',
+  SUN: '일요일',
+};
+
 export function BusinessHoursSection({ hours }) {
   if (!hours) return null;
 
@@ -12,17 +22,19 @@ export function BusinessHoursSection({ hours }) {
           <div key={index} className="flex items-center">
             <span
               className={`shrink-0 ${
-                item.type === 'sat'
+                item.day === 'SAT'
                   ? 'text-[#0265CF]'
-                  : item.type === 'hol'
+                  : item.day === 'SUN'
                     ? 'text-[#E74D23]'
                     : 'text-[#9E9E9E]'
               }`}
             >
-              {item.day}
+              {DAY_MAP[item.day] || item.day}
             </span>
 
-            <span className="ml-8">{item.time}</span>
+            <span className="ml-8">
+              {item.hours === 'CLOSED' ? '휴무' : item.hours}
+            </span>
           </div>
         ))}
       </div>
