@@ -1,51 +1,58 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-import placeholder from '@/assets/images/pageImages/placeholder.svg';
+import { fetchHospitalDetail } from '@/apis/hospitals/hospitalDetail';
 import { HosipitalDetail } from '@/components/hosiptals/ui/HospitalCard/HospitalDetail';
 import { DetailContent } from '@/components/hosiptals/ui/HospitalDetail/detailInfo';
 import { DetailTabMenu } from '@/components/hosiptals/ui/HospitalDetail/DetailTabMenu';
-import { HospitalDetailHeader } from '@/components/hosiptals/ui/HospitalDetail/HospitalDetailHeader';
 import { ReviewContent } from '@/components/hosiptals/ui/HospitalDetail/review';
 
 export function HospitalDetail() {
+  const { id } = useParams();
+
+  const [hospital, setHospital] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('detail');
 
-  const hospitalData = {
-    img: placeholder,
-    name: '리틀버드서울 버드앤주클리닉',
-    status: '진료중',
-    time: '20:00',
-    distance: '1.2',
-    phoneNumber: '02-1234-5678',
-    rating: '4.8',
-    reviews: '25',
-    kinds: ['소형동물', '포유류'],
-    address: '서울 마포구 독막로 13길 31, 병원명',
-    hours: [
-      { day: '월요일', time: '09:00 - 18:00' },
-      { day: '화요일', time: '09:00 - 18:00' },
-      { day: '수요일', time: '09:00 - 18:00' },
-      { day: '목요일', time: '09:00 - 18:00' },
-      { day: '금요일', time: '09:00 - 18:00' },
-      { day: '토요일', time: '11:00 - 15:00', type: 'sat' },
-      { day: '일요일', time: '휴무', type: 'hol' },
-      { day: '공휴일', time: '휴무', type: 'hol' },
-    ],
-  };
+  useEffect(() => {
+    const getDetail = async () => {
+      setIsLoading(true);
+
+      //사용자의 현위치 조회
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          try {
+            const data = await fetchHospitalDetail(id, latitude, longitude);
+            setHospital(data);
+          } catch (error) {
+            console.error('상세 정보 조회 실패');
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        async (err) => {
+          console.error('위치 정보 차단됨', err);
+          setIsLoading(false);
+        }
+      );
+    };
+
+    if (id) getDetail();
+  }, [id]);
+
+  //TODO: 로딩화면 변경
+  if (isLoading) return <div>로딩 중...</div>;
+  if (!hospital) return <div>정보를 찾을 수 없습니다.</div>;
 
   return (
     <div className="relative flex flex-col bg-[#F5F5F5]">
       <div className="bg-white px-8 py-10">
-        <HosipitalDetail {...hospitalData} />
+        <HosipitalDetail {...hospital} />
       </div>
       <DetailTabMenu activeTab={activeTab} onChangeTab={setActiveTab} />
       <div className="flex-1">
-        {activeTab === 'detail' && (
-          <DetailContent
-            hospitalData={hospitalData}
-            hours={hospitalData.hours}
-          />
-        )}
+        {activeTab === 'detail' && <DetailContent hospitalData={hospital} />}
         {activeTab === 'review' && <ReviewContent />}
       </div>
     </div>
