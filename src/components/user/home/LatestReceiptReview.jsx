@@ -110,7 +110,7 @@ export default function LatestReceiptReview() {
                     <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
                       <RatingStars rating={review.totalRating} />
                       <span>({review.totalRating.toFixed(1)})</span>
-                      <span>· 후기 {review.likeCount}</span>
+                      <span>· 후기 {review.reviewCount}</span>
                     </div>
 
                     <p className="mt-1 line-clamp-2 text-xs text-gray-500">
