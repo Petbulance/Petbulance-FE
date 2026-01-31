@@ -63,13 +63,17 @@ export default function HomeBanner() {
         ]}
         className="overflow-hidden"
       >
+        {/*todo */}
         <CarouselContent className="-ml-0">
           {banners.map((banner) => (
             <CarouselItem
               key={banner.bannerId}
               className="mr-[10px] basis-[90%] pl-0"
             >
-              <div className="relative overflow-hidden rounded-lg">
+              <div
+                className="relative cursor-pointer overflow-hidden rounded-lg"
+                onClick={() => navigate(`/notices/${banner.noticeId}`)}
+              >
                 <img
                   src={banner.imageUrl}
                   alt="banner"
@@ -80,10 +84,7 @@ export default function HomeBanner() {
                 <div className="absolute inset-0 bg-black/30 p-4 text-white">
                   {/* 하단 버튼 영역 */}
                   <div className="absolute right-3 bottom-3 left-3 flex items-center justify-between">
-                    <button
-                      onClick={() => navigate(`/notices/${banner.noticeId}`)}
-                      className="rounded-md bg-white/90 px-3 py-1 text-xs font-medium text-black"
-                    >
+                    <button className="rounded-md bg-white/90 px-3 py-1 text-xs font-medium text-black">
                       자세히
                     </button>
 

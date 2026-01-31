@@ -1,6 +1,6 @@
 import { LogOut } from 'lucide-react';
 
-import logo from '@/assets/images/logo/pet_logo.svg';
+import logo from '@/assets/images/logo/pet_logo.png';
 
 export default function AdminSidebar({ menus, isOpen, currentPath, onChange }) {
   /** ✅ 하위 경로 포함 active 판별 */
