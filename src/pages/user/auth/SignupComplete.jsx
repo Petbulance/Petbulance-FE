@@ -18,6 +18,7 @@ export default function SignupComplete() {
   const getMyProfile = async () => {
     try {
       const response = await api.get('/users/me');
+      console.log('유저조회', response);
       setNickname(response.data.data.nickname);
     } catch (e) {
       console.error('유저 조회 실패', e);
@@ -34,7 +35,7 @@ export default function SignupComplete() {
     try {
       const response = await api.get('/terms/status');
       const terms = response.data.data;
-
+      console.log('정책', terms);
       const hasAgree =
         terms.service === 'AGREE' ||
         terms.privacy === 'AGREE' ||

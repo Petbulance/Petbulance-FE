@@ -40,7 +40,7 @@ export default function GoogleCallback() {
           authCode: res.data.access_token,
         });
         console.log('데이터', JWTres);
-        localStorage.setItem('access_token', res.data.access_token);
+        localStorage.setItem('access_token', JWTres.data.access_token);
         localStorage.setItem(
           'recent_login',
           JSON.stringify({
