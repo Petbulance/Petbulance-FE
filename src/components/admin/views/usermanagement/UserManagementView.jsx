@@ -26,6 +26,7 @@ export default function UserManagement() {
           usernameOrEmail: params.keyword || '',
           signUpPath: params.provider !== 'ALL' ? params.provider : undefined,
           userStatus: params.status !== 'ALL' ? params.status : undefined,
+          userType: 'ROLE_CLIENT',
         },
       });
       setUsers(response.data.data.content || []);
