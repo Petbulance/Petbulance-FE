@@ -16,6 +16,7 @@ export default function KakaoCallback() {
 
     const sendCode = async () => {
       try {
+        console.log(`${import.meta.env.VITE_KAKAO_REST_API_KEY}`);
         const res = await axios.post(
           'https://kauth.kakao.com/oauth/token',
           {

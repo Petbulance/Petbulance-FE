@@ -47,10 +47,6 @@ export default function SocialSignUp() {
       import.meta.env.VITE_NAVER_REDIRECT_URI
     )}` +
     `&state=${state}`;
-  useEffect(() => {
-    console.log(`${import.meta.env.VITE_GOOGLE_CLIENT_ID}`);
-    console.log(`${import.meta.env.VITE_GOOGLE_REDIRECT_URI}`);
-  }, []);
   const handleKakaoLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
   };

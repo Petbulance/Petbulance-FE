@@ -67,6 +67,7 @@ export default function ContentModify() {
   return (
     <ContentForm
       mode="edit"
+      noticeId={id}
       initialData={item}
       onBack={() => navigate('/admin/content')}
     />
