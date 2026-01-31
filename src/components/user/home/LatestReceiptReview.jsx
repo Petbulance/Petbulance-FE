@@ -69,7 +69,12 @@ export default function LatestReceiptReview() {
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-[19px] font-semibold">최신 영수증 후기</h2>
         <button>
-          <ChevronRight size={20} />
+          <ChevronRight
+            size={20}
+            onClick={() => {
+              alert('후기 화면 이동');
+            }}
+          />
         </button>
       </div>
 

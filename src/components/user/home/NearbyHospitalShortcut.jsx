@@ -1,4 +1,5 @@
 import { ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import allIcon from '@/assets/images/icons/icon-all.png';
 import amphibianIcon from '@/assets/images/icons/icon-amphibian.png';
@@ -16,31 +17,58 @@ const ICON_MAP = {
   어류: fishIcon,
 };
 
+const CATEGORY_TO_TYPE = {
+  전체: null,
+  소형포유류: 'SMALLMAMMALS',
+  조류: 'BIRD',
+  파충류: 'REPTILE',
+  양서류: 'AMPHIBIAN',
+  어류: 'FISH',
+};
+
 export default function NearbyHospitalShortcut() {
+  const navigate = useNavigate();
   const categories = ['전체', '소형포유류', '조류', '파충류', '양서류', '어류'];
+
+  const handleClick = (category) => {
+    const animalType = CATEGORY_TO_TYPE[category];
+
+    if (!animalType) {
+      navigate('/index/hospitals');
+      return;
+    }
+    console.log('anim,al', animalType);
+    navigate(`/index/hospitals?animalType=${animalType}`);
+  };
 
   return (
     <div className="bg-white">
+      {/* 타이틀 */}
       <button className="flex w-full items-center justify-between">
         <span className="text-[19px] font-semibold text-gray-950">
           내 주변 병원 바로가기
         </span>
-        <span className="">
-          <ChevronRight size={20} />
-        </span>
+        <ChevronRight
+          size={20}
+          onClick={() => {
+            alert('병원 이동');
+          }}
+        />
       </button>
 
+      {/* 카테고리 */}
       <div className="mt-3 flex gap-2 overflow-x-auto">
         {categories.map((item) => (
-          <div
+          <button
             key={item}
+            onClick={() => handleClick(item)}
             className="flex min-w-[64px] flex-col items-center text-xs"
           >
             <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
               <img src={ICON_MAP[item]} alt={item} className="h-full w-full" />
             </div>
             <span>{item}</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>
