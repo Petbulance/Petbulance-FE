@@ -340,7 +340,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'auth/signupcomplete',
-        element: <SignupComplete />,
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <SignupComplete />
+          </LayoutShell>
+        ),
       },
       // 알림
       {

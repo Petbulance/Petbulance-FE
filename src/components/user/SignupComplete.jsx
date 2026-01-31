@@ -7,21 +7,21 @@ import TermsBottomSheet from '@/components/user/ui/TermsBottomSheet.jsx';
 
 export default function SignupComplete() {
   const [open, setOpen] = useState(true);
-
+  const [nickname, setNickname] = useState('');
   const navigate = useNavigate();
 
-  // todo 유저 정보 가져오기
-  // useEffect(() => {
-  //   const getMyProfile = async () => {
-  //     try {
-  //       const response = await api.get('/users/me');
-  //       console.log(response);
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //   };
-  //   getMyProfile();
-  // }, []);
+  useEffect(() => {
+    const getMyProfile = async () => {
+      try {
+        const response = await api.get('/users/me');
+        console.log(response);
+        setNickname(response.data.data.nickname);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    getMyProfile();
+  }, []);
   return (
     <div className="flex min-h-screen flex-col bg-white px-6">
       {/* 상단 여백 + 콘텐츠 */}
@@ -33,12 +33,12 @@ export default function SignupComplete() {
         />
 
         <h2 className="mb-2 flex items-center gap-1 text-lg font-bold">
-          <span className="text-success">따뜻한햄스터07님</span>
+          <span className="text-success">{nickname}님</span>
           <span className="text-gray-800">환영해요!</span>
         </h2>
 
         <h2 className="mb-8 text-sm leading-relaxed text-gray-500">
-          <span className="text-success">펫블런스</span>
+          <span className="text-success">펫뷸런스</span>
           <span className="text-gray-800">
             에서 지금 필요한
             <br />
@@ -52,7 +52,7 @@ export default function SignupComplete() {
         <button
           className="bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-pressed w-full rounded-lg py-4 text-sm font-semibold"
           onClick={() => {
-            navigate('/index');
+            navigate('/index/home');
           }}
         >
           시작하기

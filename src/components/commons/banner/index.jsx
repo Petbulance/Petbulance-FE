@@ -6,7 +6,7 @@ export function ServiceBanner() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative w-md rounded-[10px] bg-emerald-100">
+    <div className="relative w-md rounded-[10px] bg-emerald-100 shadow-lg">
       <img src={bannerImg} alt="배너" className="w-full rounded-lg" />
 
       {/* 버튼 영역 */}
