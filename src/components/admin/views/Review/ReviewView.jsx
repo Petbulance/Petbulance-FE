@@ -29,7 +29,7 @@ export default function ReviewView() {
             size: pageSize,
           },
         });
-
+        console.log(response);
         const data = response.data.data;
 
         setReviews(data.content);
@@ -116,7 +116,7 @@ export default function ReviewView() {
           </tbody>
         </table>
 
-        {totalPages > 1 && (
+        {totalPages > 0 && (
           <div className="flex items-center justify-center py-6">
             <Pagination
               page={page}
