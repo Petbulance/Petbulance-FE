@@ -19,11 +19,12 @@ export default function GoogleCallback() {
       try {
         const params = new URLSearchParams({
           grant_type: 'authorization_code',
-          client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-          redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          client_secret: import.meta.env.VITE_GOOGLE_CLIENT,
+          redirect_uri: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
           code,
         });
-
+        console.log('google', params);
         const res = await axios.post(
           'https://oauth2.googleapis.com/token',
           params,
