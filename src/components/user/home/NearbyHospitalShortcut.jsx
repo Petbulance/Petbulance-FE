@@ -1,3 +1,5 @@
+import { ChevronRight } from 'lucide-react';
+
 import allIcon from '@/assets/images/icons/icon-all.png';
 import amphibianIcon from '@/assets/images/icons/icon-amphibian.png';
 import birdIcon from '@/assets/images/icons/icon-bird.png';
@@ -23,7 +25,9 @@ export default function NearbyHospitalShortcut() {
         <span className="text-[19px] font-semibold text-gray-950">
           내 주변 병원 바로가기
         </span>
-        <span className="">{'>'}</span>
+        <span className="">
+          <ChevronRight size={20} />
+        </span>
       </button>
 
       <div className="mt-3 flex gap-2 overflow-x-auto">

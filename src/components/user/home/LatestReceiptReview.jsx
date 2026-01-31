@@ -1,5 +1,5 @@
 import Autoplay from 'embla-carousel-autoplay';
-import { Star } from 'lucide-react';
+import { Star, ChevronRight } from 'lucide-react';
 
 import {
   Carousel,
@@ -122,7 +122,9 @@ export default function LatestReceiptReview() {
       {/* 타이틀 */}
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-[19px] font-semibold">최신 영수증 후기</h2>
-        <button className=" ">{'>'}</button>
+        <button className=" ">
+          <ChevronRight size={20} />
+        </button>
       </div>
 
       {/* 캐러셀 */}
