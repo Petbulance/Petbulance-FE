@@ -39,9 +39,16 @@ export default function NaverCallback() {
         });
 
         console.log('res', res);
-        const { accessToken, isNewUser } = res.data;
+        const { accessToken, isNewUser } = res.data.data;
 
         localStorage.setItem('access_token', res.data.data.accessToken);
+        localStorage.setItem(
+          'recent_login',
+          JSON.stringify({
+            provider: 'NAVER',
+            at: Date.now(),
+          })
+        );
         localStorage.removeItem('com.naver.nid.access_token');
         localStorage.removeItem('com.naver.nid.oauth.state_token');
         if (res.data.data.refreshToken) {

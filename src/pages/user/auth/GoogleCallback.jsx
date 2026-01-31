@@ -41,6 +41,13 @@ export default function GoogleCallback() {
         });
         console.log('데이터', JWTres);
         localStorage.setItem('access_token', res.data.access_token);
+        localStorage.setItem(
+          'recent_login',
+          JSON.stringify({
+            provider: 'GOOGLE',
+            at: Date.now(),
+          })
+        );
         navigate('/index/auth/signupcomplete');
         // navigate('/');
       } catch (e) {

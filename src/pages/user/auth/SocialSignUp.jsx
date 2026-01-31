@@ -49,7 +49,6 @@ export default function SocialSignUp() {
   };
 
   useEffect(() => {
-    // SDK 준비만 (버튼 렌더링 ❌)
     window.naverLogin = new window.naver.LoginWithNaverId({
       clientId: import.meta.env.VITE_NAVER_CLIENT_ID,
       callbackUrl: import.meta.env.VITE_NAVER_REDIRECT_URI,
@@ -58,9 +57,18 @@ export default function SocialSignUp() {
 
     window.naverLogin.init();
   }, []);
+  useEffect(() => {
+    const stored = localStorage.getItem('recent_login');
+    if (!stored) return;
+
+    try {
+      setRecentLogin(JSON.parse(stored));
+    } catch {
+      localStorage.removeItem('recent_login');
+    }
+  }, []);
 
   const handleNaverLogin = () => {
-    // 🔥 SDK 방식으로 로그인 시작
     window.naverLogin.authorize();
   };
 

@@ -34,6 +34,13 @@ export default function KakaoCallback() {
         });
         console.log('데이터', JWTres);
         localStorage.setItem('access_token', JWTres.data.data.accessToken);
+        localStorage.setItem(
+          'recent_login',
+          JSON.stringify({
+            provider: 'KAKAO',
+            at: Date.now(),
+          })
+        );
         navigate('/index/auth/signupcomplete');
       } catch (e) {
         console.error('카카오 로그인 실패', e);
