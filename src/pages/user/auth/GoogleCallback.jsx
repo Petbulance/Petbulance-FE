@@ -20,8 +20,8 @@ export default function GoogleCallback() {
         const params = new URLSearchParams({
           grant_type: 'authorization_code',
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-          client_secret: import.meta.env.VITE_GOOGLE_CLIENT,
-          redirect_uri: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+          client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+          redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
           code,
         });
         console.log('google', params);
