@@ -1,13 +1,21 @@
+import { useNavigate } from 'react-router-dom';
+
+import bannerImg from '@/assets/images/OpenEvent.png';
+
 export function ServiceBanner() {
+  const navigate = useNavigate();
+
   return (
-    <div className="h-191 w-md rounded-[10px] bg-emerald-100 p-6">
-      <div className="rounded-xl bg-emerald-600 p-6 text-white">
-        <div className="text-lg font-semibold">펫뷸런스</div>
-        <div className="mt-2 text-sm opacity-90">
-          서비스 배너 및 QR 코드 영역
-        </div>
-        <div className="mt-6 h-32 rounded-lg bg-white/20" />
-      </div>
+    <div className="relative w-md rounded-[10px] bg-emerald-100">
+      <img src={bannerImg} alt="배너" className="w-full rounded-lg" />
+
+      {/* 버튼 영역 */}
+      <button
+        onClick={() => navigate('/event/open')} // 이동할 경로
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full bg-[#2DA969] px-6 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+      >
+        이벤트 상세보기 →
+      </button>
     </div>
   );
 }
