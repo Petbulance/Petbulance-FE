@@ -1,6 +1,7 @@
 import Autoplay from 'embla-carousel-autoplay';
 import { ChevronRight, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import {
@@ -37,6 +38,7 @@ function RatingStars({ rating }) {
    최신 영수증 후기
 =============================== */
 export default function LatestReceiptReview() {
+  const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
 
   /* ===============================
@@ -49,7 +51,7 @@ export default function LatestReceiptReview() {
           receipt: true,
         },
       });
-      console.log('review', response);
+
       setReviews(response.data.data.list || []);
     } catch (e) {
       console.error('최신 영수증 후기 조회 실패', e);
@@ -68,13 +70,8 @@ export default function LatestReceiptReview() {
       {/* ================= 타이틀 ================= */}
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-[19px] font-semibold">최신 영수증 후기</h2>
-        <button>
-          <ChevronRight
-            size={20}
-            onClick={() => {
-              alert('후기 화면 이동');
-            }}
-          />
+        <button onClick={() => navigate('/index/reviews')}>
+          <ChevronRight size={20} />
         </button>
       </div>
 
@@ -91,9 +88,13 @@ export default function LatestReceiptReview() {
         >
           <CarouselContent className="-ml-4">
             {reviews.map((review) => (
-              <CarouselItem key={review.id} className="basis-[90%] pl-4">
+              <CarouselItem
+                key={review.id}
+                className="basis-[90%] pl-4"
+                onClick={() => navigate(`/index/reviews/${review.id}`)}
+              >
                 {/* 카드 */}
-                <div className="flex gap-3 rounded-xl bg-gray-100 p-3 shadow-sm">
+                <div className="flex cursor-pointer gap-3 rounded-xl bg-gray-100 p-3 shadow-sm active:scale-[0.98]">
                   {/* 좌측 이미지 */}
                   <img
                     src={review.hospitalImage}
