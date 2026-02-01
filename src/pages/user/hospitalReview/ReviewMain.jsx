@@ -8,9 +8,11 @@ import { ReviewContent } from '@/components/reviews/ui/ReviewContent';
 import { ReviewFilterBar } from '@/components/reviews/ui/ReviewFilterBar';
 import { ReviewRegionFilterSheet } from '@/components/reviews/ui/ReviewRegionFilterSheet';
 import { WriteBtn } from '@/components/reviews/ui/WriteBtn';
+import { useOutletContext } from 'react-router-dom';
 
 export function ReviewMain() {
-  const [activeSheet, setActiveSheet] = useState(null);
+  const [activeSheet, setActiveSheet] = useOutletContext();
+
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,7 +104,11 @@ export function ReviewMain() {
 
       {activeSheet && (
         <div className="absolute inset-0 z-[2000] bg-white">
-          <HospitalFilterModalContainer onClose={closeSheet} mode={activeSheet}>
+          <HospitalFilterModalContainer
+            onClose={closeSheet}
+            mode={activeSheet}
+            onModeChange={setActiveSheet}
+          >
             {activeSheet === 'region' ? (
               <ReviewRegionFilterSheet
                 filterState={filters}

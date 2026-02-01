@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import { TabMenu } from './TabMenu';
 
-export function HospitalFilterModalContainer({ mode, onClose, children }) {
+export function HospitalFilterModalContainer({
+  mode,
+  onClose,
+  onModeChange,
+  children,
+}) {
   const [activeTab, setActiveTab] = useState(mode);
 
   const [translateY, setTranslateY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [params, setParams] = useSearchParams();
 
   const startYRef = useRef(0);
   const startTranslateRef = useRef(0);
@@ -16,18 +19,16 @@ export function HospitalFilterModalContainer({ mode, onClose, children }) {
 
   const CLOSE_THRESHOLD = 120;
 
-  // mode가 변경되면 탭도 동기화
   useEffect(() => {
     setActiveTab(mode);
   }, [mode]);
 
-  //탭 변경시 URL 변경
   const changeTab = (nextTab) => {
     setActiveTab(nextTab);
 
-    const next = new URLSearchParams(params);
-    next.set('sheet', nextTab);
-    setParams(next, { replace: true });
+    if (onModeChange) {
+      onModeChange(nextTab);
+    }
   };
 
   const onHandlePointerDown = (e) => {
