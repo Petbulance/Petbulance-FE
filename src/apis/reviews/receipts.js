@@ -16,3 +16,30 @@ export const fetchHospitalReviews = async (hospitalId, params = {}) => {
     throw error;
   }
 };
+
+export const getFilteredReceipts = async (params = {}) => {
+  const combinedRegion =
+    params.city && params.city !== '전체'
+      ? `${params.city}시${params.region || ''}`
+      : '';
+
+  try {
+    const response = await api.get('/receipts/filter', {
+      params: {
+        region: combinedRegion,
+        animalType: params.animal,
+        receipt: params.receipt,
+      },
+    });
+
+    console.log('api 출력:', response.data.data.list);
+    return response.data.data.list;
+  } catch (error) {
+    if (error.response) {
+      console.error('서버 에러:', error.response.status, error.response.data);
+    } else {
+      console.error('필터 목록을 불러오는 중 에러 발생:', error.message);
+    }
+    throw error;
+  }
+};
