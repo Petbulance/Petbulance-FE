@@ -32,7 +32,6 @@ export function HosipitalDetail({
 
   useEffect(() => {
     const recordHistory = async () => {
-
       if (!id) return;
 
       try {
@@ -44,7 +43,7 @@ export function HosipitalDetail({
 
     recordHistory();
   }, [id]);
-  
+
   const formattedDistance = distanceMeter
     ? (distanceMeter / 1000).toFixed(1)
     : '0.0';
