@@ -4,26 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import api from '@/apis/api.jsx';
 import partyIcon from '@/assets/images/pageImages/partyImg.svg';
 import TermsBottomSheet from '@/components/user/ui/TermsBottomSheet.jsx';
+import useUserStore from '@/stores/useUserStore';
 
 export default function SignupComplete() {
   const [open, setOpen] = useState(false);
-  const [nickname, setNickname] = useState('');
   const [hasRequiredAgree, setHasRequiredAgree] = useState(false);
 
   const navigate = useNavigate();
 
-  /* ===============================
-     유저 정보 조회
-  =============================== */
-  const getMyProfile = async () => {
-    try {
-      const response = await api.get('/users/me');
-      console.log('유저조회', response);
-      setNickname(response.data.data.nickname);
-    } catch (e) {
-      console.error('유저 조회 실패', e);
-    }
-  };
+  const { profile, fetchMyProfile } = useUserStore();
 
   /* ===============================
      내 약관 상태 조회
@@ -35,7 +24,7 @@ export default function SignupComplete() {
     try {
       const response = await api.get('/terms/status');
       const terms = response.data.data;
-      console.log('정책', terms);
+
       const hasAgree =
         terms.service === 'AGREE' ||
         terms.privacy === 'AGREE' ||
@@ -43,7 +32,6 @@ export default function SignupComplete() {
 
       setHasRequiredAgree(hasAgree);
 
-      // ❗ 필수 약관 전부 미동의면 BottomSheet 오픈
       if (!hasAgree) {
         setOpen(true);
       }
@@ -53,10 +41,7 @@ export default function SignupComplete() {
   };
 
   /* ===============================
-     로그아웃 처리
-     - 서버 로그아웃
-     - 토큰 제거
-     - 로그인 페이지 이동
+     로그아웃
   =============================== */
   const handleLogout = async () => {
     try {
@@ -64,7 +49,6 @@ export default function SignupComplete() {
     } catch (e) {
       console.warn('서버 로그아웃 실패', e);
     } finally {
-      // 클라이언트 토큰 정리
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('recent_login');
@@ -73,14 +57,20 @@ export default function SignupComplete() {
     }
   };
 
+  /* ===============================
+     최초 진입 시
+     - 프로필을 zustand에 저장
+     - 약관 조회
+  =============================== */
   useEffect(() => {
-    getMyProfile();
+    fetchMyProfile(); // ⭐ 여기서 전역 저장
+    console.log('pro', profile);
     getMyTerms();
-  }, []);
+  }, [fetchMyProfile]);
 
   return (
     <div className="flex min-h-screen flex-col bg-white px-6">
-      {/* ================= 상단 콘텐츠 ================= */}
+      {/* ================= 상단 ================= */}
       <div className="mt-48 flex flex-col items-center text-center">
         <img
           src={partyIcon}
@@ -89,7 +79,7 @@ export default function SignupComplete() {
         />
 
         <h2 className="mb-2 flex items-center gap-1 text-lg font-bold">
-          <span className="text-success">{nickname}님</span>
+          <span className="text-success">{profile?.nickname ?? ''}</span>
           <span className="text-gray-800">환영해요!</span>
         </h2>
 

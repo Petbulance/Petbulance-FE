@@ -67,7 +67,7 @@ export default function MyPage() {
   return (
     <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
       {/* 상단 프로필 */}
-      <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile} />
+      <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile ?? null} />
 
       {/* 사용자 설정 */}
       <Group title="사용자 설정">
