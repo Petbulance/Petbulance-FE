@@ -2,9 +2,46 @@ import { Activity } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import api from '@/apis/api.jsx';
+import AnimalTypeSelect from '@/components/admin/ui/AnimalTypeSelect.jsx';
+import HospitalHistories from '@/components/admin/views/Hosptial/HospitalHistories.jsx';
 
 const days = ['월', '화', '수', '목', '금', '토', '일'];
 const dayMap = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+// animalTypes.ts
+export const ANIMAL_TYPE_OPTIONS = [
+  // 소동물
+  { value: 'HAMSTER', label: '햄스터' },
+  { value: 'GUINEAPIG', label: '기니피그' },
+  { value: 'CHINCHILLA', label: '친칠라' },
+  { value: 'RABBIT', label: '토끼' },
+  { value: 'HEDGEHOG', label: '고슴도치' },
+  { value: 'FERRET', label: '페럿' },
+  { value: 'SUGAR_GLIDER', label: '슈가글라이더' },
+  { value: 'PRAIRIE_DOG', label: '프레리도그' },
+  { value: 'FLYING_SQUIRREL', label: '하늘다람쥐' },
+  { value: 'OTHER_SMALL_MAMMALS', label: '기타 소동물' },
+
+  // 조류
+  { value: 'PARROT', label: '앵무새' },
+  { value: 'FINCH_TYPES', label: '핀치류' },
+  { value: 'OTHER_BIRDS', label: '기타 조류' },
+
+  // 파충류
+  { value: 'GECKO', label: '게코' },
+  { value: 'OTHER_LIZARDS', label: '기타 도마뱀' },
+  { value: 'SNAKE', label: '뱀' },
+  { value: 'TURTLE', label: '거북이' },
+  { value: 'OTHER_REPTILES', label: '기타 파충류' },
+
+  // 양서류
+  { value: 'FROG', label: '개구리' },
+  { value: 'AXOLOTL', label: '우파루파' },
+  { value: 'SALAMANDER', label: '도롱뇽' },
+  { value: 'OTHER_AMPHIBIANS', label: '기타 양서류' },
+
+  // 어류
+  { value: 'ORNAMENTAL_FISH', label: '관상어' },
+];
 
 export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
   const isCreateMode = mode === 'create';
@@ -136,9 +173,7 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
       night: !!form.night,
       twentyFour: !!form.twentyFour,
 
-      animalTypes: form.treatmentAnimalType
-        ? form.treatmentAnimalType.split(',').map((v) => v.trim())
-        : [],
+      animalTypes: form.treatmentAnimalType ?? [],
 
       operationTimes: form.worktimes.map((w) => ({
         dayOfWeek: w.dayOfWeek,
@@ -152,6 +187,7 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
     };
 
     try {
+      console.log('등록/수정', payload);
       if (isCreateMode) {
         await api.post('/admin/hospital/save', payload);
         alert('병원이 등록되었습니다.');
@@ -255,12 +291,9 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
             {/* 우측 */}
             <div className="space-y-4">
               <WorkTimes hours={hours} onChange={updateWorkTime} />
-              <Input
-                label="진료가능종 (태그)"
+              <AnimalTypeSelect
                 value={form.treatmentAnimalType}
-                onChange={(v) =>
-                  updateField('treatmentAnimalType', v.replaceAll(' ', ''))
-                }
+                onChange={(v) => updateField('treatmentAnimalType', v)}
               />
               <Input
                 label="태그 (쉼표 구분)"
@@ -275,61 +308,7 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="mb-4 flex items-start gap-2 rounded bg-blue-50 p-4 text-sm text-blue-800">
-              <Activity size={16} className="mt-0.5 shrink-0" />
-              <p>해당 병원 정보에 대한 수정 이력입니다.</p>
-            </div>
-
-            <table className="w-full overflow-hidden rounded-lg border text-left text-sm">
-              <thead className="border-b bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3">일시</th>
-                  <th className="px-4 py-3">항목</th>
-                  <th className="px-4 py-3">변경 전</th>
-                  <th className="px-4 py-3">변경 후</th>
-                  <th className="px-4 py-3">담당자</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y">
-                {histories.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="px-4 py-6 text-center text-gray-400"
-                    >
-                      변경 이력이 없습니다.
-                    </td>
-                  </tr>
-                ) : (
-                  histories.map((h, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50">
-                      {/* 일시 */}
-                      <td className="px-4 py-3 text-gray-500">
-                        {new Date(h.createdAt).toLocaleString()}
-                      </td>
-                      {/* 처리 내역 */}
-                      <td className="px-4 py-3 font-medium">
-                        {h.modifySubject}
-                      </td>
-                      {/* 변경 전 */}
-                      <td className="px-4 py-3 text-xs text-red-700">
-                        {h.beforeModify || '-'}
-                      </td>
-                      {/* 변경 후 */}
-                      <td className="px-4 py-3 text-blue-600">
-                        {h.afterModify || '-'}
-                      </td>{' '}
-                      <td className="px-4 py-3 text-gray-600">
-                        {h.actorId ?? '시스템'}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          <HospitalHistories histories={histories} />
         )}
       </div>
     </div>
