@@ -4,7 +4,21 @@ import api from '@/apis/api.jsx';
 import HospitalForm from '@/components/admin/views/Hosptial/HospitalForm.jsx';
 import HospitalHistories from '@/components/admin/views/Hosptial/HospitalHistories.jsx';
 
-const dayMap = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+const DAY_MAP = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+
+/* =========================
+   시간 파싱 유틸
+   "09:00~22:00" → ["09:00:00", "22:00:00"]
+========================= */
+const parseTimeRange = (value) => {
+  if (!value) return [null, null];
+  if (value === '휴무' || value === '미작성') return [null, null];
+
+  const match = value.match(/^(\d{2}:\d{2})~(\d{2}:\d{2})$/);
+  if (!match) return [null, null];
+
+  return [`${match[1]}:00`, `${match[2]}:00`];
+};
 
 export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
   const isCreateMode = mode === 'create';
@@ -13,63 +27,6 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
   const [hospital, setHospital] = useState(null);
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(false);
-  const toLocalTime = (time) => {
-    if (!time) return null;
-
-    const [hour, minute, second = '0'] = time.split(':');
-
-    return {
-      hour: Number(hour),
-      minute: Number(minute),
-      second: Number(second),
-      nano: 0,
-    };
-  };
-
-  const mapHospitalToForm = (data) => {
-    const baseWorktimes = Array.isArray(data.worktimes) ? data.worktimes : [];
-
-    const holidayOpen = data.holidayOpen ?? false;
-
-    const hasHoliday = baseWorktimes.some((w) => w.dayOfWeek === '공휴일');
-
-    return {
-      name: data.name ?? '',
-      phoneNumber: data.phoneNumber ?? '',
-      address: data.address ?? '',
-      streetAddress: data.streetAddress ?? '',
-      lat: data.lat ?? '',
-      lon: data.lng ?? '',
-      tag: data.tag ?? '',
-      information: data.information ?? '',
-      url: data.url ?? '',
-      image: data.image ?? '',
-
-      night: data.nighCare ?? false,
-      twentyFour: data.twentyFourHours ?? false,
-
-      treatmentAnimalType: data.treatmentAnimalType
-        ? data.treatmentAnimalType.split(',').map((v) => v.trim())
-        : [],
-
-      worktimes: hasHoliday
-        ? baseWorktimes.map((w) =>
-            w.dayOfWeek === '공휴일' ? { ...w, isOpen: holidayOpen } : w
-          )
-        : [
-            ...baseWorktimes,
-            {
-              dayOfWeek: '공휴일',
-              isOpen: holidayOpen, // ⭐ 여기 중요
-              openTime: null,
-              closeTime: null,
-              startBreakTime: null,
-              endBreakTime: null,
-              deadLineTime: null,
-            },
-          ],
-    };
-  };
 
   /* =========================
      초기화 / 상세 조회
@@ -82,7 +39,7 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
         address: '',
         streetAddress: '',
         lat: '',
-        lon: '',
+        lng: '',
         tag: '',
         treatmentAnimalType: [],
         information: '',
@@ -90,9 +47,8 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
         image: '',
         night: false,
         twentyFour: false,
-
         worktimes: [
-          ...dayMap.map((d) => ({
+          ...DAY_MAP.map((d) => ({
             dayOfWeek: d,
             isOpen: false,
             openTime: null,
@@ -112,8 +68,6 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
           },
         ],
       });
-
-      setHospital(null);
       return;
     }
     if (!hospitalId) return;
@@ -122,12 +76,29 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
       setLoading(true);
       try {
         const res = await api.get(`/admin/hospital/detail/${hospitalId}`);
-        setHospital(res.data.data);
-        console.log(res.data.data);
-        setForm(mapHospitalToForm(res.data.data));
+        const data = res.data.data;
+
+        setHospital(data);
+        setForm({
+          name: data.name ?? '',
+          phoneNumber: data.phoneNumber ?? '',
+          address: data.address ?? '',
+          streetAddress: data.streetAddress ?? '',
+          lat: data.lat ?? '',
+          lng: data.lng ?? '',
+          tag: data.tag ?? '',
+          information: data.information ?? '',
+          url: data.url ?? '',
+          image: data.image ?? '',
+          night: data.nighCare ?? false,
+          twentyFour: data.twentyFourHours ?? false,
+          treatmentAnimalType: data.treatmentAnimalType
+            ? data.treatmentAnimalType.split(',').map((v) => v.trim())
+            : [],
+          worktimes: data.worktimes ?? [],
+        });
       } catch (e) {
         console.error(e);
-        setHospital(null);
         setForm(null);
       } finally {
         setLoading(false);
@@ -135,21 +106,21 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
     };
 
     fetchDetail();
-  }, [hospitalId]);
+  }, [hospitalId, isCreateMode]);
 
   const currentHospital = hospital ?? {};
   const histories = currentHospital.hospitalHistories ?? [];
 
   /* =========================
-     운영시간 가공 (UI 유지)
+     운영시간 표시용
   ========================= */
   const hours = useMemo(() => {
     const map = {};
     form?.worktimes?.forEach((w) => {
-      const idx = dayMap.indexOf(w.dayOfWeek);
+      const idx = DAY_MAP.indexOf(w.dayOfWeek);
       if (idx !== -1) {
         map[idx] = w.isOpen
-          ? `${w.openTime ?? ''}~${w.closeTime ?? ''}`
+          ? `${w.openTime?.slice(0, 5)}~${w.closeTime?.slice(0, 5)}`
           : '휴무';
       }
     });
@@ -168,25 +139,29 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
       const next = prev.worktimes.map((w) => {
         if (w.dayOfWeek !== dayOfWeek) return w;
 
+        // 공휴일: 체크만
         if (dayOfWeek === '공휴일') {
           return {
             ...w,
             isOpen: value,
             openTime: null,
             closeTime: null,
+            startBreakTime: null,
+            endBreakTime: null,
+            deadLineTime: null,
           };
         }
 
-        const [openTime, closeTime] =
-          value === '휴무' || value === '미작성'
-            ? [null, null]
-            : value.split('~');
+        const [openTime, closeTime] = parseTimeRange(value);
 
         return {
           ...w,
           isOpen: !!openTime,
-          openTime: openTime ? `${openTime}:00` : null,
-          closeTime: closeTime ? `${closeTime}:00` : null,
+          openTime,
+          closeTime,
+          startBreakTime: null,
+          endBreakTime: null,
+          deadLineTime: null,
         };
       });
 
@@ -195,45 +170,31 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
   };
 
   /* =========================
-     저장 (등록 / 수정)
+     저장
   ========================= */
   const handleSave = async () => {
     const payload = {
-      // ✅ 이름 정확히
-      name: form.name,
+      hospitalName: form.name,
+      phoneNumber: form.phoneNumber,
+      tags: form.tag ? form.tag.split(',').map((t) => t.trim()) : [],
+      information: form.information,
       address: form.address,
       streetAddress: form.streetAddress,
-      phoneNumber: form.phoneNumber,
-      information: form.information,
-
-      // ✅ lng (lon ❌)
-      lat: form.lat !== '' ? Number(form.lat) : 0,
-      lng: form.lng !== '' ? Number(form.lng) : 0,
-
-      url: form.url ?? null,
-      image: form.image ?? null,
-
-      // ✅ DTO 필드명 정확히
-      nighCare: !!form.night,
-      twentyFourHours: !!form.twentyFour,
-
-      tag: form.tag ?? '',
-
-      // ✅ 문자열로
-      treatmentAnimalType: Array.isArray(form.treatmentAnimalType)
-        ? form.treatmentAnimalType.join(',')
-        : (form.treatmentAnimalType ?? ''),
-
-      // ✅ 공휴일 포함 + LocalTime 객체
-      worktimes: form.worktimes.map((w) => ({
+      lat: Number(form.lat) || 0,
+      lon: Number(form.lng) || 0,
+      url: form.url || null,
+      image: form.image || null,
+      night: !!form.night,
+      twentyFour: !!form.twentyFour,
+      animalTypes: form.treatmentAnimalType,
+      operationTimes: form.worktimes.map((w) => ({
         dayOfWeek: w.dayOfWeek,
         isOpen: !!w.isOpen,
-
-        openTime: toLocalTime(w.openTime),
-        closeTime: toLocalTime(w.closeTime),
-        breakStartTime: toLocalTime(w.startBreakTime),
-        breakEndTime: toLocalTime(w.endBreakTime),
-        receptionDeadline: toLocalTime(w.deadLineTime),
+        openTime: w.openTime,
+        closeTime: w.closeTime,
+        startBreakTime: w.startBreakTime,
+        endBreakTime: w.endBreakTime,
+        deadLineTime: w.deadLineTime,
       })),
     };
 
