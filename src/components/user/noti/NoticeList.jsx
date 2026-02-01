@@ -1,5 +1,14 @@
 import { ChevronLeft } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import api from '@/apis/api.jsx';
+
+const NOTICE_STATUS_MAP = {
+  EVENT: '이벤트',
+  NOTICE: '공지',
+  AD: '광고',
+};
 
 const BADGE_STYLE = {
   이벤트: 'bg-[#E6FAEE] text-[#27BE69]',
@@ -7,11 +16,25 @@ const BADGE_STYLE = {
   광고: 'bg-[#FAF5B8] text-[#142435]',
 };
 
-export default function NoticeList({ NOTIFICATIONS }) {
+export default function NoticeList() {
   const navigate = useNavigate();
-  const notices = NOTIFICATIONS.filter((n) => n.isNotice);
+  const [noticeData, setNoticeData] = useState([]);
 
-  if (notices.length === 0) {
+  const getNotices = async () => {
+    try {
+      const response = await api.get('/notices');
+      setNoticeData(response.data?.data?.content ?? []);
+    } catch (e) {
+      console.error(e);
+      setNoticeData([]);
+    }
+  };
+
+  useEffect(() => {
+    getNotices();
+  }, []);
+
+  if (noticeData.length === 0) {
     return (
       <div className="flex h-full items-center justify-center bg-white">
         <p className="text-[18px] text-[#424242]">공지사항이 없어요</p>
@@ -21,30 +44,34 @@ export default function NoticeList({ NOTIFICATIONS }) {
 
   return (
     <div className="bg-white">
-      {notices.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          onClick={() => navigate(`/index/mypage/notice/${item.id}`)}
-          className="flex w-full items-center justify-between border-b px-4 py-4 text-left hover:bg-gray-50 active:bg-gray-100"
-        >
-          <div>
-            <span
-              className={`mb-1 inline-block rounded px-2 py-0.5 text-[14px] font-medium ${
-                BADGE_STYLE[item.type]
-              }`}
-            >
-              {item.type}
-            </span>
+      {noticeData.map((item) => {
+        const label = NOTICE_STATUS_MAP[item.noticeStatus] ?? '공지';
 
-            <p className="text-[17px] font-medium">{item.title}</p>
+        return (
+          <button
+            key={item.noticeId}
+            type="button"
+            onClick={() => navigate(`/index/mypage/notice/${item.noticeId}`)}
+            className="flex w-full items-center justify-between border-b px-4 py-4 text-left hover:bg-gray-50 active:bg-gray-100"
+          >
+            <div>
+              <span
+                className={`mb-1 inline-block rounded px-2 py-0.5 text-[14px] font-medium ${
+                  BADGE_STYLE[label]
+                }`}
+              >
+                {label}
+              </span>
 
-            <p className="mt-1 text-[13px] text-gray-400">{item.date}</p>
-          </div>
+              <p className="text-[17px] font-medium">{item.title}</p>
 
-          <ChevronLeft className="h-8 w-8 rotate-180 text-[#E0E0E0]" />
-        </button>
-      ))}
+              <p className="mt-1 text-[13px] text-gray-400">{item.createdAt}</p>
+            </div>
+
+            <ChevronLeft className="h-8 w-8 rotate-180 text-[#E0E0E0]" />
+          </button>
+        );
+      })}
     </div>
   );
 }

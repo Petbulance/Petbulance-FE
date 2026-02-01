@@ -9,10 +9,12 @@ import {
   Security,
 } from '@carbon/icons-react';
 import { ChevronRight } from 'lucide-react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
 import ProfileSection from '@/components/user/my/ProfileSection.jsx';
+import useUserStore from '@/stores/useUserStore.js';
 
 function Group({ title, children }) {
   return (
@@ -24,6 +26,7 @@ function Group({ title, children }) {
     </section>
   );
 }
+
 function Item({ Icon, iconNode, label, right, onClick }) {
   return (
     <div
@@ -42,18 +45,29 @@ function Item({ Icon, iconNode, label, right, onClick }) {
 }
 
 export default function MyPage() {
-  const isLoggedIn = true;
   const navigate = useNavigate();
-  const user = {
-    name: '따뜻한햄스터07',
-    email: 'user@example.com',
-    profileImage: 'https://picsum.photos/seed/profile/200/200',
+  const isLoggedIn = Boolean(localStorage.getItem('access_token'));
+
+  const { profile: myProfile, fetchMyProfile } = useUserStore();
+
+  const requireLogin = (path) => {
+    if (!isLoggedIn) {
+      navigate('/index/auth/login');
+      return;
+    }
+    navigate(path);
   };
+
+  useEffect(() => {
+    if (isLoggedIn && !myProfile) {
+      fetchMyProfile();
+    }
+  }, [isLoggedIn, myProfile, fetchMyProfile]);
 
   return (
     <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
-      {/* 상단 프로필 영역 */}
-      <ProfileSection isLoggedIn={isLoggedIn} user={user} />
+      {/* 상단 프로필 */}
+      <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile} />
 
       {/* 사용자 설정 */}
       <Group title="사용자 설정">
@@ -62,40 +76,42 @@ export default function MyPage() {
           iconNode={
             <img src={notificationIcon} className="h-5 w-5" alt="알림 설정" />
           }
-          onClick={() => navigate('/index/notification/setting')}
+          onClick={() => requireLogin('/index/notification/setting')}
         />
+
         <Item
           Icon={Login}
           label="로그인 계정 관리"
-          onClick={() => navigate('/index/mypage/loginsetting')}
+          onClick={() => requireLogin('/index/mypage/loginsetting')}
         />
+
         <Item
           Icon={Security}
           label="권한"
-          onClick={() => {
-            navigate('/index/mypage/authorization');
-          }}
+          onClick={() => requireLogin('/index/mypage/authorization')}
         />
       </Group>
 
+      {/* 작성글 관리 */}
       <Group title="작성글 관리">
         <Item
           Icon={Review}
           label="후기 관리"
-          onClick={() => navigate('/index/mypage/reviewmanage')}
+          onClick={() => requireLogin('/index/mypage/reviewmanage')}
         />
         <Item
           Icon={Document}
           label="게시글 관리"
-          onClick={() => navigate('/index/mypage/boardmanage')}
+          onClick={() => requireLogin('/index/mypage/boardmanage')}
         />
         <Item
           Icon={Forum}
           label="댓글 관리"
-          onClick={() => navigate('/index/mypage/commentmanage')}
+          onClick={() => requireLogin('/index/mypage/commentmanage')}
         />
       </Group>
 
+      {/* 고객지원 */}
       <Group title="고객지원">
         <Item
           Icon={Bullhorn}

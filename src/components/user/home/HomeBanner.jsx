@@ -72,7 +72,9 @@ export default function HomeBanner() {
             >
               <div
                 className="relative cursor-pointer overflow-hidden rounded-lg"
-                onClick={() => navigate(`/notices/${banner.noticeId}`)}
+                onClick={() =>
+                  navigate(`/index/mypage/notice/${banner.noticeId}`)
+                }
               >
                 <img
                   src={banner.imageUrl}
