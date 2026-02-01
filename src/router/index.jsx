@@ -66,6 +66,7 @@ import SupportPartnerForm from '@/pages/user/my/Support/SupportPartnerForm.jsx';
 import SupportWritePage from '@/pages/user/my/Support/SupportWritePage.jsx';
 import TermsDetailPage from '@/pages/user/my/TermsDetailPage.jsx';
 import TermsPage from '@/pages/user/my/TermsPage.jsx';
+import NotFoundPage from '@/pages/user/NotFoundPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
@@ -111,6 +112,10 @@ const router = createBrowserRouter([
     path: '/index',
     element: isServiceDomain ? <App /> : <Navigate to="/admin" replace />,
     children: [
+      {
+        index: true,
+        element: <Navigate to="home" replace />,
+      },
       {
         path: 'home',
         element: (
@@ -375,6 +380,10 @@ const router = createBrowserRouter([
   { path: '/auth/kakao/callback', element: <KakaoCallback /> },
   { path: '/auth/google/callback', element: <GoogleCallback /> },
   { path: '/auth/naver/callback', element: <NaverCallback /> },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ]);
 
 export default router;
