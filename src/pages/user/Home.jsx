@@ -14,7 +14,9 @@ export default function Home() {
       </div>
       <div className="space-y-6 bg-white">
         <LatestReceiptReview />
-        {/*<PopularPostList />*/}
+      </div>
+      <div className="space-y-6 bg-white px-[24px] py-[24px]">
+        <PopularPostList />
       </div>
     </>
   );
