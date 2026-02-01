@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import { fetchHospitalReviews } from '@/apis/reviews/receipts';
 import { GreenBtn } from '@/components/commons/button/greenBtn';
+import { sortLabels } from '@/data/reviewSort';
 
 import { ReviewCard } from './ReviewCard';
 import { ReviewFilterBar } from './reviewFilterBar';
@@ -43,12 +44,6 @@ export function ReviewContent() {
   useEffect(() => {
     loadReviews();
   }, [loadReviews]);
-
-  const sortLabels = {
-    createdAt: '최신순',
-    likeCount: '추천순',
-    totalRating: '좋아요순',
-  };
 
   return (
     <div className="flex flex-col bg-white">

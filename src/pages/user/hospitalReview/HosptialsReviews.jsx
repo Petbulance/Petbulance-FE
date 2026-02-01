@@ -8,13 +8,11 @@ const POPUP_STEPS = ['confirm', 'scan', 'success', 'form1', 'form2', 'form3'];
 
 export default function HosptialsReviews() {
   const [params] = useSearchParams();
-  const sheet = params.get('sheet');
   const step = params.get('step');
 
-  const isSheetOpen = sheet === 'region' || sheet === 'animal';
   const isPopupStep = step && POPUP_STEPS.includes(step);
 
-  const hideLayout = isSheetOpen || isPopupStep;
+  const hideLayout = isPopupStep;
 
   return (
     <LayoutShell banner={<ServiceBanner />}>

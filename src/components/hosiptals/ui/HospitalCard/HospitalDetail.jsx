@@ -11,7 +11,7 @@ import Star from '@/assets/images/icons/Star.svg';
 import { CategoryButton } from './CategoryButton';
 
 export function HosipitalDetail({
-  img,
+  image,
   name,
   openNow,
   time,
@@ -55,7 +55,7 @@ export function HosipitalDetail({
   return (
     <div className="flex items-center gap-3">
       <img
-        src={img}
+        src={image}
         alt="병원 이미지"
         className="h-25 w-25 rounded-[16.88px] object-cover"
       />

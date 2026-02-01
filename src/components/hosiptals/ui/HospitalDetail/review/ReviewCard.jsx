@@ -17,6 +17,15 @@ export function ReviewCard({ review }) {
   const [isLiked, setIsLiked] = useState(review.liked);
   const [likeCount, setLikeCount] = useState(review.likeCount);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  };
+
   const handleDetailClick = () => {
     navigate(`${review.id}`);
   };
@@ -56,7 +65,7 @@ export function ReviewCard({ review }) {
             <img src={gray_dot} alt="" />
             <span>{review.userNickname}</span>
             <img src={gray_dot} alt="" />
-            <span>{review.reviewDate}</span>
+            <span>{formatDate(review.createDate)}</span>
           </div>
         </div>
         <button onClick={(e) => e.stopPropagation()}>

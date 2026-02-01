@@ -1,99 +1,51 @@
-import { useState } from 'react';
+import { useMemo } from 'react';
 
+import greenCheck from '@/assets/images/icons/green_check.svg';
 import { GreenBtn } from '@/components/commons/button/greenBtn';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 
-import { ModalCategoryHeader } from './ModalCategoryHeader';
-import { ModalTag } from './ModalTag';
-import { ResetHeader } from './ResetHeader';
+export function ReviewAnimalFilterSheet({
+  filterState,
+  setFilterState,
+  onApply,
+}) {
+  const categoryKeys = useMemo(() => Object.keys(ANIMAL_CATEGORY_KO), []);
 
-export function ReviewAnimalFilterSheet() {
-  const ANIMAL_DATA = [
-    {
-      category: '소형 포유류',
-      tags: [
-        '햄스터',
-        '토끼',
-        '기니피그',
-        '슈가글라이더',
-        '고슴도치',
-        '친칠라',
-        '페럿',
-        '프레리도그',
-        '하늘다람쥐',
-        '기타 소동물',
-      ],
-    },
-    {
-      category: '조류',
-      tags: ['앵무새', '핀치류', '기타 조류'],
-    },
-    {
-      category: '파충류',
-      tags: ['게코', '기타 도마뱀', '거북이', '기타 파충류'],
-    },
-    {
-      category: '양서류',
-      tags: ['개구리', '우파루파', '도룡뇽', '기타 양서류'],
-    },
-    {
-      category: '어류',
-      tags: ['관상어', '기타 어류'],
-    },
-  ];
-
-  const [selectedTags, setSelectedTags] = useState([]);
-
-  const toggleTag = (tag) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
+  const handleAnimalClick = (englishKey) => {
+    setFilterState((prev) => ({
+      ...prev,
+      animal: englishKey,
+    }));
   };
-
-  //카테고리 전체 선택/해제 핸들러
-  const toggleCategory = (categoryTags) => {
-    const allSelected = categoryTags.every((tag) => selectedTags.includes(tag));
-
-    if (allSelected) {
-      setSelectedTags(
-        selectedTags.filter((tag) => !categoryTags.includes(tag))
-      );
-    } else {
-      const newTags = [...new Set([...selectedTags, ...categoryTags])];
-      setSelectedTags(newTags);
-    }
-  };
-
-  const resetSelection = () => setSelectedTags([]);
 
   return (
-    <div className="flex h-dvh flex-col bg-white pb-50">
-      <ResetHeader onClick={resetSelection} />
-      <div className="min-h-0 flex-1 overflow-y-auto px-8">
-        {ANIMAL_DATA.map((section) => {
-          const isAllSelected = section.tags.every((tag) =>
-            selectedTags.includes(tag)
-          );
+    <div className="flex h-full flex-col">
+      <div className="min-h-0 flex-1 overflow-y-auto px-10 text-[25px] font-medium">
+        <div className="bg-white">
+          {categoryKeys.map((key) => {
+            // 3. 현재 저장된 값과 키가 일치하는지만 확인 (매우 단순해짐)
+            const isActive = filterState.animal === key;
 
-          return (
-            <div key={section.category} className="mt-11 first:mt-6">
-              <ModalCategoryHeader
-                section={section}
-                isAllSelected={isAllSelected}
-                onToggleAll={() => toggleCategory(section.tags)}
-              />
-
-              <ModalTag
-                section={section}
-                selectedTags={selectedTags}
-                toggleTag={toggleTag}
-              />
-            </div>
-          );
-        })}
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleAnimalClick(key)}
+                className="flex w-full items-center justify-between pt-10"
+              >
+                <span
+                  className={`${isActive ? 'text-[#2DA969]' : 'text-[#616161]'}`}
+                >
+                  {ANIMAL_CATEGORY_KO[key]} {/* 한글 명칭 표시 */}
+                </span>
+                {isActive && <img src={greenCheck} alt="green_check_icon" />}
+              </button>
+            );
+          })}
+        </div>
       </div>
-      <GreenBtn name="후기 보기" />
+
+      <GreenBtn name="후기 보기" onClick={() => onApply(filterState.animal)} />
     </div>
   );
 }

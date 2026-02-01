@@ -51,3 +51,11 @@ export const ANIMAL_NAME_KO = {
   // 어류
   ORNAMENTAL_FISH: '관상어',
 };
+
+export const ANIMAL_CATEGORY_KO = {
+  SMALLMAMMALS: '소형포유류',
+  AVIAN: '조류',
+  REPTILE: '파충류',
+  AMPHIBIAN: '양서류',
+  FISH: '어류',
+};
