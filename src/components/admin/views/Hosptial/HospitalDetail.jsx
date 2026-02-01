@@ -1,47 +1,10 @@
-import { Activity } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import api from '@/apis/api.jsx';
-import AnimalTypeSelect from '@/components/admin/ui/AnimalTypeSelect.jsx';
+import HospitalForm from '@/components/admin/views/Hosptial/HospitalForm.jsx';
 import HospitalHistories from '@/components/admin/views/Hosptial/HospitalHistories.jsx';
 
-const days = ['월', '화', '수', '목', '금', '토', '일'];
 const dayMap = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-// animalTypes.ts
-export const ANIMAL_TYPE_OPTIONS = [
-  // 소동물
-  { value: 'HAMSTER', label: '햄스터' },
-  { value: 'GUINEAPIG', label: '기니피그' },
-  { value: 'CHINCHILLA', label: '친칠라' },
-  { value: 'RABBIT', label: '토끼' },
-  { value: 'HEDGEHOG', label: '고슴도치' },
-  { value: 'FERRET', label: '페럿' },
-  { value: 'SUGAR_GLIDER', label: '슈가글라이더' },
-  { value: 'PRAIRIE_DOG', label: '프레리도그' },
-  { value: 'FLYING_SQUIRREL', label: '하늘다람쥐' },
-  { value: 'OTHER_SMALL_MAMMALS', label: '기타 소동물' },
-
-  // 조류
-  { value: 'PARROT', label: '앵무새' },
-  { value: 'FINCH_TYPES', label: '핀치류' },
-  { value: 'OTHER_BIRDS', label: '기타 조류' },
-
-  // 파충류
-  { value: 'GECKO', label: '게코' },
-  { value: 'OTHER_LIZARDS', label: '기타 도마뱀' },
-  { value: 'SNAKE', label: '뱀' },
-  { value: 'TURTLE', label: '거북이' },
-  { value: 'OTHER_REPTILES', label: '기타 파충류' },
-
-  // 양서류
-  { value: 'FROG', label: '개구리' },
-  { value: 'AXOLOTL', label: '우파루파' },
-  { value: 'SALAMANDER', label: '도롱뇽' },
-  { value: 'OTHER_AMPHIBIANS', label: '기타 양서류' },
-
-  // 어류
-  { value: 'ORNAMENTAL_FISH', label: '관상어' },
-];
 
 export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
   const isCreateMode = mode === 'create';
@@ -262,51 +225,12 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
       {/* ===== 콘텐츠 ===== */}
       <div className="flex-1 overflow-y-auto p-6">
         {hospitalTab === 'info' ? (
-          <div className="grid grid-cols-2 gap-6">
-            {/* 좌측 */}
-            <div className="space-y-4">
-              <Input
-                label="병원명"
-                value={form.name}
-                onChange={(v) => updateField('name', v)}
-              />
-              <Input
-                label="전화번호"
-                value={form.phoneNumber}
-                onChange={(v) => updateField('phoneNumber', v)}
-              />
-              <Input
-                label="주소"
-                value={form.address}
-                onChange={(v) => updateField('address', v)}
-              />
-              <LatLng
-                lat={form.lat}
-                lng={form.lng}
-                onChangeLat={(v) => updateField('lat', v)}
-                onChangeLng={(v) => updateField('lng', v)}
-              />
-            </div>
-
-            {/* 우측 */}
-            <div className="space-y-4">
-              <WorkTimes hours={hours} onChange={updateWorkTime} />
-              <AnimalTypeSelect
-                value={form.treatmentAnimalType}
-                onChange={(v) => updateField('treatmentAnimalType', v)}
-              />
-              <Input
-                label="태그 (쉼표 구분)"
-                value={form.tag}
-                onChange={(v) => updateField('tag', v)}
-              />
-              <Textarea
-                label="병원 소개글"
-                value={form.information}
-                onChange={(v) => updateField('information', v)}
-              />
-            </div>
-          </div>
+          <HospitalForm
+            form={form}
+            hours={hours}
+            onChangeField={updateField}
+            onChangeWorkTime={updateWorkTime}
+          />
         ) : (
           <HospitalHistories histories={histories} />
         )}
@@ -314,76 +238,3 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
     </div>
   );
 }
-
-/* ===== UI 보조 컴포넌트 (UI 동일) ===== */
-
-const Input = ({ label, value, onChange }) => (
-  <div>
-    <label className="mb-1 block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <input
-      type="text"
-      defaultValue={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded border p-2 text-sm"
-    />
-  </div>
-);
-
-const Textarea = ({ label, value, onChange }) => (
-  <div>
-    <label className="mb-1 block text-sm font-medium text-gray-700">
-      {label}
-    </label>
-    <textarea
-      rows={10}
-      defaultValue={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded border p-2 text-sm"
-    />
-  </div>
-);
-
-const LatLng = ({ lat, lng, onChangeLat, onChangeLng }) => (
-  <div>
-    <label className="mb-1 block text-sm font-medium text-gray-700">
-      위도/경도
-    </label>
-    <div className="flex gap-2">
-      <input
-        type="text"
-        defaultValue={lat}
-        onChange={(e) => onChangeLat(e.target.value)}
-        className="w-full rounded border p-2 text-sm"
-      />
-      <input
-        type="text"
-        defaultValue={lng}
-        onChange={(e) => onChangeLng(e.target.value)}
-        className="w-full rounded border p-2 text-sm"
-      />
-    </div>
-  </div>
-);
-
-const WorkTimes = ({ hours, onChange }) => (
-  <div>
-    <label className="mb-1 block text-sm font-medium text-gray-700">
-      운영시간
-    </label>
-    <div className="grid grid-cols-2 gap-2">
-      {days.map((day, idx) => (
-        <div key={day} className="flex items-center gap-2">
-          <span className="w-4 text-xs text-gray-500">{day}</span>
-          <input
-            type="text"
-            defaultValue={hours[idx] || '미작성'}
-            onBlur={(e) => onChange(idx, e.target.value)}
-            className="w-full rounded border p-1 text-xs"
-          />
-        </div>
-      ))}
-    </div>
-  </div>
-);
