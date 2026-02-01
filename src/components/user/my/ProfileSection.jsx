@@ -8,6 +8,7 @@ export default function ProfileSection({ isLoggedIn }) {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   const profile = useUserStore((state) => state.profile);
+  console.log('이미지', profile?.profileImageUrl);
 
   /* ======================
      비로그인
@@ -60,7 +61,6 @@ export default function ProfileSection({ isLoggedIn }) {
       </section>
     );
   }
-
   /* ======================
      로그인 O, 프로필 있음
   ====================== */
@@ -71,14 +71,14 @@ export default function ProfileSection({ isLoggedIn }) {
         <div className="flex items-center gap-3">
           {/* 프로필 이미지 */}
           <img
-            src={profile.profileImageUrl}
+            src={profile?.profileImageUrl}
             alt="프로필"
             className="h-10 w-10 rounded-full object-cover"
           />
 
           <div>
-            <p className="text-sm font-semibold">{profile.nickname}</p>
-            <p className="text-xs text-gray-400">{profile.email}</p>
+            <p className="text-sm font-semibold">{profile?.nickname}</p>
+            <p className="text-xs text-gray-400">{profile?.email}</p>
           </div>
         </div>
 

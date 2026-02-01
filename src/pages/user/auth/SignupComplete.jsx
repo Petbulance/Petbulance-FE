@@ -31,7 +31,7 @@ export default function SignupComplete() {
         terms.location === 'AGREE';
 
       setHasRequiredAgree(hasAgree);
-
+      console.log('agre', hasAgree);
       if (!hasAgree) {
         setOpen(true);
       }
@@ -109,29 +109,20 @@ export default function SignupComplete() {
 
       {/* ❌ 필수 약관 전부 미동의 */}
       {!hasRequiredAgree && (
-        <div className="flex min-h-screen flex-col bg-white px-6">
-          {/* 상단 콘텐츠 */}
-          <div className="mt-48 flex flex-col items-center text-center">
-            <button
-              className="w-full rounded-lg bg-[#2DA969] py-4 text-sm font-semibold text-white"
-              onClick={() => setOpen(true)}
-            >
-              약관 보기
-            </button>
-          </div>
-          {/*여백*/}
-          <div className="flex-1" />
+        <div className="mx-auto mt-40 w-full max-w-sm space-y-3 pb-6">
+          <button
+            className="w-full rounded-lg bg-[#2DA969] py-4 text-sm font-semibold text-white"
+            onClick={() => setOpen(true)}
+          >
+            약관 보기
+          </button>
 
-          {/* 버튼 영역 */}
-          <div className="mx-auto w-full max-w-sm pb-6">
-            <button className="bg-primary w-full rounded-lg py-4 text-sm font-semibold text-white">
-              시작하기
-            </button>
-
-            <button className="mt-3 w-full rounded-lg py-4 text-sm text-gray-500">
-              다른 소셜로그인 선택
-            </button>
-          </div>
+          <button
+            className="text-caption w-full rounded-lg py-4 text-sm"
+            onClick={handleLogout}
+          >
+            다른 소셜로그인 선택
+          </button>
         </div>
       )}
 
