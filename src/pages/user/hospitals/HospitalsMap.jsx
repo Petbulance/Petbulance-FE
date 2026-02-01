@@ -20,27 +20,16 @@ export default function HospitalsMap() {
 
   const {
     filterState,
-
     setFilterState,
-
     hospitals,
-
     setHospitals,
-
     activeSheet,
-
     setActiveSheet,
-
     isSortOpen,
-
     setIsSortOpen,
-
     handleSortChange,
-
     handleToggleOpen,
-
     handleApplyFilter,
-
     closeSheet,
   } = useHospitalFilter();
 

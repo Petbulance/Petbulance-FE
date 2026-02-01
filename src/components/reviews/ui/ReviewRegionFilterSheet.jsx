@@ -2,67 +2,42 @@ import { useMemo, useState } from 'react';
 
 import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { ResetBtn } from '@/components/hosiptals/ui/FilterPopup/ResetBtn';
+import { CITIES, REGION_DATA } from '@/data/regionData';
 
-export function ReviewRegionFilterSheet() {
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedRegion, setSelectedRegion] = useState('');
+export function ReviewRegionFilterSheet({ onApply, filterState }) {
+  const [temp, setTemp] = useState({
+    city: filterState.city,
+    region: filterState.region,
+  });
 
-  const cities = useMemo(
-    () => [
-      '서울',
-      '경기',
-      '지역',
-      '지역',
-      '지역',
-      '지역',
-      '지역',
-      '지역',
-      '지역',
-      '지역',
-    ],
-    []
-  );
+  const districts = useMemo(() => {
+    if (!temp.city) return [];
+    return REGION_DATA[temp.city] || [];
+  }, [temp.city]);
 
-  const districts = useMemo(
-    () => [
-      '강남구',
-      '강동구',
-      '강북구',
-      '강서구',
-      '관악구',
-      '광진구',
-      '구로구',
-      '금천구',
-      '노원구',
-      '도봉구',
-      '동작구',
-      '마포구',
-      '서대문구',
-      '서초구',
-      '성동구',
-    ],
-    []
-  );
+  const handleCityClick = (cityValue) => {
+    setTemp({ city: cityValue, region: '' });
+  };
+
+  const handleRegionClick = (regionValue) => {
+    setTemp((prev) => ({ ...prev, region: regionValue }));
+  };
 
   return (
     <>
-      <ResetBtn
-        setSelectedCity={setSelectedCity}
-        setSelectedRegion={setSelectedRegion}
-      />
-      <div className="flex min-h-0 flex-1 gap-4 text-[20px] font-medium">
+      <ResetBtn setFilterState={setTemp} />
+      <div className="flex h-[500px] min-h-0 flex-1 gap-4 text-[20px] font-medium">
         {/* 왼쪽: 시/도 */}
-        <div className="w-1/3 overflow-y-auto">
-          {cities.map((city, idx) => (
+        <div className="w-1/3 overflow-y-auto bg-[#F5F5F5]">
+          {CITIES.map((city) => (
             <div
-              key={`${city}-${idx}`}
-              onClick={() => setSelectedCity(city)}
-              className={[
-                'cursor-pointer px-10.5 py-3 text-center',
-                selectedCity === city
-                  ? 'bg-white text-[#1E1E1E]'
-                  : 'bg-[#F5F5F5] text-[#9E9E9E]',
-              ].join(' ')}
+              key={city}
+              onClick={() => handleCityClick(city)}
+              className={`cursor-pointer px-4 py-3 text-center transition-colors ${
+                temp.city === city
+                  ? 'bg-white font-bold text-[#1E1E1E]'
+                  : 'text-[#9E9E9E]'
+              }`}
             >
               {city}
             </div>
@@ -71,21 +46,31 @@ export function ReviewRegionFilterSheet() {
 
         {/* 오른쪽: 구/군 */}
         <div className="flex-1 overflow-y-auto bg-white">
-          {districts.map((dist, idx) => (
-            <div
-              key={`${dist}-${idx}`}
-              onClick={() => setSelectedRegion(dist)}
-              className={[
-                'cursor-pointer border-b px-5 py-3 hover:bg-gray-50',
-                selectedRegion === dist ? 'text-[#2DA969]' : 'text-[#1E1E1E]',
-              ].join(' ')}
-            >
-              {dist}
+          {districts.length > 0 ? (
+            districts.map((dist) => (
+              <div
+                key={dist}
+                onClick={() => handleRegionClick(dist)}
+                className={`cursor-pointer border-b px-5 py-3 transition-colors hover:bg-gray-50 ${
+                  temp.region === dist
+                    ? 'font-bold text-[#2DA969]'
+                    : 'text-[#1E1E1E]'
+                }`}
+              >
+                {dist}
+              </div>
+            ))
+          ) : (
+            <div className="flex h-full items-center justify-center text-[16px] text-gray-400">
+              시/도를 먼저 선택해주세요.
             </div>
-          ))}
+          )}
         </div>
       </div>
-      <GreenBtn name="후기 보기" />
+      <GreenBtn
+        name="후기 보기"
+        onClick={() => onApply(temp.city, temp.region)}
+      />
     </>
   );
 }

@@ -44,7 +44,7 @@ export const fetchHospitalsByName = async (name, filterState) => {
       params: {
         q: name,
         region: combinedRegion,
-        species: '',
+        species: animal,
         sortBy: sort,
         openNow: isOpen,
       },

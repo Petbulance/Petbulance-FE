@@ -11,7 +11,7 @@ export function HospitalCardList({ hospitals }) {
         {hospitals.map((h) => (
           <HospitalCard
             key={h.hospitalId}
-            img={h.thumbnailUrl}
+            img={h.image}
             name={h.name}
             status={h.isOpenNow}
             time={h.openHours}

@@ -16,7 +16,7 @@ export function HospitalCard({
   return (
     <HosipitalDetailWrap onClick={onClick}>
       <HosipitalDetail
-        img={img}
+        image={img}
         name={name}
         openNow={status}
         time={time}
