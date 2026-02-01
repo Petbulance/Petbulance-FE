@@ -8,9 +8,11 @@ import { ReviewContent } from '@/components/reviews/ui/ReviewContent';
 import { ReviewFilterBar } from '@/components/reviews/ui/ReviewFilterBar';
 import { ReviewRegionFilterSheet } from '@/components/reviews/ui/ReviewRegionFilterSheet';
 import { WriteBtn } from '@/components/reviews/ui/WriteBtn';
+import { useOutletContext } from 'react-router-dom';
 
 export function ReviewMain() {
-  const [activeSheet, setActiveSheet] = useState(null);
+  const [activeSheet, setActiveSheet] = useOutletContext();
+
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,6 +54,8 @@ export function ReviewMain() {
   };
 
   useEffect(() => {
+    console.log('액티브 시트:', activeSheet);
+
     console.log('필터', filters.city, filters.region, filters.animal);
 
     const fetchReviews = async () => {
