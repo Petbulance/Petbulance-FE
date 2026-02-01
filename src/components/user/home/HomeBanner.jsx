@@ -91,7 +91,7 @@ export default function HomeBanner() {
                     </button>
 
                     <button className="rounded-full bg-black/60 px-3 py-1 text-xs text-white">
-                      {current + 1} / {count} 모두 보기
+                      {current + 1} / {count}
                     </button>
                   </div>
                 </div>

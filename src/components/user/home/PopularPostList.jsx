@@ -47,29 +47,29 @@ const POPULAR_POSTS = [
 ];
 
 export default function PopularPostList() {
-  return (
+  /*return (
     <section>
-      {/* 헤더 */}
+      {/!* 헤더 *!/}
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-[19px] font-semibold">인기 게시글</h2>
         <button className="">{'>'}</button>
       </div>
 
-      {/* 리스트 */}
+      {/!* 리스트 *!/}
       <div className="space-y-3">
         {POPULAR_POSTS.slice(0, 5).map((post) => (
           <div
             key={post.id}
             className="flex items-center justify-between rounded-xl bg-gray-100 px-4 py-3"
           >
-            {/* 좌측 영역 */}
+            {/!* 좌측 영역 *!/}
             <div className="flex flex-col gap-1">
-              {/* 제목 */}
+              {/!* 제목 *!/}
               <p className="line-clamp-1 text-[15px] font-medium">
                 {post.title}
               </p>
 
-              {/* 메타 정보 */}
+              {/!* 메타 정보 *!/}
               <div className="flex items-center gap-2 text-xs text-gray-400">
                 <span>{post.animalCategory}</span>
                 <span>·</span>
@@ -81,7 +81,7 @@ export default function PopularPostList() {
               </div>
             </div>
 
-            {/* 우측 댓글 영역 */}
+            {/!* 우측 댓글 영역 *!/}
             <div className="flex h-[56px] w-[56px] flex-col items-center justify-center rounded-[12px] bg-white">
               <span className="text-success text-[19px] font-semibold">
                 {post.commentCount}
@@ -90,6 +90,20 @@ export default function PopularPostList() {
             </div>
           </div>
         ))}
+      </div>
+    </section>
+  );*/
+  return (
+    <section>
+      {/* 헤더 */}
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-[19px] font-semibold">커뮤니티 인기 게시글</h2>
+        <button className="">{'>'}</button>
+      </div>
+
+      {/* 리스트 */}
+      <div className="space-y-3 text-center">
+        <p>준비중</p>
       </div>
     </section>
   );

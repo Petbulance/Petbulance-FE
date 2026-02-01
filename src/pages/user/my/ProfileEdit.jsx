@@ -1,23 +1,42 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
 import cameraIcon from '@/assets/images/icons/cameraIcon.svg';
 import dangerCheckImg from '@/assets/images/icons/dangerCheckImg.svg';
 import defaultImg from '@/assets/images/icons/defaultImg.svg';
 import successCheckImg from '@/assets/images/icons/successCheckImg.svg';
+import useUserStore from '@/stores/useUserStore.js';
 
 export default function ProfileEdit() {
   const navigate = useNavigate();
 
-  // 기존 사용자 정보 (더미 → API 교체)
-  const originalNickname = '따뜻한햄스터07';
+  const { profile } = useUserStore();
+
+  /* =====================
+     방어 처리
+  ===================== */
+  if (!profile) {
+    return (
+      <div className="flex h-full items-center justify-center bg-white">
+        <p className="text-gray-400">프로필 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  /* =====================
+     초기 값
+  ===================== */
+  const originalNickname = profile.nickname;
 
   const [nickname, setNickname] = useState(originalNickname);
-  const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(
+    profile.profileImageUrl ?? null
+  );
 
-  /* ================= 유효성 검사 ================= */
-
-  // 한글 / 영문 / 숫자만 허용
+  /* =====================
+     유효성 검사
+  ===================== */
   const nicknameRegex = /^[가-힣a-zA-Z0-9]+$/;
 
   const isSame = nickname === originalNickname;
@@ -25,20 +44,29 @@ export default function ProfileEdit() {
   const isTooLong = nickname.length > 12;
   const hasSpecialChar = !nicknameRegex.test(nickname);
 
-  // 저장 가능 여부
   const canSave = !isSame && !isTooShort && !isTooLong && !hasSpecialChar;
 
-  /* ================= 저장 ================= */
-
-  const handleSave = () => {
+  /* =====================
+     저장
+  ===================== */
+  const handleSave = async () => {
     if (!canSave) return;
 
-    console.log('저장', {
-      nickname,
-      profileImage,
-    });
+    try {
+      await api.patch('/users/nickname', { nickname });
 
-    navigate(-1);
+      useUserStore.setState((state) => ({
+        profile: {
+          ...state.profile,
+          nickname,
+          profileImageUrl: profileImage,
+        },
+      }));
+      alert('닉네임 변경이 완료되었습니다.');
+      navigate(-1);
+    } catch (e) {
+      console.error('프로필 저장 실패', e);
+    }
   };
 
   return (
@@ -56,8 +84,7 @@ export default function ProfileEdit() {
             type="button"
             className="absolute right-0 bottom-0 rounded-full border-[0.8px] border-[var(--border-secondary,#757575)] bg-[#EEEEEE] p-1"
             onClick={() => {
-              // 이미지 업로드 연결 예정
-              console.log('이미지 변경');
+              console.log('이미지 변경 (추후 연결)');
             }}
           >
             <img src={cameraIcon} alt="카메라" />
@@ -65,7 +92,7 @@ export default function ProfileEdit() {
         </div>
       </div>
 
-      {/* ================= 닉네임 입력 ================= */}
+      {/* ================= 닉네임 ================= */}
       <div className="space-y-1">
         <label className="text-[19px] text-gray-800">닉네임</label>
 
@@ -76,7 +103,7 @@ export default function ProfileEdit() {
           className="mt-3 w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-[20px] text-gray-800"
         />
 
-        {/* ================= 상태 메시지 ================= */}
+        {/* 상태 메시지 */}
         {isSame ? (
           <p className="text-[16px] text-gray-800">현재 닉네임이에요</p>
         ) : nickname.length === 0 ? (
@@ -106,7 +133,7 @@ export default function ProfileEdit() {
         )}
       </div>
 
-      {/* ================= 저장 버튼 ================= */}
+      {/* ================= 저장 ================= */}
       <div className="mt-20">
         <button
           onClick={handleSave}

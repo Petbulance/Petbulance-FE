@@ -27,7 +27,14 @@ function Group({ title, children }) {
   );
 }
 
-function Item({ Icon, iconNode, label, right, onClick }) {
+function Item({
+  Icon,
+  iconNode,
+  label,
+  right,
+  onClick,
+  textClassName = 'text-[#1e1e1e]',
+}) {
   return (
     <div
       className="flex h-[48px] cursor-pointer items-center justify-between px-[24px] py-3"
@@ -36,7 +43,7 @@ function Item({ Icon, iconNode, label, right, onClick }) {
       <div className="flex items-center gap-3">
         {iconNode}
         {!iconNode && Icon && <Icon className="h-5 w-5 text-black" />}
-        <span className="text-[19px]">{label}</span>
+        <span className={`text-[19px] ${textClassName}`}>{label}</span>
       </div>
 
       {right ?? <ChevronRight className="h-4 w-4 text-gray-400" />}
@@ -67,12 +74,13 @@ export default function MyPage() {
   return (
     <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
       {/* 상단 프로필 */}
-      <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile} />
+      <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile ?? null} />
 
       {/* 사용자 설정 */}
       <Group title="사용자 설정">
         <Item
           label="알림 설정"
+          textClassName="text-red-500"
           iconNode={
             <img src={notificationIcon} className="h-5 w-5" alt="알림 설정" />
           }
@@ -82,12 +90,14 @@ export default function MyPage() {
         <Item
           Icon={Login}
           label="로그인 계정 관리"
+          textClassName="text-red-500"
           onClick={() => requireLogin('/index/mypage/loginsetting')}
         />
 
         <Item
           Icon={Security}
           label="권한"
+          textClassName="text-red-500"
           onClick={() => requireLogin('/index/mypage/authorization')}
         />
       </Group>

@@ -10,7 +10,7 @@ export default function MypageHeader({ title, onSubmit }) {
 
   const { currentInquiry } = useSupportInquiryStore();
   const { title: writeTitle, content } = useSupportWriteStore();
-
+  const { submit } = useSupportWriteStore();
   const isWrite = location.pathname.includes('/write');
   const isDetail = location.pathname.includes('/detail');
   const isModify = location.pathname.includes('/modify');
@@ -24,18 +24,9 @@ export default function MypageHeader({ title, onSubmit }) {
 
   const handleActionClick = () => {
     if (isWrite || isModify) {
-      // 실제 submit은 Page(wrapper)에서
-      onSubmit?.();
-      return;
-    }
-
-    if (isDetail && currentInquiry) {
-      navigate(`/index/mypage/support/myinquiry/modify/${currentInquiry.id}`, {
-        state: { inquiry: currentInquiry },
-      });
+      submit(navigate);
     }
   };
-
   const actionText = isWrite
     ? '등록'
     : isDetail

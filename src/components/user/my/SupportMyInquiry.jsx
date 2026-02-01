@@ -1,47 +1,82 @@
 import { ChevronLeft, PenLine } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
+
 const STATUS_STYLE = {
-  done: 'bg-[#E6F2FF] text-[#0265CF]',
-  wait: 'bg-[#EEEEEE] text-[#757575]',
+  ANSWER_COMPLETED: 'bg-[#E6F2FF] text-[#0265CF]',
+  ANSWER_WAITING: 'bg-[#EEEEEE] text-[#757575]',
 };
 
-const NOTIFICATIONS = [
-  {
-    id: 1,
-    title: '해결해주세요',
-    date: '2025-11-22',
-    status: 'done',
-  },
-  {
-    id: 2,
-    title: '건의합니다',
-    date: '2025-11-22',
-    status: 'wait',
-  },
-];
+const STATUS_LABEL = {
+  ANSWER_COMPLETED: '답변완료',
+  ANSWER_WAITING: '확인중',
+};
 
 export default function SupportMyInquiry() {
   const navigate = useNavigate();
 
-  if (NOTIFICATIONS.length === 0) {
+  const [qnaList, setQnaList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [hasNext, setHasNext] = useState(false);
+  const [lastQnaId, setLastQnaId] = useState(null);
+
+  /* =========================
+     문의 목록 조회
+  ========================= */
+  const fetchQnaList = async () => {
+    try {
+      const res = await api.get('/qna', {});
+      console.log(res);
+      const { content, hasNext } = res.data.data;
+
+      setQnaList((prev) => [...prev, ...content]);
+      setHasNext(hasNext);
+
+      if (content.length > 0) {
+        setLastQnaId(content[content.length - 1].qnaId);
+      }
+    } catch (e) {
+      console.error('문의 목록 조회 실패', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQnaList();
+  }, []);
+
+  /* =========================
+     로딩 / 빈 상태
+  ========================= */
+  if (!loading && qnaList.length === 0) {
     return (
       <div className="flex h-full items-center justify-center bg-white">
         <p className="text-[16px] text-[#9E9E9E]">작성한 문의가 없어요.</p>
+
+        {/* 글 작성 버튼 */}
+        <button
+          onClick={() => navigate('/index/mypage/support/write')}
+          className="absolute right-5 bottom-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#27BE69] text-white shadow-lg active:scale-95"
+        >
+          <PenLine className="h-5 w-5" />
+        </button>
       </div>
     );
   }
 
   return (
     <div className="relative h-full bg-white">
-      {/* 리스트 */}
+      {/* ================= 리스트 ================= */}
       <div>
-        {NOTIFICATIONS.map((item) => (
+        {qnaList.map((item) => (
           <button
-            key={item.id}
+            key={item.qnaId}
             type="button"
             onClick={() =>
-              navigate(`/index/mypage/support/myinquiry/detail/${item.id}`)
+              navigate(`/index/mypage/support/myinquiry/detail/${item.qnaId}`)
             }
             className="flex w-full items-center justify-between border-b px-4 py-4 text-left hover:bg-gray-50 active:bg-gray-100"
           >
@@ -54,11 +89,13 @@ export default function SupportMyInquiry() {
                     STATUS_STYLE[item.status]
                   }`}
                 >
-                  {item.status === 'done' ? '답변완료' : '확인중'}
+                  {STATUS_LABEL[item.status]}
                 </span>
               </div>
 
-              <p className="text-[13px] text-[#9E9E9E]">{item.date}</p>
+              <p className="text-[13px] text-[#9E9E9E]">
+                {item.createdAt.slice(0, 10)}
+              </p>
             </div>
 
             <ChevronLeft className="h-6 w-6 rotate-180 text-[#E0E0E0]" />
@@ -66,7 +103,7 @@ export default function SupportMyInquiry() {
         ))}
       </div>
 
-      {/* 글 작성 버튼 */}
+      {/* ================= 글 작성 버튼 ================= */}
       <button
         onClick={() => navigate('/index/mypage/support/write')}
         className="absolute right-5 bottom-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#27BE69] text-white shadow-lg active:scale-95"
