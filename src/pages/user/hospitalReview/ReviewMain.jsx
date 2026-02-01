@@ -54,8 +54,6 @@ export function ReviewMain() {
   };
 
   useEffect(() => {
-    console.log('액티브 시트:', activeSheet);
-
     console.log('필터', filters.city, filters.region, filters.animal);
 
     const fetchReviews = async () => {
@@ -106,7 +104,11 @@ export function ReviewMain() {
 
       {activeSheet && (
         <div className="absolute inset-0 z-[2000] bg-white">
-          <HospitalFilterModalContainer onClose={closeSheet} mode={activeSheet}>
+          <HospitalFilterModalContainer
+            onClose={closeSheet}
+            mode={activeSheet}
+            onModeChange={setActiveSheet}
+          >
             {activeSheet === 'region' ? (
               <ReviewRegionFilterSheet
                 filterState={filters}

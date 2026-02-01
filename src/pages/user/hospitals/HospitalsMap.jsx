@@ -68,7 +68,11 @@ export default function HospitalsMap() {
 
       {activeSheet && (
         <div className="absolute inset-0 z-[2000] bg-white">
-          <HospitalFilterModalContainer onClose={closeSheet} mode={activeSheet}>
+          <HospitalFilterModalContainer
+            onClose={closeSheet}
+            mode={activeSheet}
+            onModeChange={setActiveSheet}
+          >
             {activeSheet === 'region' ? (
               <SearchFilterContent
                 filterState={filterState}
