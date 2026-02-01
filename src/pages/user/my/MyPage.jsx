@@ -9,12 +9,12 @@ import {
   Security,
 } from '@carbon/icons-react';
 import { ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import api from '@/apis/api.jsx';
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
 import ProfileSection from '@/components/user/my/ProfileSection.jsx';
+import useUserStore from '@/stores/useUserStore.js';
 
 function Group({ title, children }) {
   return (
@@ -46,8 +46,9 @@ function Item({ Icon, iconNode, label, right, onClick }) {
 
 export default function MyPage() {
   const navigate = useNavigate();
-  const [myProfile, setMyProfile] = useState({});
   const isLoggedIn = Boolean(localStorage.getItem('access_token'));
+
+  const { profile: myProfile, fetchMyProfile } = useUserStore();
 
   const requireLogin = (path) => {
     if (!isLoggedIn) {
@@ -56,21 +57,16 @@ export default function MyPage() {
     }
     navigate(path);
   };
-  const getMyProfile = async () => {
-    try {
-      const response = await api.get('/users/me');
-      console.log(response);
-      setMyProfile(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
   useEffect(() => {
-    getMyProfile();
-  }, []);
+    if (isLoggedIn && !myProfile) {
+      fetchMyProfile();
+    }
+  }, [isLoggedIn, myProfile, fetchMyProfile]);
+
   return (
     <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
-      {/* 상단 프로필 영역 */}
+      {/* 상단 프로필 */}
       <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile} />
 
       {/* 사용자 설정 */}

@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ConfirmSuccessModal from '@/components/commons/layout/ConfirmSuccessModal.jsx';
+import useUserStore from '@/stores/useUserStore.js';
 
-export default function ProfileSection({ isLoggedIn, myProfile }) {
+export default function ProfileSection({ isLoggedIn }) {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
+  const profile = useUserStore((state) => state.profile);
+  console.log('profile', profile);
   // 비로그인
   if (!isLoggedIn) {
     return (
@@ -51,14 +54,14 @@ export default function ProfileSection({ isLoggedIn, myProfile }) {
       <div className="flex items-center justify-between">
         {/* 좌측 프로필 */}
         <div className="flex items-center gap-3">
-          <img
-            src={myProfile.profileImageUrl}
-            alt="프로필"
-            className="h-10 w-10 rounded-full object-cover"
-          />
+          {/*<img*/}
+          {/*  src={profile.profileImageUrl}*/}
+          {/*  alt="프로필"*/}
+          {/*  className="h-10 w-10 rounded-full object-cover"*/}
+          {/*/>*/}
           <div>
-            <p className="text-sm font-semibold">{myProfile.nickname}</p>
-            <p className="text-xs text-gray-400">{myProfile.email}</p>
+            {/*<p className="text-sm font-semibold">{profile.nickname}</p>*/}
+            {/*<p className="text-xs text-gray-400">{profile.email}</p>*/}
           </div>
         </div>
 
