@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import ConfirmSuccessModal from '@/components/commons/layout/ConfirmSuccessModal.jsx';
 
-export default function ProfileSection({ isLoggedIn, user }) {
+export default function ProfileSection({ isLoggedIn, myProfile }) {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
   // 비로그인
@@ -52,13 +52,13 @@ export default function ProfileSection({ isLoggedIn, user }) {
         {/* 좌측 프로필 */}
         <div className="flex items-center gap-3">
           <img
-            src={user.profileImage}
+            src={myProfile.profileImageUrl}
             alt="프로필"
             className="h-10 w-10 rounded-full object-cover"
           />
           <div>
-            <p className="text-sm font-semibold">{user.name}</p>
-            <p className="text-xs text-gray-400">{user.email}</p>
+            <p className="text-sm font-semibold">{myProfile.nickname}</p>
+            <p className="text-xs text-gray-400">{myProfile.email}</p>
           </div>
         </div>
 
