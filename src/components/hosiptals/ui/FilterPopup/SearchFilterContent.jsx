@@ -23,7 +23,10 @@ export function SearchFilterContent({ onApply, filterState }) {
   };
 
   const handleRegionClick = (regionValue) => {
-    setTemp((prev) => ({ ...prev, region: regionValue }));
+    setTemp((prev) => ({
+      ...prev,
+      region: regionValue === '전체' ? '' : regionValue,
+    }));
   };
 
   return (
@@ -55,7 +58,8 @@ export function SearchFilterContent({ onApply, filterState }) {
                 key={dist}
                 onClick={() => handleRegionClick(dist)}
                 className={`cursor-pointer border-b px-5 py-3 transition-colors hover:bg-gray-50 ${
-                  temp.region === dist
+                  temp.region === dist ||
+                  (dist === '전체' && temp.region === '')
                     ? 'font-bold text-[#2DA969]'
                     : 'text-[#1E1E1E]'
                 }`}
