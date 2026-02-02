@@ -22,9 +22,10 @@ export default function MainHeader({ title }) {
       <div className="flex items-center justify-between">
         {/* 타이틀 */}
         <h1
-          className={`pl-[8px] text-[25px] font-semibold ${
+          className={`cursor-pointer pl-[8px] text-[25px] font-semibold ${
             isHome ? 'text-[#2DA969]' : 'text-gray-900'
           }`}
+          onClick={() => navigate('/index/home')}
         >
           {title}
         </h1>

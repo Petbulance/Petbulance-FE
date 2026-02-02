@@ -80,7 +80,7 @@ export default function PopularPostList() {
           <p className="mt-2 text-[14px] leading-relaxed text-[#9E9E9E]">
             커뮤니티 기능 준비중이에요!
             <br />
-            빠른 시일 내에 찾아qhlf게요.
+            빠른 시일 내에 찾아뵐게요.
           </p>
         </div>
       </div>
