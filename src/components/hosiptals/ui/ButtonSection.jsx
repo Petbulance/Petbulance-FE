@@ -33,7 +33,7 @@ export function ButtonSection({
   const buttons = [
     {
       id: 'region',
-      label: state.city ? `${state.region}` : '지역',
+      label: state.region || state.city || '지역',
       isHighlighted: false,
       rightIcon: <SelectArrow />,
     },
