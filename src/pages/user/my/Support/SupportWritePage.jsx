@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import ConfirmSupportModal from '@/components/commons/layout/ConfirmSupportModal.jsx';
@@ -12,88 +12,63 @@ import { useSupportWriteStore } from '@/stores/useSupportWriteStore.js';
 export default function SupportWritePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams(); // 👈 qnaId
 
-  const { title, content, reset, setFromInquiry } = useSupportWriteStore();
+  const { title, content, reset, setFromInquiry, submit, update } =
+    useSupportWriteStore();
+
+  const { currentInquiry } = useSupportInquiryStore();
+  const inquiryFromState = location.state?.inquiry;
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [createdInquiry, setCreatedInquiry] = useState(null);
-
-  const { currentInquiry, setInquiry } = useSupportInquiryStore();
-
-  const inquiryFromState = location.state?.inquiry;
 
   const isWrite = location.pathname.includes('/write');
   const isModify = location.pathname.includes('/modify');
+  const canSubmit = title.trim() && content.trim();
 
-  const canSubmit = title.trim().length > 0 && content.trim().length > 0;
-
+  /* ================= 수정 진입 시 기존 데이터 세팅 ================= */
   useEffect(() => {
     if (!isModify) return;
 
     const inquiry = inquiryFromState || currentInquiry;
-
     if (inquiry) {
       setFromInquiry(inquiry);
     }
   }, [isModify, inquiryFromState, currentInquiry, setFromInquiry]);
 
+  /* ================= 등록 / 수정 ================= */
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
     try {
       if (isWrite) {
-        const newInquiry = {
-          id: Date.now(),
-          title: title.trim(),
-          content: content.trim(),
-          date: new Date().toISOString().split('T')[0],
-          answer: '',
-          answerDate: '',
-        };
-
-        setInquiry(newInquiry);
-        setCreatedInquiry(newInquiry);
-        setModalOpen(true);
+        await submit(navigate);
         return;
       }
 
       if (isModify) {
-        // TODO: 수정 API
-        console.log('UPDATE', { title, content });
+        await update(id);
 
-        navigate(-1);
-        reset();
         toast('문의를 수정했어요', {
           position: 'bottom-center',
-          duration: 4000,
-          style: {
-            width: '100%',
-            height: '44px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            background: '#222222E5',
-            color: '#ffffff',
-          },
-          action: {
-            label: <X className="h-4 w-4 text-white" />,
-            onClick: () => {
-              toast.dismiss();
-              // handleUndoDelete(snapshot);
-            },
-          },
-          actionButtonStyle: {
-            background: 'transparent',
-            color: '#ffffff',
-            fontWeight: 500,
-            padding: 0,
-            marginLeft: '24px',
-          },
+          duration: 3000,
         });
+
+        reset();
+        navigate(-1);
       }
     } catch (e) {
-      console.error(e);
-      toast('처리 중 오류가 발생했어요');
+      const errorName = e?.response?.data?.data?.errorClassName;
+
+      if (errorName === 'VALIDATION_ERROR') {
+        toast('제목과 내용을 모두 입력해 주세요.');
+      } else if (errorName === 'FORBIDDEN_QNA_ACCESS') {
+        toast('수정 권한이 없습니다.');
+      } else if (errorName === 'QNA_NOT_FOUND') {
+        toast('해당 문의를 찾을 수 없습니다.');
+      } else {
+        toast('처리 중 오류가 발생했어요.');
+      }
     }
   };
 
@@ -105,6 +80,7 @@ export default function SupportWritePage() {
       >
         <SupportWrite />
       </MypageLayout>
+
       <ConfirmSupportModal
         open={modalOpen}
         title="문의 제출이 완료되었습니다."
@@ -115,17 +91,6 @@ export default function SupportWritePage() {
           reset();
           setModalOpen(false);
           navigate('/index/mypage/support/MyInquiry');
-        }}
-        onConfirm={() => {
-          if (!createdInquiry) return;
-
-          navigate(
-            `/index/mypage/support/myinquiry/detail/${createdInquiry.id}`,
-            { state: { inquiry: createdInquiry } }
-          );
-
-          reset();
-          setModalOpen(false);
         }}
       />
     </>
