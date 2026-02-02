@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import ListIcon from '@/assets/images/icons/ListIcon.svg';
 import SortModal from '@/components/commons/layout/SortModal';

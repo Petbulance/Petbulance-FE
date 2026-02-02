@@ -14,31 +14,20 @@ export default function Hospitals() {
 
   const [filterState, setFilterState] = useState({
     city: '',
-
     region: '',
-
     animal: [],
-
     sort: 'distance',
-
     isOpen: false,
   });
 
   const hospitalContext = {
     activeSheet,
-
     setActiveSheet,
-
     hospitals,
-
     setHospitals,
-
     filterState,
-
     setFilterState,
-
     searchKeyword,
-
     setSearchKeyword,
   };
 
