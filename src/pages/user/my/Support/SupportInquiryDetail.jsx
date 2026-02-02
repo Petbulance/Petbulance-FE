@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import api from '@/apis/api.jsx';
 import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore';
@@ -18,6 +19,7 @@ export default function SupportInquiryDetail() {
 
   const [inquiry, setLocalInquiry] = useState(null);
   const [error, setError] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   /* ================= 단건 조회 ================= */
   const fetchInquiryDetail = async () => {
@@ -25,8 +27,8 @@ export default function SupportInquiryDetail() {
       const res = await api.get(`/qna/${id}`);
       const data = res.data.data;
 
-      setLocalInquiry(data); // 로컬 렌더링용
-      setInquiry(data);
+      setLocalInquiry(data); // 로컬 렌더링
+      setInquiry(data); // header 등 공용 store
     } catch (e) {
       const errorName = e?.response?.data?.data?.errorClassName;
 
@@ -47,6 +49,40 @@ export default function SupportInquiryDetail() {
       clearInquiry(); // ✅ 페이지 이탈 시 store 정리
     };
   }, [id]);
+
+  /* ================= 삭제 ================= */
+  const handleDelete = async () => {
+    if (deleting) return;
+
+    const confirmed = window.confirm('문의를 삭제하시겠어요?');
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+
+      await api.delete(`/qna/${id}`);
+
+      toast('문의가 삭제되었습니다.', {
+        position: 'bottom-center',
+        duration: 3000,
+      });
+
+      clearInquiry();
+      navigate('/index/mypage/support/MyInquiry', { replace: true });
+    } catch (e) {
+      const errorName = e?.response?.data?.data?.errorClassName;
+
+      if (errorName === 'FORBIDDEN_QNA_ACCESS') {
+        toast('삭제 권한이 없습니다.');
+      } else if (errorName === 'QNA_NOT_FOUND') {
+        toast('이미 삭제된 문의입니다.');
+      } else {
+        toast('삭제 중 오류가 발생했어요.');
+      }
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   /* ================= 에러 화면 ================= */
   if (error) {
@@ -110,9 +146,11 @@ export default function SupportInquiryDetail() {
           목록
         </button>
 
+        {/* ❗ 답변 완료된 문의는 삭제 막고 싶으면 여기서 조건 추가 가능 */}
         <button
-          onClick={() => alert('삭제 API 연결')}
-          className="flex-1 rounded-lg border border-[#27BE69] py-3 text-[15px] font-medium text-[#27BE69]"
+          onClick={handleDelete}
+          disabled={deleting}
+          className="flex-1 rounded-lg border border-[#27BE69] py-3 text-[15px] font-medium text-[#27BE69] disabled:opacity-50"
         >
           삭제
         </button>

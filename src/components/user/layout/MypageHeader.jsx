@@ -44,9 +44,13 @@ export default function MypageHeader({ title }) {
 
     // 🔁 상세 페이지 → 수정 페이지 이동
     if (isDetail && currentInquiry) {
-      navigate(`/index/mypage/support/myinquiry/modify/${currentInquiry.id}`, {
-        state: { inquiry: currentInquiry },
-      });
+      console.log('1', currentInquiry);
+      navigate(
+        `/index/mypage/support/myinquiry/modify/${currentInquiry.qnaId}`,
+        {
+          state: { inquiry: currentInquiry },
+        }
+      );
     }
   };
 
