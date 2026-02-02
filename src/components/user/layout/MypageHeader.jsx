@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore';
 import { useSupportWriteStore } from '@/stores/useSupportWriteStore';
 
-export default function MypageHeader({ title }) {
+export default function MypageHeader({ title, onSubmit }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -36,8 +36,13 @@ export default function MypageHeader({ title }) {
 
   /** 버튼 클릭 */
   const handleActionClick = () => {
-    // ✏️ 작성 / 수정 페이지 → submit
-    if (isWrite || isModify) {
+    if ((isWrite || isModify) && onSubmit) {
+      onSubmit();
+      return;
+    }
+
+    // ✏️ 작성 페이지 → submit
+    if (isWrite) {
       submit(navigate);
       return;
     }

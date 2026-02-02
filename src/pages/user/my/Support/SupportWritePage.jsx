@@ -26,6 +26,30 @@ export default function SupportWritePage() {
   const isModify = location.pathname.includes('/modify');
   const canSubmit = title.trim() && content.trim();
 
+  const bottomToastOptions = {
+    position: 'bottom-center',
+    duration: 3000,
+    style: {
+      width: '100%',
+      height: '44px',
+      display: 'flex',
+      alignItems: 'center',
+      background: '#222222E5',
+      color: '#ffffff',
+    },
+    action: {
+      label: '✕',
+      onClick: () => toast.dismiss(),
+    },
+    actionButtonStyle: {
+      background: 'transparent',
+      border: 'none',
+      color: '#ffffff',
+      padding: 0,
+      cursor: 'pointer',
+    },
+  };
+
   /* ================= 수정 진입 시 기존 데이터 세팅 ================= */
   useEffect(() => {
     if (!isModify) return;
@@ -49,10 +73,7 @@ export default function SupportWritePage() {
       if (isModify) {
         await update(id);
 
-        toast('문의를 수정했어요', {
-          position: 'bottom-center',
-          duration: 3000,
-        });
+        toast('문의를 수정했어요', bottomToastOptions);
 
         reset();
         navigate(-1);
@@ -61,13 +82,13 @@ export default function SupportWritePage() {
       const errorName = e?.response?.data?.data?.errorClassName;
 
       if (errorName === 'VALIDATION_ERROR') {
-        toast('제목과 내용을 모두 입력해 주세요.');
+        toast('제목과 내용을 모두 입력해 주세요.', bottomToastOptions);
       } else if (errorName === 'FORBIDDEN_QNA_ACCESS') {
-        toast('수정 권한이 없습니다.');
+        toast('수정 권한이 없습니다.', bottomToastOptions);
       } else if (errorName === 'QNA_NOT_FOUND') {
-        toast('해당 문의를 찾을 수 없습니다.');
+        toast('해당 문의를 찾을 수 없습니다.', bottomToastOptions);
       } else {
-        toast('처리 중 오류가 발생했어요.');
+        toast('처리 중 오류가 발생했어요.', bottomToastOptions);
       }
     }
   };
@@ -78,7 +99,7 @@ export default function SupportWritePage() {
         title={isWrite ? '문의 작성' : '문의 수정'}
         onSubmit={handleSubmit}
       >
-        <SupportWrite />
+        <SupportWrite onSubmit={isModify ? handleSubmit : undefined} />
       </MypageLayout>
 
       <ConfirmSupportModal

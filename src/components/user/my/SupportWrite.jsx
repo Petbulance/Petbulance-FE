@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useSupportWriteStore } from '@/stores/useSupportWriteStore';
 
-export default function SupportWrite() {
+export default function SupportWrite({ onSubmit }) {
   const navigate = useNavigate();
 
   const { title, content, setTitle, setContent, reset } =
@@ -20,6 +20,11 @@ export default function SupportWrite() {
      문의 작성
   ========================= */
   const handleSubmit = async () => {
+    if (onSubmit) {
+      await onSubmit();
+      return;
+    }
+
     if (!title.trim() || !content.trim()) {
       setErrorMessage('제목과 내용을 모두 입력해주세요.');
       return;
