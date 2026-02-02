@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import greenCheck from '@/assets/images/icons/green_check.svg';
-import { ANIMAL_GROUPS } from '@/data/animalSort';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 import { CITIES, REGION_DATA } from '@/data/regionData';
 
 import { BottomTab } from './BottomTab';
@@ -76,39 +76,37 @@ export function SearchFilterContent({ onApply, filterState }) {
 }
 
 export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
-  const currentCategoryName = useMemo(() => {
-    if (!filterState.animal || filterState.animal.length === 0) return '';
+  const selectedAnimals = useMemo(
+    () => filterState.animal || [],
+    [filterState.animal]
+  );
 
-    return (
-      Object.keys(ANIMAL_GROUPS).find(
-        (key) =>
-          JSON.stringify(ANIMAL_GROUPS[key]) ===
-          JSON.stringify(filterState.animal)
-      ) || ''
-    );
-  }, [filterState.animal]);
+  const handleAnimalClick = (englishCode) => {
+    setFilterState((prev) => {
+      const currentList = prev.animal || [];
+      const newList = currentList.includes(englishCode)
+        ? currentList.filter((item) => item !== englishCode)
+        : [...currentList, englishCode];
 
-  const categories = useMemo(() => Object.keys(ANIMAL_GROUPS), []);
-
-  const handleAnimalClick = (categoryName) => {
-    const englishCodes = ANIMAL_GROUPS[categoryName];
-    setFilterState((prev) => ({
-      ...prev,
-      animal: englishCodes,
-    }));
+      return {
+        ...prev,
+        animal: newList,
+      };
+    });
   };
 
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-10 text-[25px] font-medium">
         <div className="bg-white">
-          {categories.map((name) => {
-            const isActive = currentCategoryName === name;
+          {Object.entries(ANIMAL_CATEGORY_KO).map(([code, name]) => {
+            const isActive = selectedAnimals.includes(code);
+
             return (
               <button
-                key={name}
+                key={code}
                 type="button"
-                onClick={() => handleAnimalClick(name)}
+                onClick={() => handleAnimalClick(code)}
                 className="flex w-full items-center justify-between pt-10"
               >
                 <span
@@ -123,7 +121,7 @@ export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
         </div>
       </div>
 
-      <BottomTab onClick={() => onApply(filterState.animal)} />
+      <BottomTab onClick={() => onApply(selectedAnimals)} />
     </div>
   );
 }

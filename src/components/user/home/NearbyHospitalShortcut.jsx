@@ -20,7 +20,7 @@ const ICON_MAP = {
 const CATEGORY_TO_TYPE = {
   전체: null,
   소형포유류: 'SMALLMAMMALS',
-  조류: 'BIRD',
+  조류: 'AVIAN',
   파충류: 'REPTILE',
   양서류: 'AMPHIBIAN',
   어류: 'FISH',
