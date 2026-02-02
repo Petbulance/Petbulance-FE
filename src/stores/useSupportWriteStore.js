@@ -24,16 +24,26 @@ export const useSupportWriteStore = create((set, get) => ({
     }),
 
   /* ================= 등록 ================= */
-  submit: async (navigate) => {
+  submit: async (navigate, options = {}) => {
     const { title, content } = get();
     if (!title.trim() || !content.trim()) return;
 
     set({ submitting: true });
 
     try {
-      await api.post('/qna', { title, content });
+      const res = await api.post('/qna', { title, content });
+      const data = res.data.data;
       set({ title: '', content: '' });
-      navigate('/index/mypage/support/MyInquiry', { replace: true });
+      if (options?.onSuccess) {
+        options.onSuccess(data);
+        return data;
+      }
+
+      if (navigate) {
+        navigate('/index/mypage/support/MyInquiry', { replace: true });
+      }
+
+      return data;
     } finally {
       set({ submitting: false });
     }

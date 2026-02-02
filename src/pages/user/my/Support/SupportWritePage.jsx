@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -21,6 +20,7 @@ export default function SupportWritePage() {
   const inquiryFromState = location.state?.inquiry;
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [createdQnaId, setCreatedQnaId] = useState(null);
 
   const isWrite = location.pathname.includes('/write');
   const isModify = location.pathname.includes('/modify');
@@ -66,7 +66,12 @@ export default function SupportWritePage() {
 
     try {
       if (isWrite) {
-        await submit(navigate);
+        await submit(null, {
+          onSuccess: (data) => {
+            setCreatedQnaId(data?.qnaId ?? null);
+            setModalOpen(true);
+          },
+        });
         return;
       }
 
@@ -99,7 +104,7 @@ export default function SupportWritePage() {
         title={isWrite ? '문의 작성' : '문의 수정'}
         onSubmit={handleSubmit}
       >
-        <SupportWrite onSubmit={isModify ? handleSubmit : undefined} />
+        <SupportWrite onSubmit={handleSubmit} />
       </MypageLayout>
 
       <ConfirmSupportModal
@@ -108,9 +113,20 @@ export default function SupportWritePage() {
         content="담당자 확인 후 연락드릴게요."
         confirmText="내 문의 확인"
         cancelText="닫기"
+        onConfirm={() => {
+          reset();
+          setModalOpen(false);
+          setCreatedQnaId(null);
+          if (createdQnaId) {
+            navigate(`/index/mypage/support/myinquiry/detail/${createdQnaId}`);
+          } else {
+            navigate('/index/mypage/support/MyInquiry');
+          }
+        }}
         onCancel={() => {
           reset();
           setModalOpen(false);
+          setCreatedQnaId(null);
           navigate('/index/mypage/support/MyInquiry');
         }}
       />
