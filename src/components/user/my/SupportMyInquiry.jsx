@@ -1,8 +1,10 @@
 import { ChevronLeft, PenLine } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+
+const PAGE_SIZE = 5;
 
 const STATUS_STYLE = {
   ANSWER_COMPLETED: 'bg-[#E6F2FF] text-[#0265CF]',
@@ -19,20 +21,29 @@ export default function SupportMyInquiry() {
 
   const [qnaList, setQnaList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasNext, setHasNext] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [hasNext, setHasNext] = useState(true);
   const [lastQnaId, setLastQnaId] = useState(null);
 
-  /* =========================
-     문의 목록 조회
-  ========================= */
+  const observerRef = useRef(null);
+
   const fetchQnaList = async () => {
+    if (isFetching || !hasNext) return;
+
+    setIsFetching(true);
+
     try {
-      const res = await api.get('/qna', {});
-      console.log(res);
-      const { content, hasNext } = res.data.data;
+      const res = await api.get('/qna', {
+        params: {
+          lastQnaId,
+          pageSize: PAGE_SIZE,
+        },
+      });
+
+      const { content, hasNext: next } = res.data.data;
 
       setQnaList((prev) => [...prev, ...content]);
-      setHasNext(hasNext);
+      setHasNext(next);
 
       if (content.length > 0) {
         setLastQnaId(content[content.length - 1].qnaId);
@@ -41,6 +52,7 @@ export default function SupportMyInquiry() {
       console.error('문의 목록 조회 실패', e);
     } finally {
       setLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -48,29 +60,22 @@ export default function SupportMyInquiry() {
     fetchQnaList();
   }, []);
 
-  /* =========================
-     로딩 / 빈 상태
-  ========================= */
-  if (!loading && qnaList.length === 0) {
-    return (
-      <div className="flex h-full items-center justify-center bg-white">
-        <p className="text-[16px] text-[#9E9E9E]">작성한 문의가 없어요.</p>
+  useEffect(() => {
+    if (!observerRef.current) return;
 
-        {/* 글 작성 버튼 */}
-        <button
-          onClick={() => navigate('/index/mypage/support/write')}
-          className="absolute right-5 bottom-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#27BE69] text-white shadow-lg active:scale-95"
-        >
-          <PenLine className="h-5 w-5" />
-        </button>
-      </div>
+    const observer = new IntersectionObserver(
+      ([entry]) => entry.isIntersecting && fetchQnaList(),
+      { threshold: 1 }
     );
-  }
-  console.log('qnaList', qnaList);
+
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [hasNext, lastQnaId]);
+
   return (
     <div className="relative h-full bg-white">
       {/* ================= 리스트 ================= */}
-      <div>
+      <div className="h-full overflow-y-auto pb-32">
         {qnaList.map((item) => (
           <button
             key={item.qnaId}
@@ -83,7 +88,6 @@ export default function SupportMyInquiry() {
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <p className="text-[16px] font-medium">{item.title}</p>
-
                 <span
                   className={`rounded px-2 py-0.5 text-[12px] font-medium ${
                     STATUS_STYLE[item.status]
@@ -92,7 +96,6 @@ export default function SupportMyInquiry() {
                   {STATUS_LABEL[item.status]}
                 </span>
               </div>
-
               <p className="text-[13px] text-[#9E9E9E]">
                 {item.createdAt.slice(0, 10)}
               </p>
@@ -101,12 +104,21 @@ export default function SupportMyInquiry() {
             <ChevronLeft className="h-6 w-6 rotate-180 text-[#E0E0E0]" />
           </button>
         ))}
+
+        {hasNext && (
+          <div
+            ref={observerRef}
+            className="flex h-12 items-center justify-center text-sm text-gray-400"
+          >
+            불러오는 중...
+          </div>
+        )}
       </div>
 
-      {/* ================= 글 작성 버튼 ================= */}
+      {/* ================= 글 작성 버튼 (완전 하단 고정) ================= */}
       <button
         onClick={() => navigate('/index/mypage/support/write')}
-        className="absolute right-5 bottom-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#27BE69] text-white shadow-lg active:scale-95"
+        className="absolute right-5 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-[#27BE69] text-white shadow-lg active:scale-95"
       >
         <PenLine className="h-5 w-5" />
       </button>

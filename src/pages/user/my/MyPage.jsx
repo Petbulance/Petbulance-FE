@@ -13,9 +13,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
+import LoginRequiredModal from '@/components/commons/layout/LoginRequiredModal.jsx';
 import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 import useUserStore from '@/stores/useUserStore.js';
-import LoginRequiredModal from '@/components/commons/layout/LoginRequiredModal.jsx';
 
 function Group({ title, children }) {
   return (
@@ -115,12 +115,12 @@ export default function MyPage() {
           <Item
             Icon={Document}
             label="게시글 관리"
-            onClick={() => requireLogin('/index/mypage/boardmanage')}
+            onClick={() => alert('준비중입니다.')}
           />
           <Item
             Icon={Forum}
             label="댓글 관리"
-            onClick={() => requireLogin('/index/mypage/commentmanage')}
+            onClick={() => alert('준비중입니다.')}
           />
         </Group>
 
