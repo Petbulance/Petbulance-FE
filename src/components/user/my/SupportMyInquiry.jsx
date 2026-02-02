@@ -66,7 +66,7 @@ export default function SupportMyInquiry() {
       </div>
     );
   }
-
+  console.log('qnaList', qnaList);
   return (
     <div className="relative h-full bg-white">
       {/* ================= 리스트 ================= */}
@@ -76,7 +76,7 @@ export default function SupportMyInquiry() {
             key={item.qnaId}
             type="button"
             onClick={() =>
-              navigate(`/index/mypage/support/myinquiry/detail/${item.qnaId}`)
+              navigate(`/index/mypage/support/myinquiry/detail/${item.id}`)
             }
             className="flex w-full items-center justify-between border-b px-4 py-4 text-left hover:bg-gray-50 active:bg-gray-100"
           >
