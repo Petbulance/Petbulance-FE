@@ -61,15 +61,11 @@ export default function HomeBanner() {
             stopOnInteraction: false,
           }),
         ]}
-        className="overflow-hidden"
+        className="mx-auto max-w-full overflow-hidden"
       >
-        {/*todo */}
         <CarouselContent className="-ml-0">
           {banners.map((banner) => (
-            <CarouselItem
-              key={banner.bannerId}
-              className="mr-[10px] basis-[90%] pl-0"
-            >
+            <CarouselItem key={banner.bannerId} className="basis-full pl-0">
               <div
                 className="relative cursor-pointer overflow-hidden rounded-lg"
                 onClick={() =>
