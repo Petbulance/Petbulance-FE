@@ -48,12 +48,6 @@ export default function NearbyHospitalShortcut() {
         <span className="text-[19px] font-semibold text-gray-950">
           내 주변 병원 바로가기
         </span>
-        <ChevronRight
-          size={20}
-          onClick={() => {
-            alert('병원 이동');
-          }}
-        />
       </button>
 
       {/* 카테고리 */}
