@@ -65,6 +65,25 @@ export default function SupportInquiryDetail() {
       toast('문의가 삭제되었습니다.', {
         position: 'bottom-center',
         duration: 3000,
+        style: {
+          width: '100%',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          background: '#222222E5',
+          color: '#ffffff',
+        },
+        action: {
+          label: '✕',
+          onClick: () => toast.dismiss(),
+        },
+        actionButtonStyle: {
+          background: 'transparent',
+          border: 'none',
+          color: '#ffffff',
+          padding: 0,
+          cursor: 'pointer',
+        },
       });
 
       clearInquiry();
