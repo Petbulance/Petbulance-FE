@@ -9,6 +9,8 @@ export const fetchHospitalsByLocation = async (
   try {
     const { city, region, animal, sort, isOpen } = filterState || {};
 
+    console.log('api 지역 호출:', animal);
+
     const combinedRegion =
       city && city !== '전체' ? `${city}시${region || ''}` : '';
 
@@ -18,7 +20,10 @@ export const fetchHospitalsByLocation = async (
         lng: lng,
         bounds: Array.isArray(bounds) ? bounds.join(',') : bounds,
         region: combinedRegion,
-        species: animal,
+        animal:
+          Array.isArray(animal) && animal.length > 0
+            ? animal.join(',')
+            : undefined,
         size: 20,
         sortBy: sort,
         openNow: isOpen,

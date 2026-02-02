@@ -1,8 +1,8 @@
 import SelectArrow from '@/assets/images/icons/SelectArrow';
 import SortDropdown from '@/assets/images/icons/SortDropdown';
-import { ANIMAL_GROUPS } from '@/data/animalSort';
 
 import { SelectButton } from './SelectButton';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 
 const SORT_LABELS = {
   distance: '가까운 순',
@@ -16,15 +16,16 @@ export function ButtonSection({
   onOpenSort,
   onToggleOpen,
 }) {
+  //동물종 레이블 설정 함수
   const getGroupLabel = (selectedAnimals) => {
     if (!selectedAnimals || selectedAnimals.length === 0) return '동물종';
-    const firstSelected = selectedAnimals[0];
 
-    const groupName = Object.keys(ANIMAL_GROUPS).find((group) =>
-      ANIMAL_GROUPS[group].includes(firstSelected)
-    );
+    const firstCode = selectedAnimals[0];
+    const firstLabel = ANIMAL_CATEGORY_KO[firstCode] || firstCode;
 
-    return groupName || '동물종';
+    const count = selectedAnimals.length;
+
+    return count > 1 ? `${firstLabel} 외 ${count - 1}` : firstLabel;
   };
 
   const animalLabel = getGroupLabel(state.animal);
