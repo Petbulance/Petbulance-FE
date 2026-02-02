@@ -83,7 +83,7 @@ export default function HomeBanner() {
                 />
 
                 {/* 오버레이 */}
-                <div className="absolute inset-0 bg-black/30 p-4 text-white">
+                <div className="absolute inset-0 p-4 text-white">
                   {/* 하단 버튼 영역 */}
                   <div className="absolute right-3 bottom-3 left-3 flex items-center justify-between">
                     <button className="rounded-md bg-white/90 px-3 py-1 text-xs font-medium text-black">
