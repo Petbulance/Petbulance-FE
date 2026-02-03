@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
@@ -7,8 +7,12 @@ import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
+  const calledRef = useRef(false);
 
   useEffect(() => {
+    if (calledRef.current) return;
+    calledRef.current = true;
+
     const code = new URL(window.location.href).searchParams.get('code');
 
     if (!code) {
@@ -41,7 +45,17 @@ export default function GoogleCallback() {
           authCode: res.data.access_token,
         });
         console.log('데이터', JWTres);
-        localStorage.setItem('access_token', JWTres.data.data.accessToken);
+        const { accessToken, refreshToken, isNewUser } = JWTres.data.data;
+
+        if (isNewUser) {
+          localStorage.setItem('temp_access_token', accessToken);
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        } else {
+          localStorage.setItem('access_token', accessToken);
+          if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
+          localStorage.removeItem('temp_access_token');
+        }
         localStorage.setItem(
           'recent_login',
           JSON.stringify({
@@ -50,7 +64,6 @@ export default function GoogleCallback() {
           })
         );
         navigate('/index/auth/signupcomplete');
-        // navigate('/');
       } catch (e) {
         console.error('구글 로그인 실패', e);
         navigate('/index/auth/login');

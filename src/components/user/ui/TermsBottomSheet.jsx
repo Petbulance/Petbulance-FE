@@ -12,7 +12,7 @@ import {
 
 import TermsAgreementItem from './TermsAgreementItem.jsx';
 
-export default function TermsBottomSheet({ open, onClose }) {
+export default function TermsBottomSheet({ open, onClose, onConsented }) {
   /* ===============================
      state
   =============================== */
@@ -62,11 +62,44 @@ export default function TermsBottomSheet({ open, onClose }) {
     try {
       setLoading(true);
 
-      await api.post('/terms/consents', {
-        termsId: termsIds,
-      });
+      const tempToken = localStorage.getItem('temp_access_token');
+      const finalToken = localStorage.getItem('access_token');
+      const authToken = tempToken || finalToken;
+
+      if (!authToken) {
+        alert('로그인 정보가 없습니다. 다시 로그인해 주세요.');
+        return;
+      }
+
+      const res = await api.post(
+        '/terms/consents',
+        {
+          termsId: termsIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      const {
+        accessToken,
+        finalAccessToken,
+        refreshToken,
+      } = res.data?.data || {};
+      const tokenToStore = finalAccessToken || accessToken;
+
+      if (tokenToStore) {
+        localStorage.setItem('access_token', tokenToStore);
+        localStorage.removeItem('temp_access_token');
+      }
+      if (refreshToken) {
+        localStorage.setItem('refresh_token', refreshToken);
+      }
 
       onClose();
+      onConsented?.();
     } catch (e) {
       const error = e?.response?.data?.data;
 
