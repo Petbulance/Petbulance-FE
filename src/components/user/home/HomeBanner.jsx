@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 import {
   Carousel,
   CarouselContent,
@@ -15,6 +16,7 @@ export default function HomeBanner() {
   const [apiInstance, setApiInstance] = useState(null);
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState([]);
 
   /* ===============================
@@ -23,10 +25,13 @@ export default function HomeBanner() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
+        setLoading(true);
         const res = await api.get('/banners/home');
         setBanners(res.data.data);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -46,6 +51,14 @@ export default function HomeBanner() {
       setCurrent(apiInstance.selectedScrollSnap());
     });
   }, [apiInstance]);
+
+  if (loading) {
+    return (
+      <div className="flex w-full justify-center py-8">
+        <Spinner />
+      </div>
+    );
+  }
 
   if (!banners.length) return null;
 

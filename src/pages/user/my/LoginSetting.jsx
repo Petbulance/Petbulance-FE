@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import googleIcon from '@/assets/images/logo/googleLogo.svg';
 import kakaoIcon from '@/assets/images/logo/kakaoLogo.svg';
 import naverIcon from '@/assets/images/logo/naverLogo.svg';
+import Spinner from '@/components/commons/Spinner.jsx';
 import { Switch } from '@/components/ui/switch';
 import useUserStore from '@/stores/useUserStore';
 
@@ -25,7 +26,7 @@ const SNS_INFO = {
 };
 
 export default function LoginSetting() {
-  const { profile, fetchMyProfile } = useUserStore();
+  const { profile, fetchMyProfile, loading } = useUserStore();
   const [autoLogin, setAutoLogin] = useState(true);
 
   useEffect(() => {
@@ -34,7 +35,9 @@ export default function LoginSetting() {
     }
   }, [profile, fetchMyProfile]);
 
-  if (!profile) return null;
+  if (!profile) {
+    return <Spinner fullScreen message="로그인 정보를 불러오는 중이에요" />;
+  }
 
   const currentProvider = profile.provider;
 

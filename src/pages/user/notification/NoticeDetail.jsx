@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 const NOTICE_STATUS_MAP = {
   EVENT: '이벤트',
@@ -42,20 +43,28 @@ export default function NoticeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [noticeDetailData, setNoticeDetailData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchNoticeDetail = async () => {
     try {
+      setLoading(true);
       const response = await api.get(`/notices/${id}`);
       setNoticeDetailData(response.data.data);
     } catch (error) {
       console.error(error);
       setNoticeDetailData(null);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchNoticeDetail();
   }, [id]);
+
+  if (loading) {
+    return <Spinner fullScreen message="공지사항을 불러오는 중이에요" />;
+  }
 
   if (!noticeDetailData) {
     return (

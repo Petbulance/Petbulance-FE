@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function NaverCallback() {
   const navigate = useNavigate();
@@ -63,5 +64,5 @@ export default function NaverCallback() {
     });
   }, [navigate]);
 
-  return <div>네이버 로그인 처리 중...</div>;
+  return <Spinner fullScreen message="네이버 로그인 처리 중이에요" />;
 }

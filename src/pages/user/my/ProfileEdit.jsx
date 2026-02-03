@@ -6,6 +6,7 @@ import cameraIcon from '@/assets/images/icons/cameraIcon.svg';
 import dangerCheckImg from '@/assets/images/icons/dangerCheckImg.svg';
 import defaultImg from '@/assets/images/icons/defaultImg.svg';
 import successCheckImg from '@/assets/images/icons/successCheckImg.svg';
+import Spinner from '@/components/commons/Spinner.jsx';
 import useUserStore from '@/stores/useUserStore.js';
 
 export default function ProfileEdit() {
@@ -17,11 +18,7 @@ export default function ProfileEdit() {
      방어 처리
   ===================== */
   if (!profile) {
-    return (
-      <div className="flex h-full items-center justify-center bg-white">
-        <p className="text-gray-400">프로필 정보를 불러오는 중...</p>
-      </div>
-    );
+    return <Spinner fullScreen message="프로필 정보를 불러오는 중이에요" />;
   }
 
   /* =====================

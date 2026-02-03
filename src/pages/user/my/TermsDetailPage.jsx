@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function TermsDetailPage() {
   const { id } = useParams(); // SERVICE | PRIVACY | LOCATION | MARKETING
@@ -41,9 +42,7 @@ export default function TermsDetailPage() {
      상태 처리
   ========================= */
   if (loading) {
-    return (
-      <div className="p-4 text-sm text-gray-400">약관을 불러오는 중이에요…</div>
-    );
+    return <Spinner fullScreen message="약관을 불러오는 중이에요" />;
   }
 
   if (notFound) {

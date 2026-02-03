@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function TermsPage() {
   const navigate = useNavigate();
@@ -38,11 +39,7 @@ export default function TermsPage() {
      상태 처리
   ========================= */
   if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center bg-white">
-        <p className="text-sm text-gray-400">약관을 불러오는 중이에요…</p>
-      </div>
-    );
+    return <Spinner fullScreen message="약관을 불러오는 중이에요" />;
   }
 
   if (error) {

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 import {
   Carousel,
   CarouselContent,
@@ -39,6 +40,7 @@ function RatingStars({ rating }) {
 =============================== */
 export default function LatestReceiptReview() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
 
   /* ===============================
@@ -46,6 +48,7 @@ export default function LatestReceiptReview() {
   =============================== */
   const fetchLatestReceiptReviews = async () => {
     try {
+      setLoading(true);
       const response = await api.get('/receipts/filter', {
         params: {
           receipt: true,
@@ -55,12 +58,24 @@ export default function LatestReceiptReview() {
       setReviews(response.data.data.list || []);
     } catch (e) {
       console.error('최신 영수증 후기 조회 실패', e);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchLatestReceiptReviews();
   }, []);
+
+  if (loading) {
+    return (
+      <section className="bg-white px-[24px] py-[24px]">
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      </section>
+    );
+  }
 
   // 데이터 없으면 렌더링 안 함
   if (reviews.length === 0) return null;

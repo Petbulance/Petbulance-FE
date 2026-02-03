@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 const PAGE_SIZE = 5;
 
@@ -74,6 +75,11 @@ export default function SupportMyInquiry() {
 
   return (
     <div className="relative h-full bg-white">
+      {loading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+          <Spinner />
+        </div>
+      )}
       {/* ================= 리스트 ================= */}
       <div className="h-full overflow-y-auto pb-32">
         {qnaList.map((item) => (
@@ -110,7 +116,7 @@ export default function SupportMyInquiry() {
             ref={observerRef}
             className="flex h-12 items-center justify-center text-sm text-gray-400"
           >
-            불러오는 중...
+            {isFetching ? <Spinner /> : '불러오는 중...'}
           </div>
         )}
       </div>

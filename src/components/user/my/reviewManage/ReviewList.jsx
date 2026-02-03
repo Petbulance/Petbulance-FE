@@ -5,6 +5,7 @@ import api from '@/apis/api.jsx';
 import ConfirmDangerModal from '@/components/commons/layout/ConfirmDangerModal.jsx';
 import EmptyReview from '@/components/user/my/reviewManage/EmptyReview.jsx';
 import ReviewItem from '@/components/user/my/reviewManage/ReviewItem.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function ReviewList() {
   const [reviews, setReviews] = useState([]);
@@ -57,6 +58,14 @@ export default function ReviewList() {
   useEffect(() => {
     fetchReviews();
   }, []);
+
+  if (loading && reviews.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center bg-white">
+        <Spinner />
+      </div>
+    );
+  }
 
   /* =========================
      전체 삭제 (UI 전용)

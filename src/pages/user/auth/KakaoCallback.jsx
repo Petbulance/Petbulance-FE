@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function KakaoCallback() {
   const navigate = useNavigate();
@@ -52,8 +53,6 @@ export default function KakaoCallback() {
   }, [navigate]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      카카오 로그인 처리 중...
-    </div>
+    <Spinner fullScreen message="카카오 로그인 처리 중이에요" />
   );
 }

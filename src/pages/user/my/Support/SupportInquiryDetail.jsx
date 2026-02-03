@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore';
 
 /* ================= 상태 매핑 ================= */
@@ -20,10 +21,12 @@ export default function SupportInquiryDetail() {
   const [inquiry, setLocalInquiry] = useState(null);
   const [error, setError] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   /* ================= 단건 조회 ================= */
   const fetchInquiryDetail = async () => {
     try {
+      setLoading(true);
       const res = await api.get(`/qna/${id}`);
       const data = res.data.data;
 
@@ -40,6 +43,8 @@ export default function SupportInquiryDetail() {
         setError('문의 조회에 실패했어요.');
       }
     }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -113,7 +118,9 @@ export default function SupportInquiryDetail() {
   }
 
   /* ================= 로딩 ================= */
-  if (!inquiry) return null;
+  if (loading || !inquiry) {
+    return <Spinner fullScreen message="문의 내역을 불러오는 중이에요" />;
+  }
 
   const isAnswered = inquiry.status === 'ANSWER_COMPLETED';
 

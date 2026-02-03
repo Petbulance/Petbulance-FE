@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
+import Spinner from '@/components/commons/Spinner.jsx';
 import LoginRequiredModal from '@/components/commons/layout/LoginRequiredModal.jsx';
 import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 import useUserStore from '@/stores/useUserStore.js';
@@ -57,7 +58,7 @@ export default function MyPage() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const isLoggedIn = Boolean(localStorage.getItem('access_token'));
 
-  const { profile: myProfile, fetchMyProfile } = useUserStore();
+  const { profile: myProfile, fetchMyProfile, loading } = useUserStore();
 
   const requireLogin = (path) => {
     if (!isLoggedIn) {
@@ -75,6 +76,9 @@ export default function MyPage() {
 
   return (
     <>
+      {loading && (
+        <Spinner fullScreen message="내 정보를 불러오는 중이에요" />
+      )}
       <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
         {/* 상단 프로필 */}
         <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile ?? null} />
