@@ -46,7 +46,7 @@ export function ReviewContent() {
   }, [loadReviews]);
 
   return (
-    <div className="flex flex-col bg-white">
+    <div className="flex h-dvh flex-col bg-white">
       <ReviewFilterBar
         isPhotoOnly={isPhotoOnly}
         setIsPhotoOnly={setIsPhotoOnly}
