@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import api from '@/apis/api.jsx';
 import { Switch } from '@/components/ui/switch';
 
 export default function NotificationSetting() {
@@ -7,6 +8,17 @@ export default function NotificationSetting() {
   const [event, setEvent] = useState(true);
   const [marketing, setMarketing] = useState(false);
 
+  const fetchNoti = async () => {
+    try {
+      const res = await api.get('/users/settings/notification');
+      console.log(res);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  useEffect(() => {
+    fetchNoti();
+  }, []);
   return (
     <div className="bg-white">
       <div className="divide-y">
