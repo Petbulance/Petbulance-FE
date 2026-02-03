@@ -14,6 +14,11 @@ export default function SignupComplete() {
 
   const { profile, fetchMyProfile } = useUserStore();
 
+  const runPostLoginInit = () => {
+    fetchMyProfile(); // ⭐ 여기서 전역 저장
+    getMyTerms();
+  };
+
   /* ===============================
      내 약관 상태 조회
      - marketing 제외
@@ -21,6 +26,9 @@ export default function SignupComplete() {
      - 하나라도 AGREE면 통과
   =============================== */
   const getMyTerms = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return; // 최종 토큰 없으면 대기
+
     try {
       const response = await api.get('/terms/status');
       const terms = response.data.data;
@@ -51,6 +59,7 @@ export default function SignupComplete() {
     } finally {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('temp_access_token');
       localStorage.removeItem('recent_login');
 
       navigate('/index/auth/login', { replace: true });
@@ -59,13 +68,16 @@ export default function SignupComplete() {
 
   /* ===============================
      최초 진입 시
-     - 프로필을 zustand에 저장
-     - 약관 조회
+     - 최종 토큰이 없으면 약관 동의 모달 바로 열기
+     - 최종 토큰이 있으면 프로필/약관 조회
   =============================== */
   useEffect(() => {
-    fetchMyProfile(); // ⭐ 여기서 전역 저장
-    console.log('pro', profile);
-    getMyTerms();
+    const hasFinalToken = !!localStorage.getItem('access_token');
+    if (hasFinalToken) {
+      runPostLoginInit();
+    } else {
+      setOpen(true);
+    }
   }, [fetchMyProfile]);
 
   return (
@@ -114,7 +126,7 @@ export default function SignupComplete() {
             className="w-full rounded-lg bg-[#2DA969] py-4 text-sm font-semibold text-white"
             onClick={() => setOpen(true)}
           >
-            약관 보기
+            시작하기
           </button>
 
           <button
@@ -127,7 +139,14 @@ export default function SignupComplete() {
       )}
 
       {/* ================= 약관 Bottom Sheet ================= */}
-      <TermsBottomSheet open={open} onClose={() => setOpen(false)} />
+      <TermsBottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        onConsented={() => {
+          setHasRequiredAgree(true);
+          runPostLoginInit();
+        }}
+      />
     </div>
   );
 }
