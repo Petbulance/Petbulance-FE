@@ -16,4 +16,7 @@ export default defineConfig({
     port: 5173,
     allowedHosts: ['petbulance.local', 'admin.petbulance.local'],
   },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
 });
