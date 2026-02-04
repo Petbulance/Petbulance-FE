@@ -4,8 +4,8 @@ export default function SortModal({ open, onClose, selectedSort, onSelect }) {
   if (!open) return null;
 
   const sortOptions = [
-    { label: '리뷰 많은 순', value: 'reviewCount' },
     { label: '가까운 순', value: 'distance' },
+    { label: '리뷰 많은 순', value: 'reviewCount' },
     { label: '평점 높은 순', value: 'rating' },
   ];
   return (

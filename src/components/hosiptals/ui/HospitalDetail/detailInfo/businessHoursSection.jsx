@@ -6,13 +6,14 @@ const DAY_MAP = {
   FRI: '금요일',
   SAT: '토요일',
   SUN: '일요일',
+  공휴일: '공휴일',
 };
 
 export function BusinessHoursSection({ hours }) {
   if (!hours) return null;
 
   return (
-    <section className="p-6">
+    <section className="border-y-[1.72px] border-[#E0E0E0] p-6">
       <h3 className="mb-8 text-[20px] font-semibold text-[#424242]">
         영업 정보
       </h3>
@@ -26,7 +27,9 @@ export function BusinessHoursSection({ hours }) {
                   ? 'text-[#0265CF]'
                   : item.day === 'SUN'
                     ? 'text-[#E74D23]'
-                    : 'text-[#9E9E9E]'
+                    : item.day === '공휴일'
+                      ? 'text-[#E74D23]'
+                      : 'text-[#9E9E9E]'
               }`}
             >
               {DAY_MAP[item.day] || item.day}

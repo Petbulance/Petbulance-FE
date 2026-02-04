@@ -51,7 +51,6 @@ import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
 import { HospitalDetail } from '@/pages/user/hospitals/HospitalDetail.jsx';
 import Hospitals from '@/pages/user/hospitals/Hospitals';
 import { HospitalSearch } from '@/pages/user/hospitals/HospitalSearch';
-import { HospitalsList } from '@/pages/user/hospitals/HospitalsList';
 import HospitalsMap from '@/pages/user/hospitals/HospitalsMap';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
@@ -131,7 +130,6 @@ const router = createBrowserRouter([
         element: <Hospitals />,
         children: [
           { index: true, element: <HospitalsMap /> },
-          { path: 'list', element: <HospitalsList /> },
           { path: 'search', element: <HospitalSearch /> },
         ],
       },

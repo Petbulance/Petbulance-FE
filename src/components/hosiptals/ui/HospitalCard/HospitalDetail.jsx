@@ -60,7 +60,7 @@ export function HosipitalDetail({
         className="h-25 w-25 rounded-[16.88px] object-cover"
       />
       <div className="flex flex-col">
-        <div className="flex items-center justify-between gap-1">
+        <div className="flex items-center gap-1">
           <div className="text-[19px] font-semibold text-[#1E1E1E]">{name}</div>
           <div className="flex items-center justify-center gap-0.5 text-[16px] font-medium">
             <img src={Star} alt="star_icon" />
@@ -77,7 +77,7 @@ export function HosipitalDetail({
           {/* TODO: 영업 종료 시간 표시 로직 필요 */}
           <span className="text-[#424242]">{time}에 영업 종료</span>
           <img src={DotIcon} alt="dot_icon" />
-          <span className="text-[#9E9E9E]">{formattedDistance || '0.0'}km</span>
+          <span className="text-[#9E9E9E]">{formattedDistance}km</span>
         </div>
 
         <div className="flex items-center gap-1 font-[#067DFD] text-[15px] font-semibold text-[#067DFD]">
