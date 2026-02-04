@@ -21,7 +21,7 @@ export function HospitalInfoSlide({ hospitals, selectedHospital }) {
               name={card.name}
               status={card.isOpenNow}
               time={card.openHours}
-              distance={(card.distanceMeters / 1000).toFixed(1)}
+              distance={card.distanceMeters}
               phoneNumber={card.phone}
               rating={card.rating}
               reviews={card.reviewCount}
