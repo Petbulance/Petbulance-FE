@@ -85,7 +85,6 @@ export default function MyPage() {
         <Group title="사용자 설정">
           <Item
             label="알림 설정"
-            textClassName="text-red-500"
             iconNode={
               <img src={notificationIcon} className="h-5 w-5" alt="알림 설정" />
             }
@@ -102,7 +101,10 @@ export default function MyPage() {
             Icon={Security}
             label="권한"
             textClassName="text-red-500"
-            onClick={() => requireLogin('/index/mypage/authorization')}
+            onClick={
+              () => alert('API 개발 중')
+              // requireLogin('/index/mypage/authorization')
+            }
           />
         </Group>
 
