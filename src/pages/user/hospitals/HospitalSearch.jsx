@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { fetchHospitalsByName } from '@/apis/hospitals';
 import { registerRecentKeyword } from '@/apis/hospitals/searchHistory';
-import SortModal from '@/components/commons/layout/SortModal'; // 정렬 모달 추가
+import SortModal from '@/components/commons/layout/SortModal';
 import { ButtonSection } from '@/components/hosiptals/ui/ButtonSection';
 import { HospitalFilterModalContainer } from '@/components/hosiptals/ui/FilterPopup';
 import {
@@ -12,6 +12,7 @@ import {
 import { HospitalCardList } from '@/components/hosiptals/ui/HospitalCardList';
 import { SearchBody } from '@/components/hosiptals/ui/HospitalSearch/SearchBody';
 import { useHospitalFilter } from '@/hooks/useHospitalFilter';
+import { NoSearchResult } from '@/components/hosiptals/ui/HospitalSearch/noSearchResult';
 
 export function HospitalSearch() {
   const { searchKeyword } = useHospitalFilter();
@@ -24,10 +25,11 @@ export function HospitalSearch() {
     isOpen: false,
   });
 
+  const { activeSheet, setActiveSheet } = useHospitalFilter();
+
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [activeSheet, setActiveSheet] = useState(null);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
   const handleSearchAPI = useCallback(async () => {
@@ -35,11 +37,9 @@ export function HospitalSearch() {
 
     setIsLoading(true);
     try {
-      //병원 검색 결과 조회
       const data = await fetchHospitalsByName(searchKeyword, localFilter);
       setSearchResults(data.list || []);
 
-      // 최근 검색어 등록 API 호출
       await registerRecentKeyword(searchKeyword);
     } catch (error) {
       console.error('검색 중 오류 발생:', error);
@@ -79,14 +79,19 @@ export function HospitalSearch() {
 
       <main className="no-scrollbar flex-1 overflow-y-auto">
         {isLoading ? (
-          //TODO: 로딩 화면 구현
           <div className="flex h-full items-center justify-center">
             로딩 중...
           </div>
         ) : searchKeyword ? (
-          <div className="min-h-full bg-[#F5F5F5] py-4">
-            <HospitalCardList hospitals={searchResults} />
-          </div>
+          searchResults.length > 0 ? (
+            <div className="min-h-full bg-white py-4">
+              <HospitalCardList hospitals={searchResults} />
+            </div>
+          ) : (
+            <div className="mt-35 px-8">
+              <NoSearchResult />
+            </div>
+          )
         ) : (
           <SearchBody />
         )}
@@ -101,16 +106,24 @@ export function HospitalSearch() {
 
       {activeSheet && (
         <div className="absolute inset-0 z-[2000] bg-white">
-          <HospitalFilterModalContainer onClose={closeSheet} mode={activeSheet}>
+          <HospitalFilterModalContainer
+            onClose={closeSheet}
+            mode={activeSheet}
+            onModeChange={setActiveSheet}
+          >
             {activeSheet === 'region' ? (
               <SearchFilterContent
                 filterState={localFilter}
+                setFilterState={setLocalFilter}
                 onApply={(city, region) => handleApplyFilter({ city, region })}
               />
             ) : (
               <AnimalTypeContent
                 filterState={localFilter}
-                onApply={(animal) => handleApplyFilter({ animal })}
+                setFilterState={setLocalFilter}
+                onApply={(animalArray) =>
+                  handleApplyFilter({ animal: animalArray })
+                }
               />
             )}
           </HospitalFilterModalContainer>

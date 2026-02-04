@@ -34,11 +34,11 @@ import MainLayout from '@/components/user/layout/MainLayout.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
 import SupportMyInquiry from '@/components/user/my/SupportMyInquiry.jsx';
-import SignupComplete from '@/components/user/SignupComplete.jsx';
 import AdminLogin from '@/pages/admin/auth/AdminLogin.jsx';
 import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
 import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
 import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
+import SignupComplete from '@/pages/user/auth/SignupComplete.jsx';
 import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
 import Home from '@/pages/user/Home.jsx';
@@ -51,7 +51,6 @@ import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
 import { HospitalDetail } from '@/pages/user/hospitals/HospitalDetail.jsx';
 import Hospitals from '@/pages/user/hospitals/Hospitals';
 import { HospitalSearch } from '@/pages/user/hospitals/HospitalSearch';
-import { HospitalsList } from '@/pages/user/hospitals/HospitalsList';
 import HospitalsMap from '@/pages/user/hospitals/HospitalsMap';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
@@ -66,6 +65,7 @@ import SupportPartnerForm from '@/pages/user/my/Support/SupportPartnerForm.jsx';
 import SupportWritePage from '@/pages/user/my/Support/SupportWritePage.jsx';
 import TermsDetailPage from '@/pages/user/my/TermsDetailPage.jsx';
 import TermsPage from '@/pages/user/my/TermsPage.jsx';
+import NotFoundPage from '@/pages/user/NotFoundPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
@@ -112,6 +112,10 @@ const router = createBrowserRouter([
     element: isServiceDomain ? <App /> : <Navigate to="/admin" replace />,
     children: [
       {
+        index: true,
+        element: <Navigate to="home" replace />,
+      },
+      {
         path: 'home',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
@@ -126,7 +130,6 @@ const router = createBrowserRouter([
         element: <Hospitals />,
         children: [
           { index: true, element: <HospitalsMap /> },
-          { path: 'list', element: <HospitalsList /> },
           { path: 'search', element: <HospitalSearch /> },
         ],
       },
@@ -340,7 +343,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'auth/signupcomplete',
-        element: <SignupComplete />,
+        element: (
+          <LayoutShell banner={<ServiceBanner />}>
+            <SignupComplete />
+          </LayoutShell>
+        ),
       },
       // 알림
       {
@@ -371,6 +378,10 @@ const router = createBrowserRouter([
   { path: '/auth/kakao/callback', element: <KakaoCallback /> },
   { path: '/auth/google/callback', element: <GoogleCallback /> },
   { path: '/auth/naver/callback', element: <NaverCallback /> },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ]);
 
 export default router;

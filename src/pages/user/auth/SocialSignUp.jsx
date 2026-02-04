@@ -3,14 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import googleLogo from '@/assets/images/logo/google-color-svgrepo-com.svg';
 import kakaoLogo from '@/assets/images/logo/kakao-svgrepo-com.svg';
 import naverLogo from '@/assets/images/logo/NAVER_LOGO.png';
-import logo from '@/assets/images/logo/pet_logo.svg';
-
-// ✅ 샘플 데이터 (나중에 API로 대체)
-const MOCK_RECENT_LOGIN = {
-  provider: 'GOOGLE', // KAKAO | GOOGLE | NAVER
-  profileImage: 'https://i.pravatar.cc/100?img=12',
-  name: '민규',
-};
+import logo from '@/assets/images/logo/pet_logo.png';
 
 export default function SocialSignUp() {
   const stateRef = useRef(Math.random().toString(36).substring(2));
@@ -47,10 +40,6 @@ export default function SocialSignUp() {
       import.meta.env.VITE_NAVER_REDIRECT_URI
     )}` +
     `&state=${state}`;
-  useEffect(() => {
-    console.log(`${import.meta.env.VITE_GOOGLE_CLIENT_ID}`);
-    console.log(`${import.meta.env.VITE_GOOGLE_REDIRECT_URI}`);
-  }, []);
   const handleKakaoLogin = () => {
     window.location.href = KAKAO_AUTH_URL;
   };
@@ -59,26 +48,35 @@ export default function SocialSignUp() {
     window.location.href = GOOGLE_AUTH_URL;
   };
 
-  const handleNaverLogin = () => {
-    window.location.href = NAVER_AUTH_URL;
-  };
-
-  // 샘플
   useEffect(() => {
-    // mock
-    setRecentLogin(MOCK_RECENT_LOGIN);
+    window.naverLogin = new window.naver.LoginWithNaverId({
+      clientId: import.meta.env.VITE_NAVER_CLIENT_ID,
+      callbackUrl: import.meta.env.VITE_NAVER_REDIRECT_URI,
+      isPopup: false,
+    });
 
-    // 나중에 이렇게 교체하면 됨
-    // api.get('/auth/recent-login').then(res => {
-    //   setRecentLogin(res.data);
-    // });
+    window.naverLogin.init();
   }, []);
+  useEffect(() => {
+    const stored = localStorage.getItem('recent_login');
+    if (!stored) return;
+
+    try {
+      setRecentLogin(JSON.parse(stored));
+    } catch {
+      localStorage.removeItem('recent_login');
+    }
+  }, []);
+
+  const handleNaverLogin = () => {
+    window.naverLogin.authorize();
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-6">
       {/* 앱 아이콘 */}
-      <div className="mb-6">
-        <div className="flex h-[140px] w-[140px] items-center justify-center">
+      <div className="mb-4">
+        <div className="flex h-[100%] w-[100%] items-center justify-center">
           <img src={logo} alt="Petbulance Logo" className="h-full w-full" />
         </div>
       </div>

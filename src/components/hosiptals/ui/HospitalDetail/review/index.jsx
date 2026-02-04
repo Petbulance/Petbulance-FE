@@ -8,6 +8,7 @@ import { sortLabels } from '@/data/reviewSort';
 import { ReviewCard } from './ReviewCard';
 import { ReviewFilterBar } from './reviewFilterBar';
 import ReviewSortModal from './ReviewSortModal';
+import { NoReviewResult } from './noReviewResult';
 
 export function ReviewContent() {
   const { id: hospitalId } = useParams();
@@ -46,7 +47,7 @@ export function ReviewContent() {
   }, [loadReviews]);
 
   return (
-    <div className="flex flex-col bg-white">
+    <div className="flex h-dvh flex-col bg-white">
       <ReviewFilterBar
         isPhotoOnly={isPhotoOnly}
         setIsPhotoOnly={setIsPhotoOnly}
@@ -75,9 +76,7 @@ export function ReviewContent() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center py-20 text-gray-400">
-            <p>아직 작성된 리뷰가 없습니다.</p>
-          </div>
+          <NoReviewResult />
         )}
       </div>
 

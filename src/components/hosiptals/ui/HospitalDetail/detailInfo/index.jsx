@@ -3,13 +3,14 @@ import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { BusinessHoursSection } from './businessHoursSection';
 import { LocationSection } from './locationSection';
 import { RequestSection } from './requestSection';
+import { HospitalIntroSection } from './hospitalIntroSection';
 
 export function DetailContent({ hospitalData }) {
   return (
     <div className="bg-white">
       <LocationSection hospitalData={hospitalData} />
-      <Divider />
       <BusinessHoursSection hours={hospitalData.openHours} />
+      <HospitalIntroSection content={hospitalData.description} />
       <Divider />
       <RequestSection />
 

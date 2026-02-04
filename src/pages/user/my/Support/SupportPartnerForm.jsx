@@ -1,12 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
 import ConfirmSupportModal from '@/components/commons/layout/ConfirmSupportModal.jsx';
 import { Checkbox } from '@/components/ui/checkbox.jsx';
 import { Input } from '@/components/ui/input.jsx';
 import { Label } from '@/components/ui/label.jsx';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.jsx';
 import { Textarea } from '@/components/ui/textarea.jsx';
+
+/* ================= ENUM 매핑 ================= */
+const TYPE_MAP = {
+  ad: 'ADVERTISING',
+  partner: 'HOSPITAL_PARTNERSHIP',
+};
+
+const INTEREST_MAP = {
+  '배너 광고': 'BANNER_AD',
+  '병원 등록': 'HOSPITAL_REGISTRATION',
+  '이벤트 협업': 'EVENT_COLLABORATION',
+  기타: 'ETC',
+};
 
 export default function SupportPartnerForm() {
   const navigate = useNavigate();
@@ -23,7 +37,10 @@ export default function SupportPartnerForm() {
     content: '',
     agree: false,
   });
+
   const [modal, setModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   /* ================= handlers ================= */
   const updateField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -38,36 +55,55 @@ export default function SupportPartnerForm() {
     }));
   };
 
-  const handleSubmit = () => {
+  /* ================= 제출 ================= */
+  const handleSubmit = async () => {
     if (!form.agree) return;
 
+    if (!form.phone && !form.email) {
+      alert('연락처는 최소 1개 이상 입력해야 합니다.');
+      return;
+    }
+
+    if (form.interests.length === 0) {
+      alert('관심 항목을 최소 1개 선택해주세요.');
+      return;
+    }
+
     const payload = {
-      inquiryType: form.type, // ad | partner
+      type: TYPE_MAP[form.type],
       companyName: form.companyName,
       managerName: form.managerName,
-      position: form.position,
-      phone: form.phone,
-      email: form.email,
-      interests: form.interests, // array
+      managerPosition: form.position || null,
+      phone: form.phone || null,
+      email: form.email || null,
+      interestType: INTEREST_MAP[form.interests[0]], // ✅ 단일 값
       content: form.content,
+      privacyConsent: form.agree,
     };
 
-    console.log('📦 API Payload:', payload);
-
-    // TODO: API 연동
-    // await api.post('/support/partner', payload)
-
-    // 성공 시
-    // navigate(-1)
-    setModal(true);
+    try {
+      setSubmitting(true);
+      await api.post('/inquiries', payload);
+      setModal(true);
+    } catch (e) {
+      alert(
+        e?.response?.data?.data?.message ||
+          '문의 접수에 실패했습니다. 다시 시도해주세요.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  /* ================= 제출 가능 여부 ================= */
   const isSubmitDisabled =
     !form.companyName ||
     !form.managerName ||
-    !form.phone ||
+    (!form.phone && !form.email) ||
     !form.content ||
-    !form.agree;
+    !form.agree ||
+    form.interests.length === 0 ||
+    submitting;
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -199,11 +235,14 @@ export default function SupportPartnerForm() {
         <button
           disabled={isSubmitDisabled}
           onClick={handleSubmit}
-          className={`w-full rounded-lg py-3 text-[15px] font-medium text-white ${isSubmitDisabled ? 'bg-[#E0E0E0]' : 'bg-[#27BE69]'} `}
+          className={`w-full rounded-lg py-3 text-[15px] font-medium text-white ${
+            isSubmitDisabled ? 'bg-[#E0E0E0]' : 'bg-[#27BE69]'
+          }`}
         >
           문의 제출
         </button>
       </footer>
+
       <ConfirmSupportModal
         open={modal}
         title="문의 제출이 완료되었습니다."
@@ -212,7 +251,7 @@ export default function SupportPartnerForm() {
         cancelText="닫기"
         onCancel={() => setModal(false)}
         onConfirm={() => navigate('/index/home')}
-      ></ConfirmSupportModal>
+      />
     </div>
   );
 }

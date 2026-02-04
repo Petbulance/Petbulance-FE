@@ -1,101 +1,169 @@
-import { useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
-import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore.js';
+import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
+import { useSupportInquiryStore } from '@/stores/useSupportInquiryStore';
 
-// 임시 더미 데이터
-const NOTIFICATIONS = [
-  {
-    id: 1,
-    title: '닉네임 변경 어떻게 하나요?',
-    date: '2025-11-22',
-    content: `안녕하세요!
-              닉네임을 바꾸고 싶은데 어디서 하는지 못 찾겠어요 😢
-              회원 가입할 때 자동으로 만든 제 닉네임이 너무 제 스타일이 아니라서요.
-              마이페이지도 눌러보고 이것저것 찾아봤는데 수정하는 메뉴가 안 보이네요…
-              닉네임 변경 가능한가요? 가능하면 어디서 바꾸는지 알려주세요! 감사합니다.`,
-    answerDate: '2025-11-23',
-    answer: `안녕하세요, 펫플러스 운영팀입니다 :)
-            닉네임은 마이페이지 > 프로필 관리 > 닉네임 변경에서 수정하실 수 있어요.
-            혹시 메뉴가 보이지 않으면 앱을 재시작하거나 업데이트 후 다시 시도해 주세요.
-            감사합니다!`,
-  },
-  {
-    id: 2,
-    title: '닉네임 변경 어떻게 하나요?',
-    date: '2025-11-22',
-    content: `안녕하세요!
-              닉네임을 바꾸고 싶은데 어디서 하는지 못 찾겠어요 😢
-              회원 가입할 때 자동으로 만든 제 닉네임이 너무 제 스타일이 아니라서요.
-              마이페이지도 눌러보고 이것저것 찾아봤는데 수정하는 메뉴가 안 보이네요…
-              닉네임 변경 가능한가요? 가능하면 어디서 바꾸는지 알려주세요! 감사합니다.`,
-    answerDate: '',
-    answer: ``,
-  },
-];
+/* ================= 상태 매핑 ================= */
+const STATUS_LABEL = {
+  ANSWER_COMPLETED: '답변 완료',
+  WAITING: '답변 대기',
+};
 
 export default function SupportInquiryDetail() {
-  const location = useLocation();
-  const navigate = useNavigate();
   const { id } = useParams();
-  const { currentInquiry, setInquiry, clearInquiry } = useSupportInquiryStore();
+  const navigate = useNavigate();
 
-  const inquiryFromState = location.state?.inquiry;
-  const fallbackInquiry = NOTIFICATIONS.find((item) => item.id === Number(id));
+  const { setInquiry, clearInquiry } = useSupportInquiryStore();
 
-  const inquiry = inquiryFromState || currentInquiry || fallbackInquiry;
+  const [inquiry, setLocalInquiry] = useState(null);
+  const [error, setError] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  /* ================= 단건 조회 ================= */
+  const fetchInquiryDetail = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get(`/qna/${id}`);
+      const data = res.data.data;
+
+      setLocalInquiry(data); // 로컬 렌더링
+      setInquiry(data); // header 등 공용 store
+    } catch (e) {
+      const errorName = e?.response?.data?.data?.errorClassName;
+
+      if (errorName === 'FORBIDDEN_QNA_ACCESS') {
+        setError('접근 권한이 없는 문의입니다.');
+      } else if (errorName === 'QNA_NOT_FOUND') {
+        setError('해당 문의를 찾을 수 없습니다.');
+      } else {
+        setError('문의 조회에 실패했어요.');
+      }
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (!inquiry) return;
-    setInquiry(inquiry);
+    fetchInquiryDetail();
 
-    return () => clearInquiry();
-  }, [inquiry, setInquiry, clearInquiry]);
+    return () => {
+      clearInquiry(); // ✅ 페이지 이탈 시 store 정리
+    };
+  }, [id]);
 
-  if (!inquiry) {
+  /* ================= 삭제 ================= */
+  const handleDelete = async () => {
+    if (deleting) return;
+
+    const confirmed = window.confirm('문의를 삭제하시겠어요?');
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+
+      await api.delete(`/qna/${id}`);
+
+      toast('문의가 삭제되었습니다.', {
+        position: 'bottom-center',
+        duration: 3000,
+        style: {
+          width: '100%',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          background: '#222222E5',
+          color: '#ffffff',
+        },
+        action: {
+          label: '✕',
+          onClick: () => toast.dismiss(),
+        },
+        actionButtonStyle: {
+          background: 'transparent',
+          border: 'none',
+          color: '#ffffff',
+          padding: 0,
+          cursor: 'pointer',
+        },
+      });
+
+      clearInquiry();
+      navigate('/index/mypage/support/MyInquiry', { replace: true });
+    } catch (e) {
+      const errorName = e?.response?.data?.data?.errorClassName;
+
+      if (errorName === 'FORBIDDEN_QNA_ACCESS') {
+        toast('삭제 권한이 없습니다.');
+      } else if (errorName === 'QNA_NOT_FOUND') {
+        toast('이미 삭제된 문의입니다.');
+      } else {
+        toast('삭제 중 오류가 발생했어요.');
+      }
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  /* ================= 에러 화면 ================= */
+  if (error) {
     return (
       <div className="flex h-full items-center justify-center bg-white">
-        <p className="text-[16px] text-[#9E9E9E]">작성한 문의가 없어요.</p>
+        <p className="text-[16px] text-[#9E9E9E]">{error}</p>
       </div>
     );
   }
 
+  /* ================= 로딩 ================= */
+  if (loading || !inquiry) {
+    return <Spinner fullScreen message="문의 내역을 불러오는 중이에요" />;
+  }
+
+  const isAnswered = inquiry.status === 'ANSWER_COMPLETED';
+
   return (
     <div className="flex h-full flex-col bg-white">
-      {/* ================= Content ================= */}
-      <div className="flex-1 space-y-6 px-4 py-5">
-        {/* ===== 문의 ===== */}
+      {/* ================= 문의 ================= */}
+      <main className="flex-1 space-y-6 px-4 py-5">
         <section className="space-y-2">
           <h1 className="text-[17px] font-semibold text-[#1e1e1e]">
             {inquiry.title}
           </h1>
 
-          <p className="text-[13px] text-[#9E9E9E]">{inquiry.date}</p>
+          <p className="text-[13px] text-[#9E9E9E]">{inquiry.createdAt}</p>
 
-          <div className="rounded-lg text-[14px] whitespace-pre-line">
+          <div className="rounded-lg text-[14px] whitespace-pre-line text-[#1e1e1e]">
             {inquiry.content}
           </div>
         </section>
-      </div>
-      {inquiry.answerDate && <div className="my-3 h-[12px] bg-[#EEEEEE]" />}
-      {/* ===== 답변 ===== */}
-      <div className="flex-1 space-y-6 px-4 py-5">
-        {inquiry.answer && (
+      </main>
+
+      {/* ================= 구분선 ================= */}
+      {isAnswered && <div className="my-3 h-[12px] bg-[#EEEEEE]" />}
+
+      {/* ================= 답변 ================= */}
+      {isAnswered && inquiry.answer && (
+        <main className="flex-1 space-y-6 px-4 py-5">
           <section className="space-y-2">
             <p className="text-[14px] font-semibold text-[#27BE69]">
               펫뷸런스 운영팀 답변
             </p>
 
-            <p className="text-[13px] text-[#9E9E9E]">{inquiry.answerDate}</p>
+            <p className="text-[13px] text-[#9E9E9E]">
+              {inquiry.answer.answeredAt}
+            </p>
 
             <div className="rounded-lg text-[14px] whitespace-pre-line text-[#1e1e1e]">
-              {inquiry.answer}
+              {inquiry.answer.content}
             </div>
           </section>
-        )}
-      </div>
+        </main>
+      )}
 
-      {/* ================= Bottom Buttons ================= */}
+      {/* ================= 하단 버튼 ================= */}
       <footer className="flex gap-3 px-4 py-[32px]">
         <button
           onClick={() => navigate('/index/mypage/support/MyInquiry')}
@@ -104,9 +172,11 @@ export default function SupportInquiryDetail() {
           목록
         </button>
 
+        {/* ❗ 답변 완료된 문의는 삭제 막고 싶으면 여기서 조건 추가 가능 */}
         <button
-          onClick={() => alert('삭제 API 연결')}
-          className="flex-1 rounded-lg border border-[#27BE69] py-3 text-[15px] font-medium text-[#27BE69]"
+          onClick={handleDelete}
+          disabled={deleting}
+          className="flex-1 rounded-lg border border-[#27BE69] py-3 text-[15px] font-medium text-[#27BE69] disabled:opacity-50"
         >
           삭제
         </button>

@@ -1,13 +1,18 @@
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
+  const calledRef = useRef(false);
 
   useEffect(() => {
+    if (calledRef.current) return;
+    calledRef.current = true;
+
     const code = new URL(window.location.href).searchParams.get('code');
 
     if (!code) {
@@ -19,11 +24,12 @@ export default function GoogleCallback() {
       try {
         const params = new URLSearchParams({
           grant_type: 'authorization_code',
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           client_secret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
           redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
           code,
         });
-
+        console.log('google', params);
         const res = await axios.post(
           'https://oauth2.googleapis.com/token',
           params,
@@ -39,9 +45,25 @@ export default function GoogleCallback() {
           authCode: res.data.access_token,
         });
         console.log('데이터', JWTres);
-        localStorage.setItem('access_token', res.data.access_token);
+        const { accessToken, refreshToken, isNewUser } = JWTres.data.data;
+
+        if (isNewUser) {
+          localStorage.setItem('temp_access_token', accessToken);
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        } else {
+          localStorage.setItem('access_token', accessToken);
+          if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
+          localStorage.removeItem('temp_access_token');
+        }
+        localStorage.setItem(
+          'recent_login',
+          JSON.stringify({
+            provider: 'GOOGLE',
+            at: Date.now(),
+          })
+        );
         navigate('/index/auth/signupcomplete');
-        // navigate('/');
       } catch (e) {
         console.error('구글 로그인 실패', e);
         navigate('/index/auth/login');

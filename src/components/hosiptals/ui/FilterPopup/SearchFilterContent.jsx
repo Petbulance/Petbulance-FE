@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import greenCheck from '@/assets/images/icons/green_check.svg';
-import { ANIMAL_GROUPS } from '@/data/animalSort';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 import { CITIES, REGION_DATA } from '@/data/regionData';
 
 import { BottomTab } from './BottomTab';
@@ -23,7 +23,96 @@ export function SearchFilterContent({ onApply, filterState }) {
   };
 
   const handleRegionClick = (regionValue) => {
-    setTemp((prev) => ({ ...prev, region: regionValue }));
+    setTemp((prev) => ({
+      ...prev,
+      region: regionValue === '전체' ? '' : regionValue,
+    }));
+  };
+
+  const handleCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('위치 정보를 사용할 수 없는 브라우저입니다.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const naver = window.naver;
+
+        if (!naver || !naver.maps || !naver.maps.Service) {
+          console.error('네이버 지도 API가 로드되지 않았습니다.');
+          return;
+        }
+
+        // 좌표 -> 주소 변환 (Reverse Geocoding)
+        naver.maps.Service.reverseGeocode(
+          {
+            coords: new naver.maps.LatLng(latitude, longitude),
+            orders: [naver.maps.Service.OrderType.ADDR].join(','),
+          },
+          (status, response) => {
+            if (status !== naver.maps.Service.Status.OK) {
+              return alert('주소를 찾을 수 없습니다.');
+            }
+
+            const result = response.v2.address;
+
+            if (result && result.jibunAddress) {
+              const addressItems = response.v2.results[0]?.region;
+              if (addressItems) {
+                const apiCity = addressItems.area1.name;
+                const apiRegion = addressItems.area2.name;
+
+                const mappedCity = matchCityName(apiCity);
+
+                if (mappedCity && CITIES.includes(mappedCity)) {
+                  setTemp({
+                    city: mappedCity,
+                    region: apiRegion,
+                  });
+                } else {
+                  alert('지원하지 않는 지역이거나 데이터를 찾을 수 없습니다.');
+                }
+              }
+            }
+          }
+        );
+      },
+      (err) => {
+        console.error(err);
+        alert('위치 정보를 가져오는데 실패했습니다.');
+      }
+    );
+  };
+
+  const matchCityName = (fullCityName) => {
+    if (!fullCityName) return '';
+
+    const mapping = {
+      서울특별시: '서울',
+      경기도: '경기',
+      부산광역시: '부산',
+      대구광역시: '대구',
+      인천광역시: '인천',
+      광주광역시: '광주',
+      대전광역시: '대전',
+      울산광역시: '울산',
+      세종특별자치시: '세종',
+      강원특별자치도: '강원',
+      강원도: '강원',
+      충청북도: '충북',
+      충청남도: '충남',
+      전북특별자치도: '전북',
+      전라북도: '전북',
+      전라남도: '전남',
+      경상북도: '경북',
+      경상남도: '경남',
+      제주특별자치도: '제주',
+      제주도: '제주',
+    };
+
+    return mapping[fullCityName] || fullCityName;
   };
 
   return (
@@ -55,7 +144,8 @@ export function SearchFilterContent({ onApply, filterState }) {
                 key={dist}
                 onClick={() => handleRegionClick(dist)}
                 className={`cursor-pointer border-b px-5 py-3 transition-colors hover:bg-gray-50 ${
-                  temp.region === dist
+                  temp.region === dist ||
+                  (dist === '전체' && temp.region === '')
                     ? 'font-bold text-[#2DA969]'
                     : 'text-[#1E1E1E]'
                 }`}
@@ -70,45 +160,46 @@ export function SearchFilterContent({ onApply, filterState }) {
           )}
         </div>
       </div>
-      <BottomTab onClick={() => onApply(temp.city, temp.region)} />
+
+      <BottomTab
+        showSite={handleCurrentLocation}
+        showHospital={() => onApply(temp.city, temp.region)}
+      />
     </>
   );
 }
-
 export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
-  const currentCategoryName = useMemo(() => {
-    if (!filterState.animal || filterState.animal.length === 0) return '';
+  const selectedAnimals = useMemo(
+    () => filterState.animal || [],
+    [filterState.animal]
+  );
 
-    return (
-      Object.keys(ANIMAL_GROUPS).find(
-        (key) =>
-          JSON.stringify(ANIMAL_GROUPS[key]) ===
-          JSON.stringify(filterState.animal)
-      ) || ''
-    );
-  }, [filterState.animal]);
+  const handleAnimalClick = (englishCode) => {
+    setFilterState((prev) => {
+      const currentList = prev.animal || [];
+      const newList = currentList.includes(englishCode)
+        ? currentList.filter((item) => item !== englishCode)
+        : [...currentList, englishCode];
 
-  const categories = useMemo(() => Object.keys(ANIMAL_GROUPS), []);
-
-  const handleAnimalClick = (categoryName) => {
-    const englishCodes = ANIMAL_GROUPS[categoryName];
-    setFilterState((prev) => ({
-      ...prev,
-      animal: englishCodes,
-    }));
+      return {
+        ...prev,
+        animal: newList,
+      };
+    });
   };
 
   return (
     <div className="flex h-full flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-10 text-[25px] font-medium">
         <div className="bg-white">
-          {categories.map((name) => {
-            const isActive = currentCategoryName === name;
+          {Object.entries(ANIMAL_CATEGORY_KO).map(([code, name]) => {
+            const isActive = selectedAnimals.includes(code);
+
             return (
               <button
-                key={name}
+                key={code}
                 type="button"
-                onClick={() => handleAnimalClick(name)}
+                onClick={() => handleAnimalClick(code)}
                 className="flex w-full items-center justify-between pt-10"
               >
                 <span
@@ -123,7 +214,14 @@ export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
         </div>
       </div>
 
-      <BottomTab onClick={() => onApply(filterState.animal)} />
+      <div className="sticky right-0 left-0 z-50 px-8 pt-4">
+        <button
+          onClick={() => onApply(selectedAnimals)}
+          className="w-full rounded-[16px] bg-[#2DA969] py-5 text-[27px] font-medium text-white shadow-lg transition-transform hover:bg-[#258d58] active:scale-[0.98]"
+        >
+          병원 보기
+        </button>
+      </div>
     </div>
   );
 }

@@ -2,11 +2,17 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ConfirmSuccessModal from '@/components/commons/layout/ConfirmSuccessModal.jsx';
+import useUserStore from '@/stores/useUserStore.js';
 
-export default function ProfileSection({ isLoggedIn, user }) {
+export default function ProfileSection({ isLoggedIn }) {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
-  // 비로그인
+  const profile = useUserStore((state) => state.profile);
+  console.log('이미지', profile?.profileImageUrl);
+
+  /* ======================
+     비로그인
+  ====================== */
   if (!isLoggedIn) {
     return (
       <>
@@ -45,20 +51,34 @@ export default function ProfileSection({ isLoggedIn, user }) {
     );
   }
 
-  // 로그인
+  /* ======================
+     로그인 O, 프로필 로딩 중
+  ====================== */
+  if (!profile) {
+    return (
+      <section className="mb-[30px] rounded-xl bg-white p-4">
+        <p className="text-sm text-gray-400">프로필 정보를 불러오는 중...</p>
+      </section>
+    );
+  }
+  /* ======================
+     로그인 O, 프로필 있음
+  ====================== */
   return (
     <section className="mb-[30px] rounded-xl bg-white p-4">
       <div className="flex items-center justify-between">
         {/* 좌측 프로필 */}
         <div className="flex items-center gap-3">
+          {/* 프로필 이미지 */}
           <img
-            src={user.profileImage}
+            src={profile?.profileImageUrl}
             alt="프로필"
             className="h-10 w-10 rounded-full object-cover"
           />
+
           <div>
-            <p className="text-sm font-semibold">{user.name}</p>
-            <p className="text-xs text-gray-400">{user.email}</p>
+            <p className="text-sm font-semibold">{profile?.nickname}</p>
+            <p className="text-xs text-gray-400">{profile?.email}</p>
           </div>
         </div>
 

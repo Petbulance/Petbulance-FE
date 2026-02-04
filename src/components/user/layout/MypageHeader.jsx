@@ -9,33 +9,23 @@ export default function MypageHeader({ title, onSubmit }) {
   const location = useLocation();
 
   const { currentInquiry } = useSupportInquiryStore();
-  const { title: writeTitle, content } = useSupportWriteStore();
+  const { title: writeTitle, content, submit } = useSupportWriteStore();
 
   const isWrite = location.pathname.includes('/write');
   const isDetail = location.pathname.includes('/detail');
   const isModify = location.pathname.includes('/modify');
+  console.log('heda c', currentInquiry);
+  /** 관리자 답변 존재 여부 */
+  const hasAnswer = currentInquiry?.status === 'ANSWER_COMPLETED';
 
-  const hasAnswer = Boolean(currentInquiry?.answer);
-
-  // 버튼 표시 조건
+  console.log('cu', hasAnswer);
+  /** 버튼 노출 조건 */
   const showActionButton = (isWrite || isDetail || isModify) && !hasAnswer;
 
+  /** 등록/완료 가능 여부 */
   const canSubmit = writeTitle.trim() && content.trim();
 
-  const handleActionClick = () => {
-    if (isWrite || isModify) {
-      // 실제 submit은 Page(wrapper)에서
-      onSubmit?.();
-      return;
-    }
-
-    if (isDetail && currentInquiry) {
-      navigate(`/index/mypage/support/myinquiry/modify/${currentInquiry.id}`, {
-        state: { inquiry: currentInquiry },
-      });
-    }
-  };
-
+  /** 버튼 텍스트 */
   const actionText = isWrite
     ? '등록'
     : isDetail
@@ -44,17 +34,45 @@ export default function MypageHeader({ title, onSubmit }) {
         ? '완료'
         : '';
 
+  /** 버튼 클릭 */
+  const handleActionClick = () => {
+    if ((isWrite || isModify) && onSubmit) {
+      onSubmit();
+      return;
+    }
+
+    // ✏️ 작성 페이지 → submit
+    if (isWrite) {
+      submit(navigate);
+      return;
+    }
+
+    // 🔁 상세 페이지 → 수정 페이지 이동
+    if (isDetail && currentInquiry) {
+      console.log('1', currentInquiry);
+      navigate(
+        `/index/mypage/support/myinquiry/modify/${currentInquiry.qnaId}`,
+        {
+          state: { inquiry: currentInquiry },
+        }
+      );
+    }
+  };
+
   return (
     <header className="sticky top-0 border-b bg-white px-4 py-3 shadow-sm">
       <div className="relative flex items-center justify-between">
+        {/* 뒤로가기 */}
         <button onClick={() => navigate(-1)}>
           <ChevronLeft className="h-5 w-5" />
         </button>
 
+        {/* 타이틀 */}
         <h1 className="absolute left-1/2 -translate-x-1/2 text-[25px] font-semibold">
           {title}
         </h1>
 
+        {/* 우측 액션 버튼 */}
         {showActionButton ? (
           <button
             onClick={handleActionClick}

@@ -1,41 +1,53 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import googleIcon from '@/assets/images/logo/googleLogo.svg';
 import kakaoIcon from '@/assets/images/logo/kakaoLogo.svg';
 import naverIcon from '@/assets/images/logo/naverLogo.svg';
+import Spinner from '@/components/commons/Spinner.jsx';
 import { Switch } from '@/components/ui/switch';
+import useUserStore from '@/stores/useUserStore';
 
-const SNS_ICON = {
-  kakao: kakaoIcon,
-  google: googleIcon,
-  naver: naverIcon,
+const SNS_INFO = {
+  kakao: {
+    label: '카카오',
+    icon: kakaoIcon,
+    emailKey: 'kakaoEmail',
+  },
+  google: {
+    label: '구글',
+    icon: googleIcon,
+    emailKey: 'googleEmail',
+  },
+  naver: {
+    label: '네이버',
+    icon: naverIcon,
+    emailKey: 'naverEmail',
+  },
 };
 
 export default function LoginSetting() {
+  const { profile, fetchMyProfile, loading } = useUserStore();
   const [autoLogin, setAutoLogin] = useState(true);
 
-  const currentProvider = 'google';
+  useEffect(() => {
+    if (!profile) {
+      fetchMyProfile();
+    }
+  }, [profile, fetchMyProfile]);
 
-  const [snsAccounts] = useState([
-    {
-      provider: 'kakao',
-      label: '카카오',
-      email: 'user@kakao.com',
-      connected: true,
-    },
-    {
-      provider: 'google',
-      label: '구글',
-      email: 'user@google.com',
-      connected: false,
-    },
-    {
-      provider: 'naver',
-      label: '네이버',
-      email: 'user@naver.com',
-      connected: true,
-    },
-  ]);
+  if (!profile) {
+    return <Spinner fullScreen message="로그인 정보를 불러오는 중이에요" />;
+  }
+
+  const currentProvider = profile.provider;
+
+  const snsAccounts = Object.entries(SNS_INFO).map(([provider, info]) => ({
+    provider,
+    label: info.label,
+    icon: info.icon,
+    email: profile[info.emailKey],
+    connected: Boolean(profile[info.emailKey]),
+  }));
 
   const currentAccount = snsAccounts.find(
     (a) => a.provider === currentProvider
@@ -62,7 +74,7 @@ export default function LoginSetting() {
         </p>
       </div>
 
-      {/* ================= 현재 로그인된 계정 ================= */}
+      {/* ================= 현재 로그인 계정 ================= */}
       <div className="py-4">
         <p className="h-[36px] border-b text-[18px] font-semibold">
           현재 로그인된 계정
@@ -70,11 +82,10 @@ export default function LoginSetting() {
 
         {currentAccount && (
           <div className="flex items-center justify-between py-4">
-            {/* 왼쪽: 아이콘 + 소셜 / 아이디 */}
             <div>
               <div className="flex items-center gap-2">
                 <img
-                  src={SNS_ICON[currentAccount.provider]}
+                  src={currentAccount.icon}
                   alt={currentAccount.label}
                   className="h-6 w-5"
                 />
@@ -93,7 +104,6 @@ export default function LoginSetting() {
           </div>
         )}
 
-        {/* 하단 구분선 */}
         <div className="border-b" />
 
         <p className="mt-3 h-[48px] text-[14px] text-gray-400">
@@ -110,13 +120,12 @@ export default function LoginSetting() {
         {connectableAccounts.map((account) => (
           <div
             key={account.provider}
-            className="flex h-[82px] items-center justify-between border-b px-0 py-[16px]"
+            className="flex h-[82px] items-center justify-between border-b py-[16px]"
           >
-            {/* 왼쪽 */}
             <div>
               <div className="flex items-center gap-2">
                 <img
-                  src={SNS_ICON[account.provider]}
+                  src={account.icon}
                   alt={account.label}
                   className="h-6 w-5"
                 />
@@ -129,21 +138,11 @@ export default function LoginSetting() {
               )}
             </div>
 
-            {account.connected ? (
-              <button className="rounded-md border px-3 py-1 text-[15px] text-gray-700">
-                연결해제
-              </button>
-            ) : (
-              <button className="rounded-md border px-3 py-1 text-[15px] text-gray-700">
-                연결
-              </button>
-            )}
+            <button className="rounded-md border px-3 py-1 text-[15px] text-gray-700">
+              {account.connected ? '연결해제' : '연결'}
+            </button>
           </div>
         ))}
-
-        {/*      <p className="mt-3 text-[12px] text-gray-400">
-          계정 추가를 위해 본인 명의의 휴대폰 인증이 필요합니다.
-        </p>*/}
       </div>
     </div>
   );
