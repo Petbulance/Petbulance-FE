@@ -21,9 +21,8 @@ export function HospitalDetail() {
       //사용자의 현위치 조회
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          const { latitude, longitude } = pos.coords;
           try {
-            const data = await fetchHospitalDetail(id, latitude, longitude);
+            const data = await fetchHospitalDetail(id);
             setHospital(data);
           } catch (error) {
             console.error('상세 정보 조회 실패');

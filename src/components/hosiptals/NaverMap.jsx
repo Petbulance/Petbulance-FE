@@ -99,8 +99,6 @@ const NaverMap = React.memo(
         const searchLng = userPos ? userPos.lng : center.lng();
 
         const data = await fetchHospitalsByLocation(
-          searchLat,
-          searchLng,
           [sw.lat(), sw.lng(), ne.lat(), ne.lng()],
           filterState
         );

@@ -38,6 +38,12 @@ export default function HospitalsMap() {
 
   const [selectedHospital, setSelectedHospital] = useState(null);
 
+  const [myLocation, setMyLocation] = useState({
+    lat: null,
+    lng: null,
+    isLoaded: !navigator.geolocation,
+  });
+
   const isListOpen = searchParams.get('view') === 'list';
 
   const openList = () => {
@@ -51,6 +57,24 @@ export default function HospitalsMap() {
     newParams.delete('view');
     setSearchParams(newParams);
   };
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setMyLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          isLoaded: true,
+        });
+      },
+      (error) => {
+        console.error('위치 파악 실패', error);
+        setMyLocation((prev) => ({ ...prev, isLoaded: true }));
+      }
+    );
+  }, []);
 
   return (
     <div className="relative h-full w-full bg-[#F5F5F5]">
@@ -98,6 +122,8 @@ export default function HospitalsMap() {
             <HospitalInfoSlide
               hospitals={hospitals}
               selectedHospital={selectedHospital}
+              userLat={myLocation.lat}
+              userLng={myLocation.lng}
             />
           )}
         </>
