@@ -1,13 +1,18 @@
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function KakaoCallback() {
   const navigate = useNavigate();
+  const calledRef = useRef(false);
 
   useEffect(() => {
+    if (calledRef.current) return;
+    calledRef.current = true;
+
     const authCode = new URL(window.location.href).searchParams.get('code');
     if (!authCode) {
       navigate('/index/auth/login');
@@ -33,7 +38,17 @@ export default function KakaoCallback() {
           authCode: res.data.access_token,
         });
         console.log('데이터', JWTres);
-        localStorage.setItem('access_token', JWTres.data.data.accessToken);
+        const { accessToken, refreshToken, isNewUser } = JWTres.data.data;
+
+        if (isNewUser) {
+          localStorage.setItem('temp_access_token', accessToken);
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        } else {
+          localStorage.setItem('access_token', accessToken);
+          if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
+          localStorage.removeItem('temp_access_token');
+        }
         localStorage.setItem(
           'recent_login',
           JSON.stringify({
@@ -52,8 +67,6 @@ export default function KakaoCallback() {
   }, [navigate]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      카카오 로그인 처리 중...
-    </div>
+    <Spinner fullScreen message="카카오 로그인 처리 중이에요" />
   );
 }

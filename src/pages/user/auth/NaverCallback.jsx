@@ -1,12 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function NaverCallback() {
   const navigate = useNavigate();
+  const calledRef = useRef(false);
 
   useEffect(() => {
+    if (calledRef.current) return;
+    calledRef.current = true;
+
     const naverLogin = new window.naver.LoginWithNaverId({
       clientId: import.meta.env.VITE_NAVER_CLIENT_ID,
       callbackUrl: import.meta.env.VITE_NAVER_REDIRECT_URI,
@@ -39,9 +44,17 @@ export default function NaverCallback() {
         });
 
         console.log('res', res);
-        const { accessToken, isNewUser } = res.data.data;
+        const { accessToken, refreshToken, isNewUser } = res.data.data;
 
-        localStorage.setItem('access_token', res.data.data.accessToken);
+        if (isNewUser) {
+          localStorage.setItem('temp_access_token', accessToken);
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        } else {
+          localStorage.setItem('access_token', accessToken);
+          if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
+          localStorage.removeItem('temp_access_token');
+        }
         localStorage.setItem(
           'recent_login',
           JSON.stringify({
@@ -51,11 +64,7 @@ export default function NaverCallback() {
         );
         localStorage.removeItem('com.naver.nid.access_token');
         localStorage.removeItem('com.naver.nid.oauth.state_token');
-        if (res.data.data.refreshToken) {
-          localStorage.setItem('refresh_token', res.data.data.refreshToken);
-        }
-
-        navigate(isNewUser ? '/index/auth/signupcomplete' : '/');
+        navigate('/index/auth/signupcomplete');
       } catch (e) {
         console.error('서버 로그인 실패', e);
         navigate('/index/auth/login');
@@ -63,5 +72,5 @@ export default function NaverCallback() {
     });
   }, [navigate]);
 
-  return <div>네이버 로그인 처리 중...</div>;
+  return <Spinner fullScreen message="네이버 로그인 처리 중이에요" />;
 }

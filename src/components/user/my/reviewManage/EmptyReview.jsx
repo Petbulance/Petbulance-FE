@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
+
 import emptyReview from '@/assets/images/pageImages/emptyReview.svg';
 
 export default function EmptyReview() {
+  const navigate = useNavigate();
   return (
     <div className="flex h-full flex-col items-center justify-center px-[24px] text-center">
       <div className="mb-6 h-[160px] w-[160px]">
@@ -16,7 +19,12 @@ export default function EmptyReview() {
         <br />첫 방문 후기를 작성해보세요!
       </p>
 
-      <button className="border-success text-success mt-[72px] w-full rounded-xl border py-3 text-[15px] font-medium">
+      <button
+        className="border-success text-success mt-[72px] w-full rounded-xl border py-3 text-[15px] font-medium"
+        onClick={() => {
+          navigate('/index/reviews');
+        }}
+      >
         병원 후기 보러가기
       </button>
     </div>

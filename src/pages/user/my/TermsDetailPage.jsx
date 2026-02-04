@@ -2,38 +2,62 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 
 export default function TermsDetailPage() {
-  const { id } = useParams();
+  const { id } = useParams(); // SERVICE | PRIVACY | LOCATION | MARKETING
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
+  /* =========================
+     약관 상세 조회
+  ========================= */
   useEffect(() => {
-    const fetchTerms = async () => {
+    const fetchTermsDetail = async () => {
       try {
-        // ✅ TODO: 실제 API로 교체
-        // GET /api/terms/{id}
-        const res = await api.get(`/app/version`);
-        console.log(res);
+        setLoading(true);
+        setNotFound(false);
 
-        setData([]);
+        const res = await api.get(`/terms/${id.toUpperCase()}`);
+        setData(res.data.data);
       } catch (e) {
-        console.error(e);
+        console.error('약관 상세 조회 실패', e);
+
+        // ❌ 존재하지 않는 약관
+        if (e.response?.status === 404) {
+          setNotFound(true);
+        }
+
+        setData(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTerms();
+    fetchTermsDetail();
   }, [id]);
 
+  /* =========================
+     상태 처리
+  ========================= */
   if (loading) {
-    return <div className="p-4 text-sm text-gray-400">불러오는 중...</div>;
+    return <Spinner fullScreen message="약관을 불러오는 중이에요" />;
+  }
+
+  if (notFound) {
+    return (
+      <div className="p-4 text-sm text-gray-400">
+        요청하신 약관을 찾을 수 없어요.
+      </div>
+    );
   }
 
   if (!data) {
     return (
-      <div className="p-4 text-sm text-gray-400">약관을 찾을 수 없어요</div>
+      <div className="p-4 text-sm text-gray-400">
+        약관 정보를 불러오지 못했어요.
+      </div>
     );
   }
 
@@ -41,9 +65,10 @@ export default function TermsDetailPage() {
     <div className="bg-white px-4 py-5">
       <h1 className="mb-4 text-[18px] font-semibold">{data.title}</h1>
 
-      <div className="text-[14px] leading-relaxed whitespace-pre-line text-[#424242]">
-        {data.content}
-      </div>
+      <div
+        className="terms-content text-[14px] leading-relaxed text-[#424242]"
+        dangerouslySetInnerHTML={{ __html: data.summary }}
+      />
     </div>
   );
 }

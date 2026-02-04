@@ -4,25 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import api from '@/apis/api.jsx';
 import partyIcon from '@/assets/images/pageImages/partyImg.svg';
 import TermsBottomSheet from '@/components/user/ui/TermsBottomSheet.jsx';
+import useUserStore from '@/stores/useUserStore';
 
 export default function SignupComplete() {
   const [open, setOpen] = useState(false);
-  const [nickname, setNickname] = useState('');
   const [hasRequiredAgree, setHasRequiredAgree] = useState(false);
 
   const navigate = useNavigate();
 
-  /* ===============================
-     유저 정보 조회
-  =============================== */
-  const getMyProfile = async () => {
-    try {
-      const response = await api.get('/users/me');
-      console.log('유저조회', response);
-      setNickname(response.data.data.nickname);
-    } catch (e) {
-      console.error('유저 조회 실패', e);
-    }
+  const { profile, fetchMyProfile } = useUserStore();
+
+  const runPostLoginInit = () => {
+    fetchMyProfile(); // ⭐ 여기서 전역 저장
+    getMyTerms();
   };
 
   /* ===============================
@@ -32,18 +26,20 @@ export default function SignupComplete() {
      - 하나라도 AGREE면 통과
   =============================== */
   const getMyTerms = async () => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return; // 최종 토큰 없으면 대기
+
     try {
       const response = await api.get('/terms/status');
       const terms = response.data.data;
-      console.log('정책', terms);
+
       const hasAgree =
         terms.service === 'AGREE' ||
         terms.privacy === 'AGREE' ||
         terms.location === 'AGREE';
 
       setHasRequiredAgree(hasAgree);
-
-      // ❗ 필수 약관 전부 미동의면 BottomSheet 오픈
+      console.log('agre', hasAgree);
       if (!hasAgree) {
         setOpen(true);
       }
@@ -53,10 +49,7 @@ export default function SignupComplete() {
   };
 
   /* ===============================
-     로그아웃 처리
-     - 서버 로그아웃
-     - 토큰 제거
-     - 로그인 페이지 이동
+     로그아웃
   =============================== */
   const handleLogout = async () => {
     try {
@@ -64,23 +57,32 @@ export default function SignupComplete() {
     } catch (e) {
       console.warn('서버 로그아웃 실패', e);
     } finally {
-      // 클라이언트 토큰 정리
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('temp_access_token');
       localStorage.removeItem('recent_login');
 
       navigate('/index/auth/login', { replace: true });
     }
   };
 
+  /* ===============================
+     최초 진입 시
+     - 최종 토큰이 없으면 약관 동의 모달 바로 열기
+     - 최종 토큰이 있으면 프로필/약관 조회
+  =============================== */
   useEffect(() => {
-    getMyProfile();
-    getMyTerms();
-  }, []);
+    const hasFinalToken = !!localStorage.getItem('access_token');
+    if (hasFinalToken) {
+      runPostLoginInit();
+    } else {
+      setOpen(true);
+    }
+  }, [fetchMyProfile]);
 
   return (
     <div className="flex min-h-screen flex-col bg-white px-6">
-      {/* ================= 상단 콘텐츠 ================= */}
+      {/* ================= 상단 ================= */}
       <div className="mt-48 flex flex-col items-center text-center">
         <img
           src={partyIcon}
@@ -89,7 +91,7 @@ export default function SignupComplete() {
         />
 
         <h2 className="mb-2 flex items-center gap-1 text-lg font-bold">
-          <span className="text-success">{nickname}님</span>
+          <span className="text-success">{profile?.nickname ?? ''}</span>
           <span className="text-gray-800">환영해요!</span>
         </h2>
 
@@ -124,7 +126,7 @@ export default function SignupComplete() {
             className="w-full rounded-lg bg-[#2DA969] py-4 text-sm font-semibold text-white"
             onClick={() => setOpen(true)}
           >
-            약관 보기
+            시작하기
           </button>
 
           <button
@@ -137,7 +139,14 @@ export default function SignupComplete() {
       )}
 
       {/* ================= 약관 Bottom Sheet ================= */}
-      <TermsBottomSheet open={open} onClose={() => setOpen(false)} />
+      <TermsBottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        onConsented={() => {
+          setHasRequiredAgree(true);
+          runPostLoginInit();
+        }}
+      />
     </div>
   );
 }

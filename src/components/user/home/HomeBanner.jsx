@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 import {
   Carousel,
   CarouselContent,
@@ -15,6 +16,7 @@ export default function HomeBanner() {
   const [apiInstance, setApiInstance] = useState(null);
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState([]);
 
   /* ===============================
@@ -23,10 +25,13 @@ export default function HomeBanner() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
+        setLoading(true);
         const res = await api.get('/banners/home');
         setBanners(res.data.data);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -47,6 +52,14 @@ export default function HomeBanner() {
     });
   }, [apiInstance]);
 
+  if (loading) {
+    return (
+      <div className="flex w-full justify-center py-8">
+        <Spinner />
+      </div>
+    );
+  }
+
   if (!banners.length) return null;
 
   return (
@@ -61,18 +74,16 @@ export default function HomeBanner() {
             stopOnInteraction: false,
           }),
         ]}
-        className="overflow-hidden"
+        className="mx-auto max-w-full overflow-hidden"
       >
-        {/*todo */}
         <CarouselContent className="-ml-0">
           {banners.map((banner) => (
-            <CarouselItem
-              key={banner.bannerId}
-              className="mr-[10px] basis-[90%] pl-0"
-            >
+            <CarouselItem key={banner.bannerId} className="basis-full pl-0">
               <div
                 className="relative cursor-pointer overflow-hidden rounded-lg"
-                onClick={() => navigate(`/notices/${banner.noticeId}`)}
+                onClick={() =>
+                  navigate(`/index/mypage/notice/${banner.noticeId}`)
+                }
               >
                 <img
                   src={banner.imageUrl}
@@ -81,7 +92,7 @@ export default function HomeBanner() {
                 />
 
                 {/* 오버레이 */}
-                <div className="absolute inset-0 bg-black/30 p-4 text-white">
+                <div className="absolute inset-0 p-4 text-white">
                   {/* 하단 버튼 영역 */}
                   <div className="absolute right-3 bottom-3 left-3 flex items-center justify-between">
                     <button className="rounded-md bg-white/90 px-3 py-1 text-xs font-medium text-black">
@@ -89,7 +100,7 @@ export default function HomeBanner() {
                     </button>
 
                     <button className="rounded-full bg-black/60 px-3 py-1 text-xs text-white">
-                      {current + 1} / {count} 모두 보기
+                      {current + 1} / {count}
                     </button>
                   </div>
                 </div>
