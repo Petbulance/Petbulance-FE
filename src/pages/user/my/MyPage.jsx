@@ -51,68 +51,71 @@ export default function MyPage() {
   };
 
   return (
-    <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
-      {/* 상단 프로필 영역 */}
-      <ProfileSection isLoggedIn={isLoggedIn} user={user} />
+    <div>
+      {loading && <Spinner fullScreen message="내 정보를 불러오는 중이에요" />}
+      <div className="space-y-4 bg-gray-100 px-[24px] py-[44px]">
+        {/* 상단 프로필 */}
+        <ProfileSection isLoggedIn={isLoggedIn} myProfile={myProfile ?? null} />
 
-      {/* 사용자 설정 */}
-      <Group title="사용자 설정">
-        <Item
-          label="알림 설정"
-          iconNode={
-            <img src={notificationIcon} className="h-5 w-5" alt="알림 설정" />
-          }
-          onClick={() => navigate('/index/notification/setting')}
-        />
-        <Item
-          Icon={Login}
-          label="로그인 계정 관리"
-          onClick={() => navigate('/index/mypage/loginsetting')}
-        />
-        <Item
-          Icon={Security}
-          label="권한"
-          onClick={() => {
-            navigate('/index/mypage/authorization');
-          }}
-        />
-      </Group>
+        {/* 사용자 설정 */}
+        <Group title="사용자 설정">
+          <Item
+            label="알림 설정"
+            iconNode={
+              <img src={notificationIcon} className="h-5 w-5" alt="알림 설정" />
+            }
+            onClick={() => navigate('/index/notification/setting')}
+          />
+          <Item
+            Icon={Login}
+            label="로그인 계정 관리"
+            onClick={() => navigate('/index/mypage/loginsetting')}
+          />
+          <Item
+            Icon={Security}
+            label="권한"
+            onClick={() => {
+              navigate('/index/mypage/authorization');
+            }}
+          />
+        </Group>
 
-      <Group title="작성글 관리">
-        <Item
-          Icon={Review}
-          label="후기 관리"
-          onClick={() => navigate('/index/mypage/reviewmanage')}
-        />
-        <Item
-          Icon={Document}
-          label="게시글 관리"
-          onClick={() => navigate('/index/mypage/boardmanage')}
-        />
-        <Item
-          Icon={Forum}
-          label="댓글 관리"
-          onClick={() => navigate('/index/mypage/commentmanage')}
-        />
-      </Group>
+        <Group title="작성글 관리">
+          <Item
+            Icon={Review}
+            label="후기 관리"
+            onClick={() => navigate('/index/mypage/reviewmanage')}
+          />
+          <Item
+            Icon={Document}
+            label="게시글 관리"
+            onClick={() => navigate('/index/mypage/boardmanage')}
+          />
+          <Item
+            Icon={Forum}
+            label="댓글 관리"
+            onClick={() => navigate('/index/mypage/commentmanage')}
+          />
+        </Group>
 
-      <Group title="고객지원">
-        <Item
-          Icon={Bullhorn}
-          label="공지사항"
-          onClick={() => navigate('/index/mypage/notice')}
-        />
-        <Item
-          Icon={Headset}
-          label="문의 및 고객센터"
-          onClick={() => navigate('/index/mypage/support')}
-        />
-        <Item
-          Icon={Information}
-          label="약관 및 정책"
-          onClick={() => navigate('/index/mypage/terms')}
-        />
-      </Group>
+        <Group title="고객지원">
+          <Item
+            Icon={Bullhorn}
+            label="공지사항"
+            onClick={() => navigate('/index/mypage/notice')}
+          />
+          <Item
+            Icon={Headset}
+            label="문의 및 고객센터"
+            onClick={() => navigate('/index/mypage/support')}
+          />
+          <Item
+            Icon={Information}
+            label="약관 및 정책"
+            onClick={() => navigate('/index/mypage/terms')}
+          />
+        </Group>
+      </div>
     </div>
   );
 }

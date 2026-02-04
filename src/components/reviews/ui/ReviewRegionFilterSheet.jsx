@@ -4,10 +4,14 @@ import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { ResetBtn } from '@/components/hosiptals/ui/FilterPopup/ResetBtn';
 import { CITIES, REGION_DATA } from '@/data/regionData';
 
-export function ReviewRegionFilterSheet({ onApply, filterState }) {
+export function ReviewRegionFilterSheet({
+  onApply,
+  filterState,
+  setFilterState,
+}) {
   const [temp, setTemp] = useState({
-    city: filterState.city,
-    region: filterState.region,
+    city: filterState.city || '',
+    region: filterState.region || '',
   });
 
   const districts = useMemo(() => {
@@ -20,7 +24,10 @@ export function ReviewRegionFilterSheet({ onApply, filterState }) {
   };
 
   const handleRegionClick = (regionValue) => {
-    setTemp((prev) => ({ ...prev, region: regionValue }));
+    setTemp((prev) => ({
+      ...prev,
+      region: regionValue === '전체' ? '' : regionValue,
+    }));
   };
 
   return (

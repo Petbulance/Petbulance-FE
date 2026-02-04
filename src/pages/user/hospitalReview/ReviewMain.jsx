@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 
 import { getFilteredReceipts } from '@/apis/reviews/receipts';
 import { HospitalFilterModalContainer } from '@/components/hosiptals/ui/FilterPopup';
-import ReviewSortModal from '@/components/hosiptals/ui/HospitalDetail/review/ReviewSortModal';
 import { ReviewAnimalFilterSheet } from '@/components/reviews/ui/ReviewAnimalFilterSheet';
 import { ReviewContent } from '@/components/reviews/ui/ReviewContent';
 import { ReviewFilterBar } from '@/components/reviews/ui/ReviewFilterBar';
@@ -112,6 +111,7 @@ export function ReviewMain() {
             {activeSheet === 'region' ? (
               <ReviewRegionFilterSheet
                 filterState={filters}
+                setFilterState={setFilters}
                 onApply={(city, region) => handleApplyFilter({ city, region })}
               />
             ) : (

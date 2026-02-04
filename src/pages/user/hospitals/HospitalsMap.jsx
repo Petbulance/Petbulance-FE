@@ -76,7 +76,6 @@ export default function HospitalsMap() {
             {activeSheet === 'region' ? (
               <SearchFilterContent
                 filterState={filterState}
-                setFilterState={setFilterState}
                 onApply={(city, region) => handleApplyFilter({ city, region })}
               />
             ) : (

@@ -43,9 +43,5 @@ export default function KakaoCallback() {
     sendCode();
   }, [navigate]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      카카오 로그인 처리 중...
-    </div>
-  );
+  return <Spinner fullScreen message="카카오 로그인 처리 중이에요" />;
 }

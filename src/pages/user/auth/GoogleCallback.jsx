@@ -51,9 +51,5 @@ export default function GoogleCallback() {
     fetchToken();
   }, [navigate]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      구글 로그인 처리 중...
-    </div>
-  );
+  return <Spinner fullScreen message="구글 로그인 처리 중이에요" />;
 }
