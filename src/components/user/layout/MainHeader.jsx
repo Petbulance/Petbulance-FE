@@ -8,7 +8,7 @@ export default function MainHeader({ title }) {
   const isHome = location.pathname === '/index/home';
 
   // 알림 개수 예시
-  const notificationCount = 1; // 예시
+  const notificationCount = 0; // 예시
   // 99+ 분기
   const displayCount = notificationCount > 99 ? '99+' : notificationCount;
   const isSingleDigit = String(notificationCount).length === 1;
