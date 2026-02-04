@@ -12,6 +12,9 @@ export default function NaverCallback() {
     if (calledRef.current) return;
     calledRef.current = true;
 
+    const isConnectMode =
+      localStorage.getItem('social_connect_mode') === 'NAVER';
+
     const naverLogin = new window.naver.LoginWithNaverId({
       clientId: import.meta.env.VITE_NAVER_CLIENT_ID,
       callbackUrl: import.meta.env.VITE_NAVER_REDIRECT_URI,
@@ -26,6 +29,7 @@ export default function NaverCallback() {
 
       if (!status) {
         console.error('네이버 SDK status=false');
+        localStorage.removeItem('social_connect_mode');
         navigate('/index/auth/login');
         return;
       }
@@ -33,11 +37,31 @@ export default function NaverCallback() {
       const naverAccessToken = naverLogin.accessToken?.accessToken;
       if (!naverAccessToken) {
         console.error('네이버 access_token 없음');
+        localStorage.removeItem('social_connect_mode');
         navigate('/index/auth/login');
         return;
       }
 
       try {
+        if (isConnectMode) {
+          try {
+            await api.post('/users/social/connect', {
+              provider: 'NAVER',
+              authCode: naverAccessToken,
+            });
+            alert('성공');
+          } catch (err) {
+            console.error('네이버 계정 연결 실패', err);
+            alert('실패');
+          } finally {
+            localStorage.removeItem('social_connect_mode');
+            localStorage.removeItem('com.naver.nid.access_token');
+            localStorage.removeItem('com.naver.nid.oauth.state_token');
+            navigate('/index/mypage/loginsetting');
+          }
+          return;
+        }
+
         const res = await api.post('/auth/social/login', {
           provider: 'NAVER',
           authCode: naverAccessToken,
@@ -67,7 +91,15 @@ export default function NaverCallback() {
         navigate('/index/auth/signupcomplete');
       } catch (e) {
         console.error('서버 로그인 실패', e);
-        navigate('/index/auth/login');
+        if (isConnectMode) {
+          alert('실패');
+          localStorage.removeItem('social_connect_mode');
+          localStorage.removeItem('com.naver.nid.access_token');
+          localStorage.removeItem('com.naver.nid.oauth.state_token');
+          navigate('/index/mypage/loginsetting');
+        } else {
+          navigate('/index/auth/login');
+        }
       }
     });
   }, [navigate]);
