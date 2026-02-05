@@ -1,37 +1,44 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { fetchHospitalsByName } from '@/apis/hospitals';
+import { fetchReceiptDetail } from '@/apis/reviews/receipts';
 
 import add from '@/assets/images/icons/add_icon.svg';
 import circle_x from '@/assets/images/icons/circle_x.svg';
 import down_arrow from '@/assets/images/icons/down_arrow2.svg';
-import reviewImg from '@/assets/images/icons/review_img_ex.svg';
 import empty_star_icon from '@/assets/images/icons/star_gray_40.svg';
 import fill_star_icon from '@/assets/images/icons/star_yellow_40.svg';
 
-import { NextBtn } from './form/ReviewForm_1';
+import { NextBtn, SelectField } from './form/ReviewForm_1';
 import { InputField } from './form/ReviewForm_2';
+import { ANIMAL_CATEGORY_VALUE, ANIMAL_GROUPS_VALUE } from '@/data/animalSort';
+import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
+import { modifyReview } from '@/apis/reviews/modifyReview';
 
 export function EditReview() {
   const { reviewId } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const containerRef = useRef(null);
 
-  // 1. 전체 데이터 상태 통합 관리
+  // 1. 상태 관리
   const [data, setData] = useState({
     hospitalName: '',
+    hospitalId: null,
+    cost: '',
     animalType: '',
     animalDetail: '',
-    treatments: ['', ''],
-    ratings: {
-      expertise: 0,
-      kindness: 0,
-      facility: 0,
-    },
+    ratings: { expertise: 0, kindness: 0, facility: 0 },
     images: [],
     content: '',
   });
 
-  // 2. 카테고리 및 옵션 설정
+  const [searchTerm, setSearchTerm] = useState('');
+  const [recommendations, setRecommendations] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+
   const categories = [
     {
       id: 'expertise',
@@ -50,58 +57,119 @@ export function EditReview() {
     },
   ];
 
-  const animalOptions = [
-    { value: 'dog', label: '강아지' },
-    { value: 'cat', label: '고양이' },
-    { value: 'etc', label: '특수동물' },
-  ];
-
-  const inputFields = [
-    {
-      id: 'animalDetail',
-      label: '세부 동물명',
-      placeholder: '예: 골든햄스터, 코뉴어, 코리도라스',
-      value: data.animalDetail || '',
-    },
-    {
-      id: 'treatment1',
-      label: '진료명',
-      placeholder: '예: 골절, 발톱정리, 종양수술',
-      value: data.treatments[0] || '',
-    },
-  ];
-
-  // 3. 기존 리뷰 데이터 불러오기
+  // 2. 기존 데이터 불러오기
   useEffect(() => {
-    // 실제 구현 시: const response = await fetchReview(reviewId);
-    const mockData = {
-      hospitalName: '튼튼 동물병원',
-      animalType: 'etc',
-      animalDetail: '골든햄스터',
-      treatments: ['종양수술', '약처방'],
-      ratings: {
-        expertise: 5,
-        kindness: 4,
-        facility: 5,
-      },
-      images: [reviewImg, reviewImg, reviewImg],
-      content:
-        '주말에 갑자기 햄스터가 원인불명으로 아픈 바람에 급하게 찾아갔는데 정말 친절하셨어요. 시설도 깔끔해서 믿음이 갔습니다.',
+    const getReviewDetail = async () => {
+      if (!reviewId) return;
+      setIsLoading(true);
+      try {
+        const res = await fetchReceiptDetail(reviewId);
+        const mappedData = {
+          hospitalName: res.hospitalName,
+          hospitalId: res.hospitalId,
+          cost: res.totalPrice?.toString() || '',
+          animalType: res.animalType,
+          animalDetail: res.detailAnimalType,
+          ratings: {
+            expertise: res.expertiseRating || 0,
+            kindness: res.kindnessRating || 0,
+            facility: res.facilityRating || 0,
+          },
+          images: res.images || [],
+          content: res.reviewContent || '',
+        };
+        setData(mappedData);
+        setSearchTerm(res.hospitalName);
+      } catch (error) {
+        console.error('리뷰 로드 실패:', error);
+        alert('리뷰 정보를 불러올 수 없습니다.');
+        navigate(-1);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    setData(mockData);
-  }, [reviewId]);
+    getReviewDetail();
+  }, [reviewId, navigate]);
 
-  // 4. 핸들러 함수들
-  const handleChange = (field, value) => {
-    setData((prev) => ({ ...prev, [field]: value }));
+  // 3. 병원명 검색 로직
+  useEffect(() => {
+    if (!searchTerm.trim() || searchTerm === data.hospitalName) return;
+    const timer = setTimeout(async () => {
+      try {
+        const results = await fetchHospitalsByName(searchTerm, {});
+        setRecommendations(results.list || results || []);
+        setShowDropdown(true);
+      } catch (error) {
+        console.error('병원 추천 목록 로드 실패:', error);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm, data.hospitalName]);
+
+  const detailOptions = useMemo(() => {
+    return data.animalType ? ANIMAL_GROUPS_VALUE[data.animalType] || [] : [];
+  }, [data.animalType]);
+
+  const handleUpdateSubmit = async () => {
+    const cleanedCost = Number(data.cost.toString().replace(/[^0-9]/g, ''));
+
+    const payload = {
+      reviewId: Number(reviewId),
+      title: '병원 후기 수정',
+      receiptChecked: true,
+      hospitalId: Number(data.hospitalId),
+      expertiseRating: Number(data.ratings.expertise),
+      kindnessRating: Number(data.ratings.kindness),
+      facilityRating: Number(data.ratings.facility),
+      totalPrice: cleanedCost,
+      animalType: data.animalType,
+      receiptItems: [{ name: '진료비', price: cleanedCost }],
+      visitDate: new Date().toISOString().split('T')[0],
+      reviewComment: data.content,
+      images: data.images.map((img) => ({
+        filename: typeof img === 'string' ? img.split('/').pop() : img.name,
+        contentType: typeof img === 'string' ? 'image/jpeg' : img.type,
+      })),
+      detailAnimalType: data.animalDetail,
+    };
+
+    try {
+      await modifyReview(payload);
+      setIsSuccessOpen(true);
+    } catch (error) {
+      alert('후기 수정에 실패했습니다.');
+      console.error(error);
+    }
   };
 
-  const handleRating = (catId, score) => {
+  const handleChange = (field, value) =>
+    setData((prev) => ({ ...prev, [field]: value }));
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (!value.trim()) {
+      setRecommendations([]);
+      setShowDropdown(false);
+      setData((prev) => ({ ...prev, hospitalName: '', hospitalId: null }));
+    }
+  };
+
+  const handleSelectHospital = (hospital) => {
+    setData((prev) => ({
+      ...prev,
+      hospitalName: hospital.name,
+      hospitalId: hospital.hospitalId || hospital.id,
+    }));
+    setSearchTerm(hospital.name);
+    setShowDropdown(false);
+  };
+
+  const handleRating = (catId, score) =>
     setData((prev) => ({
       ...prev,
       ratings: { ...prev.ratings, [catId]: score },
     }));
-  };
 
   const handleAddImage = (e) => {
     const files = Array.from(e.target.files);
@@ -113,52 +181,99 @@ export function EditReview() {
     }));
   };
 
-  const handleRemoveImage = (index) => {
+  const handleRemoveImage = (index) =>
     setData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
-  };
 
-  const handleContentChange = (e) => {
-    handleChange('content', e.target.value);
-  };
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target))
+        setShowDropdown(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  if (isLoading)
+    return (
+      <div className="flex h-screen items-center justify-center text-[20px] font-medium text-gray-500">
+        리뷰 정보를 불러오는 중입니다...
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      {/* 병원명 섹션 */}
-      <section className="mb-10">
+    <div className="relative min-h-screen bg-white p-6 pb-[100px]">
+      <h2 className="mb-8 text-[24px] font-bold text-[#424242]">후기 수정</h2>
+
+      {/* 병원명 입력 */}
+      <div className="relative mb-6" ref={containerRef}>
         <label className="mb-2 block text-[19px] font-medium text-[#424242]">
           병원명
         </label>
         <input
-          className="w-full rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-[14px] text-[18px] focus:border-[#27BE69] focus:outline-none"
+          className="w-full rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-[14px] text-[20px] focus:outline-none"
           placeholder="병원명을 입력하세요"
-          value={data.hospitalName}
-          onChange={(e) => handleChange('hospitalName', e.target.value)}
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={() =>
+            searchTerm && recommendations.length > 0 && setShowDropdown(true)
+          }
         />
-      </section>
+        {showDropdown && recommendations.length > 0 && (
+          <ul className="absolute z-50 mt-1 max-h-[220px] w-full overflow-y-auto rounded-[8px] border border-[#EEEEEE] bg-white shadow-xl">
+            {recommendations.map((hospital) => (
+              <li
+                key={hospital.id}
+                className="cursor-pointer border-b border-[#F5F5F5] px-4 py-3 last:border-none hover:bg-[#F9F9F9]"
+                onClick={() => handleSelectHospital(hospital)}
+              >
+                <div className="text-[18px] font-medium text-[#424242]">
+                  {hospital.name}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-      {/* 별점 섹션 */}
-      <section className="mt-15 text-center">
-        <h3 className="mb-15 text-left text-[23px] font-semibold text-[#424242]">
-          솔직한 후기를 남겨주세요
-        </h3>
+      <InputField
+        label="총 비용"
+        value={data.cost || ''}
+        onChange={(val) => handleChange('cost', val)}
+      />
+
+      <SelectField
+        label="동물종"
+        value={data.animalType}
+        options={ANIMAL_CATEGORY_VALUE}
+        onChange={(val) =>
+          setData((prev) => ({ ...prev, animalType: val, animalDetail: '' }))
+        }
+      />
+
+      <SelectField
+        label="세부 동물명"
+        value={data.animalDetail}
+        options={detailOptions}
+        onChange={(val) => handleChange('animalDetail', val)}
+        disabled={!data.animalType}
+      />
+
+      <section className="mt-12 text-center">
         {categories.map((cat) => (
-          <div key={cat.id} className="mb-15">
-            <span className="text-[23px] font-semibold text-[#424242]">
+          <div key={cat.id} className="mb-10 text-left">
+            <span className="text-[20px] font-semibold text-[#424242]">
               {cat.label}
             </span>
-            <p className="my-3 text-[20px] font-medium text-[#9E9E9E]">
-              {cat.desc}
-            </p>
-            <div className="flex justify-center gap-1">
+            <div className="mt-4 flex justify-center gap-1">
               {[1, 2, 3, 4, 5].map((num) => (
                 <button
                   key={num}
                   type="button"
                   onClick={() => handleRating(cat.id, num)}
-                  className="p-1 transition-transform active:scale-90"
+                  className="p-1 active:scale-95"
                 >
                   <img
                     src={
@@ -166,7 +281,7 @@ export function EditReview() {
                         ? fill_star_icon
                         : empty_star_icon
                     }
-                    alt={`${num}점`}
+                    alt="star"
                     className="h-10 w-10"
                   />
                 </button>
@@ -176,88 +291,31 @@ export function EditReview() {
         ))}
       </section>
 
-      {/* 동물종 및 진료 상세 정보 섹션 */}
       <section className="mt-10">
-        <label className="mb-2 block text-[19px] font-medium text-[#424242]">
-          동물종
-        </label>
-        <div className="relative mb-6 w-[280px]">
-          <select
-            className={`w-full appearance-none rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-2 text-[20px] focus:outline-none ${
-              data.animalType ? 'text-[#424242]' : 'text-[#BCBCBC]'
-            }`}
-            value={data.animalType}
-            onChange={(e) => handleChange('animalType', e.target.value)}
-          >
-            <option value="" disabled>
-              동물종을 선택해주세요
-            </option>
-            {animalOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute top-[10px] right-4 flex items-center">
-            <img src={down_arrow} alt="drop_down" />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          {inputFields.map((field, index) => (
-            <InputField
-              key={`${field.id}-${index}`}
-              label={field.label}
-              placeholder={field.placeholder}
-              value={field.value}
-              onChange={(val) => {
-                if (field.id.startsWith('treatment')) {
-                  const newTreatments = [...(data.treatments || ['', ''])];
-                  const tIndex = field.id === 'treatment1' ? 0 : 1;
-                  newTreatments[tIndex] = val;
-                  handleChange('treatments', newTreatments);
-                } else {
-                  handleChange(field.id, val);
-                }
-              }}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* 사진 및 내용 수정 섹션 */}
-      <section className="mt-10">
-        <h3 className="mb-4 text-[19px] font-medium text-[#424242]">
-          사진 수정
-        </h3>
-        <div className="mb-8 flex flex-wrap gap-[10.32px]">
+        <div className="mb-8 flex flex-wrap gap-2.5">
           {data.images.map((img, index) => (
-            <div key={index} className="relative h-[116px] w-[116px]">
-              <div className="absolute top-0 left-0 z-10 rounded-tl-[6px] rounded-br-[6px] bg-black/50 px-[5.5px] py-[1.5px] text-[8.25px] font-medium text-white">
-                {index + 1}
-              </div>
+            <div key={index} className="relative h-[110px] w-[110px]">
               <img
                 src={img}
                 alt="review"
-                className="h-full w-full rounded-[8px] object-cover"
+                className="h-full w-full rounded-[8px] border border-[#EEEEEE] object-cover"
               />
               <button
                 type="button"
                 onClick={() => handleRemoveImage(index)}
-                className="absolute -top-[4px] -right-[6px] z-20"
+                className="absolute -top-2 -right-2 z-20"
               >
                 <img src={circle_x} alt="delete" />
               </button>
             </div>
           ))}
-
           {data.images.length < 5 && (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex h-[116px] w-[116px] flex-col items-center justify-center rounded-[8px] border border-[1.53px] border-[#E0E0E0] bg-[#FFFFFF]"
+              className="flex h-[110px] w-[110px] items-center justify-center rounded-[8px] border border-[#E0E0E0] bg-white"
             >
-              <img src={add} alt="add_file" />
+              <img src={add} alt="add" />
               <input
                 ref={fileInputRef}
                 type="file"
@@ -269,27 +327,35 @@ export function EditReview() {
             </button>
           )}
         </div>
-
-        <div className="flex flex-col">
-          <label className="mb-2 text-[19px] font-medium text-[#424242]">
-            내용
-          </label>
-          <textarea
-            className="h-[256px] w-full resize-none rounded-[6px] border border-[#EEEEEE] px-4 py-3 text-[18px] placeholder:text-[#BDBDBD] focus:border-[#27BE69] focus:outline-none"
-            placeholder="반려동물 자랑글 혹은 케어 방법 질문 등을 작성해보세요."
-            value={data.content}
-            onChange={handleContentChange}
-          />
-        </div>
+        <label className="mb-2 block text-[19px] font-medium text-[#424242]">
+          내용
+        </label>
+        <textarea
+          className="h-[200px] w-full resize-none rounded-[8px] border border-[#EEEEEE] p-4 text-[18px] focus:outline-none"
+          value={data.content}
+          onChange={(e) => handleChange('content', e.target.value)}
+        />
       </section>
 
-      <div className="mt-12 mb-8">
+      <div className="mt-12">
         <NextBtn
-          label="후기 등록하기"
-          onClick={() => navigate(-1)}
+          label="수정 완료"
+          onClick={handleUpdateSubmit}
           isComplete={true}
         />
       </div>
+
+      {isSuccessOpen && (
+        <ConfirmSelectModal
+          open={true}
+          title={`후기가 수정되었습니다.`}
+          content={`작성해주신 후기는 검수 완료 후 공개됩니다.`}
+          confirmText="작성한 후기 확인"
+          cancelText="닫기"
+          onConfirm={() => navigate(`/index/reviews/detail/${reviewId}`)}
+          onCancel={() => navigate('/index/reviews')}
+        />
+      )}
     </div>
   );
 }
