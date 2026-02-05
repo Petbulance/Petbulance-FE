@@ -5,7 +5,7 @@ import { SearchHeader } from '@/components/hosiptals/layout/SearchHeader';
 
 import { HospitalReviewDefaultHeader } from './HospitalReviewDefaultHeader';
 
-export function HospitalReviewHeader() {
+export function HospitalReviewHeader({ onSearch }) {
   const navigate = useNavigate();
 
   const [isSearching, setIsSearching] = useState(false);
@@ -16,6 +16,17 @@ export function HospitalReviewHeader() {
   useEffect(() => {
     if (isSearching) inputRef.current?.focus();
   }, [isSearching]);
+
+  const handleSearch = () => {
+    if (!keyword.trim()) return;
+    onSearch(keyword);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const openSearch = () => {
     setIsSearching(true);
@@ -40,6 +51,8 @@ export function HospitalReviewHeader() {
           inputRef={inputRef}
           keyword={keyword}
           onChangeKeyword={onChangeKeyword}
+          onKeyDown={handleKeyDown}
+          onConfirm={handleSearch}
         />
       )}
     </header>
