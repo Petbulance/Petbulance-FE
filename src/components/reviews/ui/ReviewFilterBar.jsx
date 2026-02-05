@@ -1,47 +1,58 @@
 import { useNavigate } from 'react-router-dom';
-
 import { Camera } from '@/assets/images/icons/Camera';
 import { Check } from '@/assets/images/icons/Check';
 import down_arrow from '@/assets/images/icons/down_arrow.svg';
 import SelectArrow from '@/assets/images/icons/SelectArrow';
 import { SelectButton } from '@/components/hosiptals/ui/SelectButton';
-import { ANIMAL_CATEGORY_KO, ANIMAL_GROUPS } from '@/data/animalSort';
-import { sortLabels } from '@/data/reviewSort'; // { latest: '최신순', rating: '별점순' ... } 형태 가정
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
+import { sortLabels } from '@/data/reviewSort';
 
 export function ReviewFilterBar({
   onOpenSheet,
-  currentFilters,
+  currentFilters = {},
   onToggleFilter,
 }) {
-  const animalLabel = ANIMAL_CATEGORY_KO[currentFilters.animal] || '동물종';
+  const selectedAnimals = currentFilters?.animal || [];
+  let animalLabel = '동물종';
 
-  const currentSortLabel = sortLabels[currentFilters.sort] || '최신순';
+  if (selectedAnimals.length > 0) {
+    const firstAnimalKo =
+      ANIMAL_CATEGORY_KO[selectedAnimals[0]] || selectedAnimals[0];
+    animalLabel =
+      selectedAnimals.length > 1
+        ? `${firstAnimalKo} 외 ${selectedAnimals.length - 1}`
+        : firstAnimalKo;
+  }
+
+  const currentSortLabel = sortLabels?.[currentFilters?.sort] || '최신순';
 
   const buttons = [
     {
       id: 'region',
-      label: currentFilters.city ? `${currentFilters.region}` : '지역',
-      isHighlighted: false,
+      label: currentFilters?.city ? currentFilters.region || '전체' : '지역',
+      isHighlighted: !!currentFilters?.city,
       rightIcon: <SelectArrow />,
     },
     {
       id: 'animal',
-      label: currentFilters.animal ? animalLabel : '동물종',
-      isHighlighted: false,
+      label: animalLabel,
+      isHighlighted: selectedAnimals.length > 0,
       rightIcon: <SelectArrow />,
     },
     {
       id: 'hasImage',
       label: '사진 후기',
-      isHighlighted: !!currentFilters.image,
-      leftIcon: <Camera color={currentFilters.image ? '#067DFD' : '#9E9E9E'} />,
+      isHighlighted: !!currentFilters?.image,
+      leftIcon: (
+        <Camera color={currentFilters?.image ? '#067DFD' : '#9E9E9E'} />
+      ),
     },
     {
       id: 'isVerified',
       label: '영수증인증',
-      isHighlighted: !!currentFilters.receipt,
+      isHighlighted: !!currentFilters?.receipt,
       leftIcon: (
-        <Check color={currentFilters.receipt ? '#067DFD' : '#9E9E9E'} />
+        <Check color={currentFilters?.receipt ? '#067DFD' : '#9E9E9E'} />
       ),
     },
   ];
@@ -70,10 +81,7 @@ export function ReviewFilterBar({
         ))}
       </div>
 
-      <button
-        className="ml-4 flex shrink-0 items-center gap-1 text-[18px] font-medium text-[#1E1E1E]"
-        // onClick={() => onOpenSheet('sort')}
-      >
+      <button className="ml-4 flex shrink-0 items-center gap-1 text-[18px] font-medium text-[#1E1E1E]">
         {currentSortLabel}
         <img src={down_arrow} alt="toggle" />
       </button>
