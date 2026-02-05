@@ -16,11 +16,15 @@ export default function GoogleCallback() {
     const code = new URL(window.location.href).searchParams.get('code');
 
     if (!code) {
+      localStorage.removeItem('social_connect_mode');
       navigate('/index/auth/login');
       return;
     }
 
     const fetchToken = async () => {
+      const isConnectMode =
+        localStorage.getItem('social_connect_mode') === 'GOOGLE';
+
       try {
         const params = new URLSearchParams({
           grant_type: 'authorization_code',
@@ -40,6 +44,24 @@ export default function GoogleCallback() {
           }
         );
         console.log(res.data);
+
+        if (isConnectMode) {
+          try {
+            await api.post('/users/social/connect', {
+              provider: 'GOOGLE',
+              authCode: res.data.access_token,
+            });
+            alert('성공');
+          } catch (err) {
+            console.error('구글 계정 연결 실패', err);
+            alert('실패');
+          } finally {
+            localStorage.removeItem('social_connect_mode');
+            navigate('/index/mypage/loginsetting');
+          }
+          return;
+        }
+
         const JWTres = await api.post('/auth/social/login', {
           provider: 'GOOGLE',
           authCode: res.data.access_token,
@@ -66,7 +88,13 @@ export default function GoogleCallback() {
         navigate('/index/auth/signupcomplete');
       } catch (e) {
         console.error('구글 로그인 실패', e);
-        navigate('/index/auth/login');
+        if (isConnectMode) {
+          alert('실패');
+          localStorage.removeItem('social_connect_mode');
+          navigate('/index/mypage/loginsetting');
+        } else {
+          navigate('/index/auth/login');
+        }
       }
     };
 

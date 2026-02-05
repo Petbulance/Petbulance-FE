@@ -15,11 +15,15 @@ export default function KakaoCallback() {
 
     const authCode = new URL(window.location.href).searchParams.get('code');
     if (!authCode) {
+      localStorage.removeItem('social_connect_mode');
       navigate('/index/auth/login');
       return;
     }
 
     const sendCode = async () => {
+      const isConnectMode =
+        localStorage.getItem('social_connect_mode') === 'KAKAO';
+
       try {
         console.log(`${import.meta.env.VITE_KAKAO_REST_API_KEY}`);
         const res = await axios.post(
@@ -33,6 +37,24 @@ export default function KakaoCallback() {
           { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
         console.log(res.data.access_token);
+
+        if (isConnectMode) {
+          try {
+            await api.post('/users/social/connect', {
+              provider: 'KAKAO',
+              authCode: res.data.access_token,
+            });
+            alert('성공');
+          } catch (err) {
+            console.error('카카오 계정 연결 실패', err);
+            alert('실패');
+          } finally {
+            localStorage.removeItem('social_connect_mode');
+            navigate('/index/mypage/loginsetting');
+          }
+          return;
+        }
+
         const JWTres = await api.post('/auth/social/login', {
           provider: 'KAKAO',
           authCode: res.data.access_token,
@@ -59,7 +81,13 @@ export default function KakaoCallback() {
         navigate('/index/auth/signupcomplete');
       } catch (e) {
         console.error('카카오 로그인 실패', e);
-        navigate('/index/auth/login');
+        if (isConnectMode) {
+          alert('실패');
+          localStorage.removeItem('social_connect_mode');
+          navigate('/index/mypage/loginsetting');
+        } else {
+          navigate('/index/auth/login');
+        }
       }
     };
 

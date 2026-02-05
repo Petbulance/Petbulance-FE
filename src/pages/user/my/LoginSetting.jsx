@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import googleIcon from '@/assets/images/logo/googleLogo.svg';
 import kakaoIcon from '@/assets/images/logo/kakaoLogo.svg';
@@ -28,12 +28,47 @@ const SNS_INFO = {
 export default function LoginSetting() {
   const { profile, fetchMyProfile, loading } = useUserStore();
   const [autoLogin, setAutoLogin] = useState(true);
+  const stateRef = useRef(Math.random().toString(36).substring(2));
+  const state = stateRef.current;
+
+  const KAKAO_AUTH_URL =
+    `https://kauth.kakao.com/oauth/authorize` +
+    `?client_id=${import.meta.env.VITE_KAKAO_REST_API_KEY}` +
+    `&redirect_uri=${import.meta.env.VITE_KAKAO_REDIRECT_URI}` +
+    `&response_type=code`;
+
+  const GOOGLE_AUTH_URL =
+    `https://accounts.google.com/o/oauth2/v2/auth` +
+    `?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}` +
+    `&redirect_uri=${import.meta.env.VITE_GOOGLE_REDIRECT_URI}` +
+    `&response_type=code` +
+    `&scope=openid%20email%20profile` +
+    `&access_type=offline` +
+    `&prompt=consent`;
+
+  const NAVER_AUTH_URL =
+    `https://nid.naver.com/oauth2.0/authorize` +
+    `?response_type=code` +
+    `&client_id=${import.meta.env.VITE_NAVER_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(
+      import.meta.env.VITE_NAVER_REDIRECT_URI
+    )}` +
+    `&state=${state}`;
 
   useEffect(() => {
-    if (!profile) {
-      fetchMyProfile();
-    }
-  }, [profile, fetchMyProfile]);
+    fetchMyProfile();
+  }, [fetchMyProfile]);
+
+  useEffect(() => {
+    if (!window.naver) return;
+    window.naverLogin = new window.naver.LoginWithNaverId({
+      clientId: import.meta.env.VITE_NAVER_CLIENT_ID,
+      callbackUrl: import.meta.env.VITE_NAVER_REDIRECT_URI,
+      isPopup: false,
+      state,
+    });
+    window.naverLogin.init();
+  }, []);
 
   if (!profile) {
     return <Spinner fullScreen message="로그인 정보를 불러오는 중이에요" />;
@@ -56,6 +91,29 @@ export default function LoginSetting() {
   const connectableAccounts = snsAccounts.filter(
     (a) => a.provider !== currentProvider
   );
+
+  const handleConnect = (provider) => {
+    const upper = provider.toUpperCase();
+    localStorage.setItem('social_connect_mode', upper);
+
+    switch (upper) {
+      case 'KAKAO':
+        window.location.href = KAKAO_AUTH_URL;
+        return;
+      case 'GOOGLE':
+        window.location.href = GOOGLE_AUTH_URL;
+        return;
+      case 'NAVER':
+        if (window.naverLogin) {
+          window.naverLogin.authorize();
+        } else {
+          window.location.href = NAVER_AUTH_URL;
+        }
+        return;
+      default:
+        localStorage.removeItem('social_connect_mode');
+    }
+  };
 
   return (
     <div className="h-full bg-white px-[24px]">
@@ -138,7 +196,12 @@ export default function LoginSetting() {
               )}
             </div>
 
-            <button className="rounded-md border px-3 py-1 text-[15px] text-gray-700">
+            <button
+              className="rounded-md border px-3 py-1 text-[15px] text-gray-700"
+              onClick={() => {
+                if (!account.connected) handleConnect(account.provider);
+              }}
+            >
               {account.connected ? '연결해제' : '연결'}
             </button>
           </div>

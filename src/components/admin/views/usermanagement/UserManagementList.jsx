@@ -12,6 +12,21 @@ const deriveUserStatus = ({ communityBan, reviewBan }) => {
   if (communityBan) return '커뮤정지';
   return '정상';
 };
+const formatDateTime = (dateString) => {
+  if (!dateString) return '-';
+
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) return '-';
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mi = String(date.getMinutes()).padStart(2, '0');
+
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+};
 
 /* =====================
    가입경로 변환
@@ -90,7 +105,9 @@ export default function UserManagementList({
 
                     <td className="px-6 py-4">{signUpPath}</td>
 
-                    <td className="px-6 py-4">{user.createdAt || '-'}</td>
+                    <td className="px-6 py-4">
+                      {formatDateTime(user.createdAt) || '-'}
+                    </td>
 
                     <td className="px-6 py-4">
                       <StatusBadge status={status} />

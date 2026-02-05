@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
@@ -13,6 +13,7 @@ export default function ProfileEdit() {
   const navigate = useNavigate();
 
   const { profile } = useUserStore();
+  const fileInputRef = useRef(null);
 
   /* =====================
      방어 처리
@@ -30,6 +31,7 @@ export default function ProfileEdit() {
   const [profileImage, setProfileImage] = useState(
     profile.profileImageUrl ?? null
   );
+  const [imageUploading, setImageUploading] = useState(false);
 
   /* =====================
      유효성 검사
@@ -66,6 +68,125 @@ export default function ProfileEdit() {
     }
   };
 
+  /* =====================
+     프로필 이미지 업로드
+  ===================== */
+  const handlePickImage = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/heic',
+      'image/gif',
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      alert('지원하지 않는 이미지 형식입니다.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('이미지 크기는 10MB 이하로 업로드 해주세요.');
+      return;
+    }
+
+    setImageUploading(true);
+    try {
+      console.log('file', {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      });
+      console.log('업로드 이미지 정보', {
+        fileName: file.name,
+        type: file.type,
+      });
+      // 1) presign 요청 (단일 파일)
+      const presignRes = await api.patch('/users/profile', {
+        filename: file.name,
+        contentType: file.type,
+      });
+      console.log(
+        'patch /users/profile',
+        {
+          status: presignRes.status,
+          data: presignRes.data,
+        },
+        '/users/profile'
+      );
+      const uploaded = presignRes.data?.data;
+
+      if (!uploaded?.preSignedUrl || !uploaded?.imageUrl) {
+        throw new Error('Presigned URL 또는 imageUrl을 받아오지 못했습니다.');
+      }
+      console.log('받아온 이미지 정보', uploaded);
+      // 2) S3에 업로드
+      const putRes = await fetch(uploaded.preSignedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+      if (!putRes.ok) {
+        throw new Error(
+          `S3 업로드 실패 (status ${putRes.status} ${putRes.statusText})`
+        );
+      }
+      console.log('fetch put ', putRes);
+      // 3) 업로드 성공 검증/확정
+      console.log("'/users/profile/success로 전달", {
+        saveId: uploaded.saveId,
+        filename: uploaded.filename || file.name,
+      });
+      const confirmRes = await api.post('/users/profile/success', {
+        saveId: uploaded.saveId,
+        filename: uploaded.filename || file.name,
+      });
+      console.log(
+        'confirm response',
+        {
+          status: confirmRes.status,
+          data: confirmRes.data,
+        },
+        '/users/profile/confirm',
+        {}
+      );
+
+      // 성공 시 UI 반영 (confirm 응답 우선 사용)
+      const confirmedImageUrl =
+        confirmRes.data?.data?.imageUrl || uploaded.imageUrl;
+      if (confirmedImageUrl) setProfileImage(confirmedImageUrl);
+      useUserStore.setState((state) => ({
+        profile: {
+          ...state.profile,
+          profileImageUrl: confirmedImageUrl ?? state.profile.profileImageUrl,
+        },
+      }));
+      alert('프로필 이미지가 변경되었습니다.');
+    } catch (err) {
+      console.error('프로필 이미지 업로드 실패', {
+        message: err?.message,
+        status: err?.response?.status,
+        data: err?.response?.data,
+        stack: err?.stack,
+      });
+      if (err?.response?.status === 405) {
+        alert(
+          '이미지 업로드 API가 허용되지 않습니다(405). 서버 설정을 확인해주세요.'
+        );
+      } else {
+        alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
   return (
     <div className="flex h-full flex-col bg-white px-4 py-4">
       {/* ================= 프로필 이미지 ================= */}
@@ -80,13 +201,22 @@ export default function ProfileEdit() {
           <button
             type="button"
             className="absolute right-0 bottom-0 rounded-full border-[0.8px] border-[var(--border-secondary,#757575)] bg-[#EEEEEE] p-1"
-            onClick={() => {
-              console.log('이미지 변경 (추후 연결)');
-            }}
+            onClick={handlePickImage}
+            disabled={imageUploading}
           >
             <img src={cameraIcon} alt="카메라" />
           </button>
         </div>
+        {imageUploading && (
+          <p className="mt-2 text-sm text-gray-500">이미지 업로드 중...</p>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
       </div>
 
       {/* ================= 닉네임 ================= */}

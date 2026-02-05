@@ -8,7 +8,6 @@ export default function MypageLayout({
   children,
   onSubmit,
 }) {
-  console.log(left);
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
       {/* Header */}

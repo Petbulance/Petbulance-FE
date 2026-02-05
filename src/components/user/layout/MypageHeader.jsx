@@ -14,11 +14,9 @@ export default function MypageHeader({ title, onSubmit }) {
   const isWrite = location.pathname.includes('/write');
   const isDetail = location.pathname.includes('/detail');
   const isModify = location.pathname.includes('/modify');
-  console.log('heda c', currentInquiry);
   /** 관리자 답변 존재 여부 */
   const hasAnswer = currentInquiry?.status === 'ANSWER_COMPLETED';
 
-  console.log('cu', hasAnswer);
   /** 버튼 노출 조건 */
   const showActionButton = (isWrite || isDetail || isModify) && !hasAnswer;
 
@@ -49,7 +47,6 @@ export default function MypageHeader({ title, onSubmit }) {
 
     // 🔁 상세 페이지 → 수정 페이지 이동
     if (isDetail && currentInquiry) {
-      console.log('1', currentInquiry);
       navigate(
         `/index/mypage/support/myinquiry/modify/${currentInquiry.qnaId}`,
         {

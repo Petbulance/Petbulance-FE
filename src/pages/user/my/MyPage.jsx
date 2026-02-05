@@ -13,8 +13,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import notificationIcon from '@/assets/images/icons/NotificationIcon.svg';
-import Spinner from '@/components/commons/Spinner.jsx';
 import LoginRequiredModal from '@/components/commons/layout/LoginRequiredModal.jsx';
+import Spinner from '@/components/commons/Spinner.jsx';
 import ProfileSection from '@/components/user/my/ProfileSection.jsx';
 import useUserStore from '@/stores/useUserStore.js';
 
@@ -85,7 +85,6 @@ export default function MyPage() {
         <Group title="사용자 설정">
           <Item
             label="알림 설정"
-            textClassName="text-red-500"
             iconNode={
               <img src={notificationIcon} className="h-5 w-5" alt="알림 설정" />
             }
@@ -95,7 +94,6 @@ export default function MyPage() {
           <Item
             Icon={Login}
             label="로그인 계정 관리"
-            textClassName="text-red-500"
             onClick={() => requireLogin('/index/mypage/loginsetting')}
           />
 
@@ -103,7 +101,10 @@ export default function MyPage() {
             Icon={Security}
             label="권한"
             textClassName="text-red-500"
-            onClick={() => requireLogin('/index/mypage/authorization')}
+            onClick={
+              () => alert('API 개발 중')
+              // requireLogin('/index/mypage/authorization')
+            }
           />
         </Group>
 
