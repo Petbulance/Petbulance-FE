@@ -107,14 +107,10 @@ export default function ProfileEdit() {
         fileName: file.name,
         type: file.type,
       });
-      // 1) presign 요청
+      // 1) presign 요청 (단일 파일)
       const presignRes = await api.patch('/users/profile', {
-        files: [
-          {
-            filename: file.name,
-            contentType: file.type,
-          },
-        ],
+        filename: file.name,
+        contentType: file.type,
       });
       console.log(
         'patch /users/profile',
@@ -126,8 +122,8 @@ export default function ProfileEdit() {
       );
       const uploaded = presignRes.data?.data;
 
-      if (!uploaded?.preSignedUrl || !uploaded?.saveId) {
-        throw new Error('Presigned URL을 받아오지 못했습니다.');
+      if (!uploaded?.preSignedUrl || !uploaded?.imageUrl) {
+        throw new Error('Presigned URL 또는 imageUrl을 받아오지 못했습니다.');
       }
       console.log('받아온 이미지 정보', uploaded);
       // 2) S3에 업로드
