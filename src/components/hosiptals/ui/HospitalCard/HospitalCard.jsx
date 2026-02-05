@@ -6,7 +6,11 @@ export function HospitalCard({
   name,
   status,
   time,
-  distance,
+  lat,
+  lng,
+  userLat,
+  userLng,
+  // distance,
   phoneNumber,
   rating,
   reviews,
@@ -20,7 +24,11 @@ export function HospitalCard({
         name={name}
         openNow={status}
         time={time}
-        distanceMeter={distance}
+        lat={lat}
+        lng={lng}
+        userLat={userLat}
+        userLng={userLng}
+        // distanceMeter={distance}
         phone={phoneNumber}
         overallRating={rating}
         reviewCount={reviews}

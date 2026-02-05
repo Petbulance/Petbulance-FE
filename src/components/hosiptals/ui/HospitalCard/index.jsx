@@ -2,7 +2,12 @@ import { useNavigate } from 'react-router-dom';
 
 import { HospitalCard } from './HospitalCard';
 
-export function HospitalInfoSlide({ hospitals, selectedHospital }) {
+export function HospitalInfoSlide({
+  hospitals,
+  selectedHospital,
+  userLat,
+  userLng,
+}) {
   const navigate = useNavigate();
 
   const displayList = selectedHospital ? [selectedHospital] : hospitals;
@@ -21,7 +26,11 @@ export function HospitalInfoSlide({ hospitals, selectedHospital }) {
               name={card.name}
               status={card.isOpenNow}
               time={card.openHours}
-              distance={card.distanceMeters}
+              lat={card.lat}
+              lng={card.lng}
+              userLat={userLat}
+              userLng={userLng}
+              // distance={card.distanceMeters}
               phoneNumber={card.phone}
               rating={card.rating}
               reviews={card.reviewCount}

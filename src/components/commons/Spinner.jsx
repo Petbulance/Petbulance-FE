@@ -4,9 +4,7 @@ export default function Spinner({ fullScreen = false, message }) {
   return (
     <div
       className={`${
-        fullScreen
-          ? 'fixed inset-0 z-50 bg-white/70'
-          : 'w-full py-10'
+        fullScreen ? 'fixed inset-0 z-50 bg-white/70' : 'w-full py-10'
       } flex items-center justify-center`}
     >
       <div className="flex flex-col items-center gap-3">

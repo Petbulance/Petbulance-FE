@@ -43,3 +43,14 @@ export const getFilteredReceipts = async (params = {}) => {
     throw error;
   }
 };
+
+export const fetchReceiptDetail = async (reviewId) => {
+  try {
+    const response = await api.get(`/receipts/detail/${reviewId}`);
+
+    return response.data.data;
+  } catch (error) {
+    console.error(`영수증 상세 조회 실패 (ID: ${reviewId}):`, error);
+    throw error;
+  }
+};

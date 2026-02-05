@@ -8,9 +8,18 @@ import { useState } from 'react';
 const POPUP_STEPS = ['confirm', 'scan', 'success', 'form1', 'form2', 'form3'];
 
 export default function HosptialsReviews() {
+  const [searchKeyword, setSearchKeyword] = useState('');
+
   const [activeSheet, setActiveSheet] = useState(false);
   const [params] = useSearchParams();
   const step = params.get('step');
+
+  const reviewContext = {
+    activeSheet,
+    setActiveSheet,
+    searchKeyword,
+    setSearchKeyword,
+  };
 
   const isPopupStep = step && POPUP_STEPS.includes(step);
 
@@ -19,10 +28,10 @@ export default function HosptialsReviews() {
   return (
     <LayoutShell banner={<ServiceBanner />}>
       {hideLayout ? (
-        <Outlet context={[activeSheet, setActiveSheet]} />
+        <Outlet context={reviewContext} />
       ) : (
-        <HospitalReviewLayout>
-          <Outlet context={[activeSheet, setActiveSheet]} />
+        <HospitalReviewLayout onSearch={setSearchKeyword}>
+          <Outlet context={reviewContext} />
         </HospitalReviewLayout>
       )}
     </LayoutShell>

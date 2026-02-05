@@ -2,8 +2,10 @@ import { useRef } from 'react';
 
 import camera_icon from '@/assets/images/icons/camera_icon.svg';
 import { WriteReviewHeader } from '@/components/reviews/layout/WriteReviewHeader';
-
 import { NextBtn } from './ReviewForm_1';
+import delete_icon from '@/assets/images/icons/circle_x.svg';
+import add_icon from '@/assets/images/icons/add_icon.svg';
+import { ProgressBar } from '@/components/reviews/ui/ProgressBar';
 
 export default function ReviewForm_3({ data, setData, onNext }) {
   const fileInputRef = useRef(null);
@@ -13,6 +15,10 @@ export default function ReviewForm_3({ data, setData, onNext }) {
   };
 
   const handleImageUpload = () => {
+    if ((data.images?.length || 0) >= 10) {
+      alert('사진은 최대 10장까지 첨부할 수 있어요.');
+      return;
+    }
     fileInputRef.current?.click();
   };
 
@@ -35,35 +41,80 @@ export default function ReviewForm_3({ data, setData, onNext }) {
     e.target.value = '';
   };
 
+  const handleRemoveImage = (indexToRemove) => {
+    setData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, index) => index !== indexToRemove),
+    }));
+  };
+
   const isComplete = data.content.trim().length > 0;
+  const hasImages = (data.images?.length || 0) > 0;
 
   return (
     <div className="h-dvh">
       <WriteReviewHeader label="후기 작성" />
 
-      <div className="flex h-full flex-col overflow-y-auto bg-white px-6 pt-10">
-        <div className="mb-10">
-          <button
-            type="button"
-            onClick={handleImageUpload}
-            className="flex h-[124px] w-[124px] flex-col items-center justify-center rounded-[12px] border-[1.72px] border-[#EEEEEE] bg-white text-[#9E9E9E]"
-          >
-            <img src={camera_icon} alt="camera" />
-            <span className="text-[20.67px] font-medium">
-              <span>{data.images?.length || 0}</span>/10
-            </span>
-          </button>
+      <div className="flex h-full flex-col overflow-y-auto bg-white px-6 pt-10 pb-6">
+        <ProgressBar currentStep={3} />
 
-          {/* hidden file input */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFileChange}
-          />
+        {/* === 이미지 영역 === */}
+        <div className="mb-10 flex w-full flex-wrap gap-4">
+          {!hasImages && (
+            <button
+              type="button"
+              onClick={handleImageUpload}
+              className="flex h-[96px] w-[96px] flex-col items-center justify-center rounded-[12px] border-[1.72px] border-[#EEEEEE] bg-white text-[#9E9E9E]"
+            >
+              <img src={camera_icon} alt="camera" />
+              <span className="text-[20.67px] font-medium">0/10</span>
+            </button>
+          )}
+
+          {hasImages && (
+            <>
+              {data.images.map((file, index) => (
+                <div
+                  key={`${file.name}-${index}`}
+                  className="relative h-[96px] w-[96px]"
+                >
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`preview-${index}`}
+                    className="h-full w-full rounded-[12px] object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute top-[-2.33px] right-[-1.67px] flex h-6 w-6 items-center justify-center rounded-full bg-[#1E1E1E] shadow-md transition-colors hover:bg-black"
+                  >
+                    <img src={delete_icon} alt="delete" />
+                  </button>
+                </div>
+              ))}
+
+              {data.images.length < 10 && (
+                <button
+                  type="button"
+                  onClick={handleImageUpload}
+                  className="flex h-[96px] w-[96px] items-center justify-center rounded-[12px] border-[1.72px] border-[#EEEEEE] bg-white transition-colors hover:bg-gray-50"
+                >
+                  <img src={add_icon} alt="add" />
+                </button>
+              )}
+            </>
+          )}
         </div>
+
+        {/* hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleFileChange}
+        />
 
         <div className="flex flex-col">
           <label className="mb-1 text-[19px] font-medium text-[#424242]">
@@ -71,13 +122,13 @@ export default function ReviewForm_3({ data, setData, onNext }) {
           </label>
           <textarea
             className="h-[256px] w-full resize-none rounded-[6px] border border-[#EEEEEE] px-4 py-3 text-[18px] placeholder:text-[#BDBDBD] focus:outline-none"
-            placeholder="반려동물 자랑글 혹은 케어 방법 질문 등을 작성해보세요."
+            placeholder="생생한 진료/치료 후기를 공유해주세요."
             value={data.content}
             onChange={handleContentChange}
           />
         </div>
 
-        <div className="absolute right-6 bottom-0 left-6">
+        <div className="mt-auto pt-6">
           <NextBtn
             label="후기 등록하기"
             onClick={onNext}

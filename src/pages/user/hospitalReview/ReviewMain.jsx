@@ -1,25 +1,21 @@
 import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import { getFilteredReceipts } from '@/apis/reviews/receipts';
 import { HospitalFilterModalContainer } from '@/components/hosiptals/ui/FilterPopup';
-import ReviewSortModal from '@/components/hosiptals/ui/HospitalDetail/review/ReviewSortModal';
 import { ReviewAnimalFilterSheet } from '@/components/reviews/ui/ReviewAnimalFilterSheet';
 import { ReviewContent } from '@/components/reviews/ui/ReviewContent';
 import { ReviewFilterBar } from '@/components/reviews/ui/ReviewFilterBar';
 import { ReviewRegionFilterSheet } from '@/components/reviews/ui/ReviewRegionFilterSheet';
 import { WriteBtn } from '@/components/reviews/ui/WriteBtn';
-import { useOutletContext } from 'react-router-dom';
 
 export function ReviewMain() {
-  const [activeSheet, setActiveSheet] = useOutletContext();
+  const { activeSheet, setActiveSheet } = useOutletContext();
 
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState('createdAt');
-  const [isPhotoOnly, setIsPhotoOnly] = useState(false);
-
+  // 1. 필터 초기 상태 (animal은 배열)
   const [filters, setFilters] = useState({
     city: '',
     region: '',
@@ -44,17 +40,14 @@ export function ReviewMain() {
     });
   };
 
-  const handleApplyFilter = (newFilters) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...newFilters,
-      cursorId: 0,
-    }));
+  const handleApplyFilter = (newData) => {
+    setFilters((prev) => ({ ...prev, ...newData, cursorId: 0 }));
     closeSheet();
   };
 
+  // 상태 변경 감지 및 API 호출
   useEffect(() => {
-    console.log('필터', filters.city, filters.region, filters.animal);
+    console.log('✅ [API 호출] 현재 적용된 필터:', filters);
 
     const fetchReviews = async () => {
       setIsLoading(true);
@@ -85,15 +78,6 @@ export function ReviewMain() {
             onToggleFilter={handleToggleFilter}
           />
 
-          {/* <ReviewSortModal
-      open={isSortOpen}
-      onClose={() => setIsSortOpen(false)}
-      selectedSort={selectedSort}
-      onSelect={(value) => {
-        setSelectedSort(value);
-      }}
-    /> */}
-
           <ReviewContent data={reviews} />
 
           <div className="pointer-events-none sticky bottom-4 flex justify-end px-4">
@@ -118,7 +102,9 @@ export function ReviewMain() {
               <ReviewAnimalFilterSheet
                 filterState={filters}
                 setFilterState={setFilters}
-                onApply={(tags) => handleApplyFilter({ animalType: tags })}
+                onApply={(animalArray) =>
+                  handleApplyFilter({ animal: animalArray })
+                }
               />
             )}
           </HospitalFilterModalContainer>

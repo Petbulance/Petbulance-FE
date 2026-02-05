@@ -1,23 +1,16 @@
 import api from '../api';
 
-export const fetchHospitalsByLocation = async (
-  lat,
-  lng,
-  bounds = [],
-  filterState
-) => {
+export const fetchHospitalsByLocation = async (bounds = [], filterState) => {
   try {
     const { city, region, animal, sort, isOpen } = filterState || {};
 
-    console.log('api 병원 조회:', animal, lat, lng, bounds);
+    console.log('api 병원 조회:', animal, bounds);
 
     const combinedRegion =
       city && city !== '전체' ? `${city}시${region || ''}` : '';
 
     const response = await api.get('/hospitals', {
       params: {
-        lat: lat,
-        lng: lng,
         bounds: Array.isArray(bounds) ? bounds.join(',') : bounds,
         region: combinedRegion,
         animal:

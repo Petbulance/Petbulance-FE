@@ -1,109 +1,92 @@
 import down_arrow from '@/assets/images/icons/down_arrow2.svg';
+import empty_star_icon from '@/assets/images/icons/star_gray_40.svg';
+import fill_star_icon from '@/assets/images/icons/star_yellow_40.svg';
 import { WriteReviewHeader } from '@/components/reviews/layout/WriteReviewHeader';
 
 import { NextBtn } from './ReviewForm_1';
+import { ProgressBar } from '@/components/reviews/ui/ProgressBar';
 
 export default function ReviewForm_2({ data, setData, onNext }) {
-  const inputFields = [
+  const categories = [
     {
-      id: 'animalDetail',
-      label: '세부 동물명',
-      placeholder: '예: 골든햄스터, 코뉴어, 코리도라스',
-      value: data.animalDetail,
+      id: 'expertise',
+      label: '전문성',
+      desc: '증상과 치료에 대해 자세히 설명했나요?',
     },
     {
-      id: 'treatment1',
-      label: '진료명',
-      placeholder: '예: 골절, 발톱정리, 종양수술',
-      value: data.treatments[0] || '',
+      id: 'kindness',
+      label: '친절도',
+      desc: '접수/수납 과정에서 충분한 안내를 받았나요?',
     },
     {
-      id: 'treatment2',
-      label: '진료명',
-      placeholder: '예: 골절, 발톱정리, 종양수술',
-      value: data.treatments[1] || '',
+      id: 'facility',
+      label: '시설/환경',
+      desc: '진료실과 병원 시설이 위생적이었나요?',
     },
   ];
 
-  const animalOptions = [
-    { value: 'dog', label: '강아지' },
-    { value: 'cat', label: '고양이' },
-    { value: 'etc', label: '특수동물' },
-  ];
-
-  // 입력값 변경 핸들러
-  const handleChange = (field, value) => {
-    setData((prev) => ({ ...prev, [field]: value }));
+  const handleRating = (cat, val) => {
+    setData((prev) => ({
+      ...prev,
+      ratings: { ...prev.ratings, [cat]: val },
+    }));
   };
 
-  // 필수 입력값 확인
-  const isComplete =
-    data.animalType && data.animalDetail && data.treatments?.length > 0;
+  const isComplete = Object.values(data.ratings).every((v) => v > 0);
 
   return (
     <div className="h-dvh">
       <WriteReviewHeader label="후기 작성" />
 
       <div className="flex h-full flex-col overflow-y-auto bg-white px-6 pt-[39px]">
-        <div className="space-y-10">
-          <div>
-            <label className="mb-2 block text-[19px] font-medium text-[#424242]">
-              동물종
-            </label>
-            <div className="relative w-[280px]">
-              <select
-                className={`w-full appearance-none rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-2 text-[20px] focus:outline-none ${data.animalType ? 'text-[#424242]' : 'text-[#BCBCBC]'}`}
-                onChange={(e) => handleChange('animalType', e.target.value)}
-              >
-                <option value="" disabled>
-                  동물종을 선택해주세요
-                </option>
-                {animalOptions.map((option) => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                    className="text-[#424242]"
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+        <ProgressBar currentStep={2} />
 
-              <div className="pointer-events-none absolute top-[10px] right-4 flex items-center">
-                <img src={down_arrow} alt="drop_down" />
+        {/* 별점 섹션 */}
+        <div className="mt-15 text-center">
+          <h3 className="mb-15 text-left text-[23px] font-semibold text-[#424242]">
+            솔직한 후기를 남겨주세요
+          </h3>
+          {categories.map((cat) => (
+            <div key={cat.id} className="mb-15">
+              <span className="text-[23px] font-semibold text-[#424242]">
+                {cat.label}
+              </span>
+              <p className="my-3 text-[20px] font-medium text-[#9E9E9E]">
+                {cat.desc}
+              </p>
+              <div className="flex justify-center">
+                {[1, 2, 3, 4, 5].map((num) => {
+                  const isSelected = num <= data.ratings[cat.id];
+
+                  return (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => handleRating(cat.id, num)}
+                      className="p-1 transition-transform active:scale-90"
+                    >
+                      <img
+                        src={isSelected ? fill_star_icon : empty_star_icon}
+                        alt={`${num}점`}
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          </div>
-
-          {inputFields.map((field, index) => (
-            <InputField
-              key={`${field.id}-${index}`}
-              label={field.label}
-              placeholder={field.placeholder}
-              value={field.value}
-              onChange={(val) => {
-                if (field.id.startsWith('treatment')) {
-                  const newTreatments = [...(data.treatments || [])];
-                  const tIndex = field.id === 'treatment1' ? 0 : 1;
-                  newTreatments[tIndex] = val;
-                  handleChange('treatments', newTreatments);
-                } else {
-                  handleChange(field.id, val);
-                }
-              }}
-            />
           ))}
+          <div className="h-[170px] w-max" />
         </div>
-        <div className="absolute right-6 bottom-0 left-6">
-          <NextBtn label="다음" onClick={onNext} isComplete={isComplete} />
-        </div>
+      </div>
+      <div className="absolute right-6 bottom-0 left-6">
+        <NextBtn label="다음" onClick={onNext} isComplete={isComplete} />
       </div>
     </div>
   );
 }
 
 export const InputField = ({ label, value, onChange, placeholder }) => (
-  <div className="mb-10">
+  <div>
     <label className="mb-2 block text-[19px] font-medium text-[#424242]">
       {label}
     </label>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react'; // useMemo 추가
 import { useLocation, useParams } from 'react-router-dom';
 
 import { registerRecentViewedHospital } from '@/apis/hospitals/searchHistory';
@@ -10,12 +10,35 @@ import Star from '@/assets/images/icons/Star.svg';
 
 import { CategoryButton } from './CategoryButton';
 
+// 거리 계산 유틸리티 함수
+function getDistanceFromLatLonInKm(lat1, lng1, lat2, lng2) {
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+  }
+
+  const R = 6371;
+  const dLat = deg2rad(lat2 - lat1);
+  const dLng = deg2rad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c;
+  return d;
+}
+
 export function HosipitalDetail({
   image,
   name,
   openNow,
   time,
-  distanceMeter,
+  lat,
+  lng,
+  userLat,
+  userLng,
   phone,
   overallRating,
   reviewCount,
@@ -30,6 +53,19 @@ export function HosipitalDetail({
   const hasMore = acceptedAnimals?.length > MAX_SHOW;
   const visibleAnimals = acceptedAnimals?.slice(0, MAX_SHOW);
 
+  const distance = useMemo(() => {
+    if (!lat || !lng || !userLat || !userLng) return null;
+
+    const dist = getDistanceFromLatLonInKm(
+      Number(userLat),
+      Number(userLng),
+      Number(lat),
+      Number(lng)
+    );
+
+    return dist.toFixed(1);
+  }, [lat, lng, userLat, userLng]);
+
   useEffect(() => {
     const recordHistory = async () => {
       if (!id) return;
@@ -43,10 +79,6 @@ export function HosipitalDetail({
 
     recordHistory();
   }, [id]);
-
-  const formattedDistance = distanceMeter
-    ? (distanceMeter / 1000).toFixed(1)
-    : '0.0';
 
   const formattedRating = overallRating
     ? Number(overallRating).toFixed(1)
@@ -74,10 +106,11 @@ export function HosipitalDetail({
             {openNow ? '진료 중' : '진료 마감'}
           </span>
           <img src={DotIcon} alt="dot_icon" />
-          {/* TODO: 영업 종료 시간 표시 로직 필요 */}
           <span className="text-[#424242]">{time}에 영업 종료</span>
           <img src={DotIcon} alt="dot_icon" />
-          <span className="text-[#9E9E9E]">{formattedDistance}km</span>
+          <span className="text-[#9E9E9E]">
+            {distance ? `${distance}km` : '- km'}
+          </span>
         </div>
 
         <div className="flex items-center gap-1 font-[#067DFD] text-[15px] font-semibold text-[#067DFD]">
@@ -94,19 +127,17 @@ export function HosipitalDetail({
         </div>
 
         {isHospitalIndexPage ? (
-          //병원 상세 페이지 병원 카드
           <div className="mt-1.5 flex w-[308px] flex-wrap items-center gap-1">
             {acceptedAnimals.map((kind, idx) => (
               <CategoryButton key={`${kind}-${idx}`} kind={kind} />
             ))}
           </div>
         ) : (
-          //지도 & 병원 목록 병원 카드
           <div className="mt-1.5 flex w-[308px] items-center gap-1 overflow-hidden">
             {visibleAnimals?.map((kind, idx) => (
               <CategoryButton key={`${kind}-${idx}`} kind={kind} />
             ))}
-            {hasMore && <img src={hide_icon} />}
+            {hasMore && <img src={hide_icon} alt="more" />}
           </div>
         )}
       </div>

@@ -20,7 +20,10 @@ export function ReviewRegionFilterSheet({ onApply, filterState }) {
   };
 
   const handleRegionClick = (regionValue) => {
-    setTemp((prev) => ({ ...prev, region: regionValue }));
+    setTemp((prev) => ({
+      ...prev,
+      region: regionValue === '전체' ? '' : regionValue,
+    }));
   };
 
   return (
@@ -67,6 +70,7 @@ export function ReviewRegionFilterSheet({ onApply, filterState }) {
           )}
         </div>
       </div>
+
       <GreenBtn
         name="후기 보기"
         onClick={() => onApply(temp.city, temp.region)}

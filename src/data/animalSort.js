@@ -59,3 +59,45 @@ export const ANIMAL_CATEGORY_KO = {
   AMPHIBIAN: '양서류',
   FISH: '어류',
 };
+
+export const ANIMAL_CATEGORY_VALUE = [
+  { value: 'SMALLMAMMALS', label: '소형포유류' },
+  { value: 'AVIAN', label: '조류' },
+  { value: 'REPTILE', label: '파충류' },
+  { value: 'AMPHIBIAN', label: '양서류' },
+  { value: 'FISH', label: '어류' },
+];
+
+export const ANIMAL_GROUPS_VALUE = {
+  SMALLMAMMALS: [
+    { value: 'HAMSTER', label: '햄스터' },
+    { value: 'RABBIT', label: '토끼' },
+    { value: 'GUINEAPIG', label: '기니피그' },
+    { value: 'SUGAR_GLIDER', label: '슈가글라이더' },
+    { value: 'CHINCHILLA', label: '친칠라' },
+    { value: 'FERRET', label: '페럿' },
+    { value: 'PRAIRIE_DOG', label: '프레리도그' },
+    // { value: 'HEDGEHOG', label: '고슴도치' },
+    { value: 'FLYING_SQUIRREL', label: '하늘다람쥐' },
+    { value: 'OTHER_SMALL_MAMMALS', label: '기타' },
+  ],
+  AVIAN: [
+    { value: 'PARROT', label: '앵무새' },
+    { value: 'FINCH_TYPES', label: '핀치류' },
+    { value: 'OTHER_BIRDS', label: '기타' },
+  ],
+  REPTILE: [
+    { value: 'GECKO', label: '게코' },
+    { value: 'OTHER_LIZARDS', label: '기타 도마뱀' },
+    // { value: 'SNAKE', label: '뱀' },
+    { value: 'TURTLE', label: '거북이' },
+    { value: 'OTHER_REPTILES', label: '기타' },
+  ],
+  AMPHIBIAN: [
+    { value: 'FROG', label: '개구리' },
+    { value: 'AXOLOTL', label: '우파루파' },
+    { value: 'SALAMANDER', label: '도롱뇽' },
+    { value: 'OTHER_AMPHIBIANS', label: '기타' },
+  ],
+  FISH: [{ value: 'ORNAMENTAL_FISH', label: '관상어' }],
+};

@@ -83,11 +83,8 @@ export default function TermsBottomSheet({ open, onClose, onConsented }) {
         }
       );
 
-      const {
-        accessToken,
-        finalAccessToken,
-        refreshToken,
-      } = res.data?.data || {};
+      const { accessToken, finalAccessToken, refreshToken } =
+        res.data?.data || {};
       const tokenToStore = finalAccessToken || accessToken;
 
       if (tokenToStore) {

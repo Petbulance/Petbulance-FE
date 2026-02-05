@@ -94,7 +94,5 @@ export default function KakaoCallback() {
     sendCode();
   }, [navigate]);
 
-  return (
-    <Spinner fullScreen message="카카오 로그인 처리 중이에요" />
-  );
+  return <Spinner fullScreen message="카카오 로그인 처리 중이에요" />;
 }

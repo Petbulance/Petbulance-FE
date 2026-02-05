@@ -101,7 +101,5 @@ export default function GoogleCallback() {
     fetchToken();
   }, [navigate]);
 
-  return (
-    <Spinner fullScreen message="구글 로그인 처리 중이에요" />
-  );
+  return <Spinner fullScreen message="구글 로그인 처리 중이에요" />;
 }
