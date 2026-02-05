@@ -14,25 +14,41 @@ export function HospitalDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('detail');
 
+  const [userLocation, setUserLocation] = useState({
+    lat: null,
+    lng: null,
+  });
+
   useEffect(() => {
     const getDetail = async () => {
       setIsLoading(true);
 
-      //사용자의 현위치 조회
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
+          setUserLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+
           try {
             const data = await fetchHospitalDetail(id);
             setHospital(data);
           } catch (error) {
-            console.error('상세 정보 조회 실패');
+            console.error('상세 정보 조회 실패', error);
           } finally {
             setIsLoading(false);
           }
         },
         async (err) => {
           console.error('위치 정보 차단됨', err);
-          setIsLoading(false);
+          try {
+            const data = await fetchHospitalDetail(id);
+            setHospital(data);
+          } catch (error) {
+            console.error('상세 정보 조회 실패', error);
+          } finally {
+            setIsLoading(false);
+          }
         }
       );
     };
@@ -40,14 +56,17 @@ export function HospitalDetail() {
     if (id) getDetail();
   }, [id]);
 
-  //TODO: 로딩화면 변경
   if (isLoading) return <div>로딩 중...</div>;
   if (!hospital) return <div>정보를 찾을 수 없습니다.</div>;
 
   return (
     <div className="relative flex flex-col bg-[#F5F5F5]">
       <div className="bg-white px-8 py-10">
-        <HosipitalDetail {...hospital} />
+        <HosipitalDetail
+          {...hospital}
+          userLat={userLocation.lat}
+          userLng={userLocation.lng}
+        />
       </div>
       <DetailTabMenu activeTab={activeTab} onChangeTab={setActiveTab} />
       <div className="flex-1">
