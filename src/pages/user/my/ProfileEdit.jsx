@@ -103,6 +103,10 @@ export default function ProfileEdit() {
         type: file.type,
         size: file.size,
       });
+      console.log('업로드 이미지 정보', {
+        fileName: file.name,
+        type: file.type,
+      });
       // 1) presign 요청
       const presignRes = await api.patch('/users/profile', {
         files: [
@@ -112,17 +116,20 @@ export default function ProfileEdit() {
           },
         ],
       });
-      console.log('presign response', {
-        status: presignRes.status,
-        data: presignRes.data,
-      });
+      console.log(
+        'patch /users/profile',
+        {
+          status: presignRes.status,
+          data: presignRes.data,
+        },
+        '/users/profile'
+      );
       const uploaded = presignRes.data?.data;
-      console.log('uploaded', uploaded);
 
       if (!uploaded?.preSignedUrl || !uploaded?.saveId) {
         throw new Error('Presigned URL을 받아오지 못했습니다.');
       }
-      console.log('uploaded', uploaded);
+      console.log('받아온 이미지 정보', uploaded);
       // 2) S3에 업로드
       const putRes = await fetch(uploaded.preSignedUrl, {
         method: 'PUT',
@@ -134,25 +141,34 @@ export default function ProfileEdit() {
           `S3 업로드 실패 (status ${putRes.status} ${putRes.statusText})`
         );
       }
-      console.log('s3 upload ok', putRes.status);
+      console.log('fetch put ', putRes);
       // 3) 업로드 성공 검증/확정
-      console.log('uploaded', uploaded.saveId);
-      console.log('file.name', file.name);
-      const confirmRes = await api.get('/users/profile/success', {
+      console.log("'/users/profile/success로 전달", {
         saveId: uploaded.saveId,
         filename: uploaded.filename || file.name,
       });
-      console.log('confirm response', {
-        status: confirmRes.status,
-        data: confirmRes.data,
+      const confirmRes = await api.post('/users/profile/success', {
+        saveId: uploaded.saveId,
+        filename: uploaded.filename || file.name,
       });
+      console.log(
+        'confirm response',
+        {
+          status: confirmRes.status,
+          data: confirmRes.data,
+        },
+        '/users/profile/confirm',
+        {}
+      );
 
-      // 성공 시 UI 반영
-      if (uploaded.imageUrl) setProfileImage(uploaded.imageUrl);
+      // 성공 시 UI 반영 (confirm 응답 우선 사용)
+      const confirmedImageUrl =
+        confirmRes.data?.data?.imageUrl || uploaded.imageUrl;
+      if (confirmedImageUrl) setProfileImage(confirmedImageUrl);
       useUserStore.setState((state) => ({
         profile: {
           ...state.profile,
-          profileImageUrl: uploaded.imageUrl ?? state.profile.profileImageUrl,
+          profileImageUrl: confirmedImageUrl ?? state.profile.profileImageUrl,
         },
       }));
       alert('프로필 이미지가 변경되었습니다.');
