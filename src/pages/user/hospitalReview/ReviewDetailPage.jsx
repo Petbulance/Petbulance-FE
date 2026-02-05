@@ -14,6 +14,7 @@ import thumbsUp from '@/assets/images/icons/thumsUp.svg';
 
 import { CategoryButton } from '@/components/hosiptals/ui/HospitalCard/CategoryButton';
 import { ANIMAL_CATEGORY_KO, ANIMAL_NAME_KO } from '@/data/animalSort';
+import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 
 export default function ReviewDetailPage() {
   const { reviewId } = useParams();
@@ -23,6 +24,9 @@ export default function ReviewDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+
+  // 모달 상태 관리
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -43,6 +47,19 @@ export default function ReviewDetailPage() {
     };
     loadData();
   }, [reviewId, navigate]);
+
+  // 삭제 확인 처리
+  const handleDeleteConfirm = async () => {
+    try {
+      // 실제 삭제 API 연동 필요 (예: await deleteReviewApi(reviewId))
+      console.log('삭제된 리뷰 ID:', reviewId);
+      alert('리뷰가 삭제되었습니다.');
+      setIsDeleteModalOpen(false);
+      navigate('/index/reviews');
+    } catch (error) {
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
 
   const handleLikeToggle = async (e) => {
     e.stopPropagation();
@@ -67,21 +84,18 @@ export default function ReviewDetailPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <div className="flex h-full items-center justify-center text-gray-500">
         로딩 중...
       </div>
     );
-  }
-
-  if (!review) {
+  if (!review)
     return (
       <div className="p-10 text-center text-gray-500">
         리뷰 정보를 찾을 수 없습니다.
       </div>
     );
-  }
 
   const {
     facilityRating = 0,
@@ -89,13 +103,12 @@ export default function ReviewDetailPage() {
     kindnessRating = 0,
   } = review;
   const averageScore = (facilityRating + expertiseRating + kindnessRating) / 3;
-
   const categoryKo = ANIMAL_CATEGORY_KO[review.animalType] || review.animalType;
   const detailAnimalKo =
     ANIMAL_NAME_KO[review.detailAnimalType] || review.detailAnimalType;
 
   return (
-    <div className="h-full bg-white">
+    <div className="relative h-full bg-white">
       <div className="flex h-fit flex-col border-b border-[#EEEEEE] bg-white px-6 pt-5 pb-5">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-1">
@@ -107,12 +120,16 @@ export default function ReviewDetailPage() {
               <span>{review.createDate?.split('T')[0]}</span>
             </div>
           </div>
-          <button>
+
+          <button
+            className="p-1 active:opacity-50"
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
             <img src={see_more} alt="더보기" />
           </button>
         </div>
 
-        {/* 2. 병원 정보 및 별점 */}
+        {/* 병원 정보 및 별점 */}
         <div className="mb-[26px] flex">
           <div className="flex flex-1 flex-col justify-center">
             <div className="mb-2 text-[20px] font-medium text-[#1E1E1E]">
@@ -146,13 +163,13 @@ export default function ReviewDetailPage() {
           )}
         </div>
 
-        {/* 3. 이미지 리스트 (가로 스크롤) */}
+        {/* 이미지 리스트 */}
         {review.images && review.images.length > 0 && (
-          <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
+          <div className="no-scrollbar mb-4 flex gap-2 overflow-x-auto pb-2">
             {review.images.map((imgUrl, index) => (
               <div
                 key={index}
-                className="h-50 w-50 shrink-0 overflow-hidden rounded-md"
+                className="h-50 w-50 shrink-0 overflow-hidden rounded-md border border-[#F5F5F5]"
               >
                 <img
                   src={imgUrl}
@@ -164,12 +181,10 @@ export default function ReviewDetailPage() {
           </div>
         )}
 
-        {/* 4. 본문 내용 */}
-        <p className="mt-4.5 text-[18px] leading-6 whitespace-pre-wrap text-[#424242]">
+        <p className="mt-4.5 text-[18px] leading-7 whitespace-pre-wrap text-[#424242]">
           {review.reviewContent}
         </p>
 
-        {/* 5. 하단 도움말(좋아요) 버튼 */}
         <div className="mt-[26px] flex justify-end">
           <button
             onClick={handleLikeToggle}
@@ -185,6 +200,16 @@ export default function ReviewDetailPage() {
           </button>
         </div>
       </div>
+
+      <ConfirmSelectModal
+        open={isDeleteModalOpen}
+        title={`후기를 수정하거나 삭제하시겠어요?`}
+        content={''}
+        confirmText="수정하기"
+        cancelText="삭제하기"
+        onConfirm={() => navigate('edit')}
+        onCancel={() => setIsDeleteModalOpen(false)}
+      />
     </div>
   );
 }
