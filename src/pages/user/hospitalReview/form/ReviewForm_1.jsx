@@ -5,7 +5,7 @@ import { ANIMAL_CATEGORY_VALUE, ANIMAL_GROUPS_VALUE } from '@/data/animalSort';
 import down_arrow from '@/assets/images/icons/down_arrow2.svg';
 import { WriteReviewHeader } from '@/components/reviews/layout/WriteReviewHeader';
 import { InputField } from './ReviewForm_2';
-import { GreenBtn } from '@/components/commons/button/greenBtn'; // GreenBtn 경로 확인 필요
+import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { NextBtn } from '@/components/reviews/ui/NextBtn';
 import { SelectField } from '@/components/reviews/ui/SelectField';
 
@@ -14,7 +14,6 @@ export default function ReviewForm_1({ data, setData, onNext }) {
   const [recommendations, setRecommendations] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // 🚩 바텀 시트 상태 관리
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const containerRef = useRef(null);
@@ -37,10 +36,13 @@ export default function ReviewForm_1({ data, setData, onNext }) {
     return () => clearTimeout(timer);
   }, [searchTerm, data.hospitalName]);
 
-  // 입력 핸들러
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
+
+    if (data.hospitalId) {
+      setData((prev) => ({ ...prev, hospitalId: null }));
+    }
 
     if (!value.trim()) {
       setRecommendations([]);
@@ -49,16 +51,19 @@ export default function ReviewForm_1({ data, setData, onNext }) {
     }
   };
 
-  // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
         setShowDropdown(false);
+
+        if (!data.hospitalId) {
+          setSearchTerm('');
+        }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [data.hospitalId]);
 
   const handleSelectHospital = (hospital) => {
     setData((prev) => ({
@@ -71,7 +76,6 @@ export default function ReviewForm_1({ data, setData, onNext }) {
     setShowDropdown(false);
   };
 
-  // 세부 동물 옵션 계산
   const detailOptions = useMemo(() => {
     return data.animalType ? ANIMAL_GROUPS_VALUE[data.animalType] || [] : [];
   }, [data.animalType]);
@@ -80,7 +84,6 @@ export default function ReviewForm_1({ data, setData, onNext }) {
     setData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // 세부 동물명 선택 핸들러 (바텀시트에서 호출)
   const handleDetailSelect = (value) => {
     handleChange('animalDetail', value);
     setIsSheetOpen(false);
@@ -104,34 +107,40 @@ export default function ReviewForm_1({ data, setData, onNext }) {
           <div className="relative">
             <input
               className="w-full rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-[14px] text-[20px] placeholder:text-[#BDBDBD] focus:outline-none"
-              placeholder="병원명을 입력하세요"
+              placeholder="검색하여 선택해주세요."
               value={searchTerm}
               onChange={handleInputChange}
-              onFocus={() =>
-                searchTerm &&
-                recommendations.length > 0 &&
-                setShowDropdown(true)
-              }
+              onFocus={() => {
+                // 검색어가 있을 때만 드롭다운 열기
+                if (searchTerm) setShowDropdown(true);
+              }}
             />
           </div>
-          {showDropdown && recommendations.length > 0 && (
+
+          {showDropdown && searchTerm && (
             <ul className="custom-scrollbar absolute z-50 mt-2 max-h-[220px] w-full overflow-y-auto rounded-[8px] border border-[#EEEEEE] bg-white shadow-lg">
-              {recommendations.map((hospital) => (
-                <li
-                  key={hospital.id}
-                  className="cursor-pointer border-b border-[#F5F5F5] px-4 py-3 transition-colors last:border-none hover:bg-[#F9F9F9]"
-                  onClick={() => handleSelectHospital(hospital)}
-                >
-                  <div className="text-[18px] font-medium text-[#424242]">
-                    {hospital.name}
-                  </div>
-                  {hospital.address && (
-                    <div className="truncate text-[14px] text-[#9E9E9E]">
-                      {hospital.address}
+              {recommendations.length > 0 ? (
+                recommendations.map((hospital) => (
+                  <li
+                    key={hospital.id}
+                    className="cursor-pointer border-b border-[#F5F5F5] px-4 py-3 transition-colors last:border-none hover:bg-[#F9F9F9]"
+                    onClick={() => handleSelectHospital(hospital)}
+                  >
+                    <div className="text-[18px] font-medium text-[#424242]">
+                      {hospital.name}
                     </div>
-                  )}
+                    {hospital.address && (
+                      <div className="truncate text-[14px] text-[#9E9E9E]">
+                        {hospital.address}
+                      </div>
+                    )}
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-3 text-center text-[18px] text-[#BDBDBD]">
+                  검색 결과가 없습니다.
                 </li>
-              ))}
+              )}
             </ul>
           )}
         </div>
@@ -149,7 +158,7 @@ export default function ReviewForm_1({ data, setData, onNext }) {
           />
         </div>
 
-        {/* 3. 동물종 선택 (기존 드롭다운 유지) */}
+        {/* 3. 동물종 선택 */}
         <SelectField
           label="동물종"
           placeholder="동물종을 선택해주세요."
@@ -159,12 +168,12 @@ export default function ReviewForm_1({ data, setData, onNext }) {
             setData((prev) => ({
               ...prev,
               animalType: value,
-              animalDetail: '', // 상위 카테고리 변경 시 상세 초기화
+              animalDetail: '',
             }));
           }}
         />
 
-        {/* 🚩 4. 세부 동물명 선택 (바텀 시트 트리거로 변경) */}
+        {/* 4. 세부 동물명 선택 */}
         <div className="mb-6">
           <label className="mb-2 block text-[19px] font-medium text-[#424242]">
             세부 동물명
@@ -203,7 +212,7 @@ export default function ReviewForm_1({ data, setData, onNext }) {
         </div>
       </div>
 
-      {/* 🚩 바텀 시트 컴포넌트 렌더링 */}
+      {/* 바텀 시트 */}
       {isSheetOpen && (
         <DetailAnimalBottomSheet
           options={detailOptions}
@@ -216,7 +225,7 @@ export default function ReviewForm_1({ data, setData, onNext }) {
   );
 }
 
-// 🚩 세부 동물명 선택용 바텀 시트 컴포넌트 (디자인 시안 반영)
+// 바텀 시트 컴포넌트는 기존 코드 유지
 function DetailAnimalBottomSheet({
   options,
   selectedValue,
@@ -231,23 +240,16 @@ function DetailAnimalBottomSheet({
 
   return (
     <>
-      {/* 배경 오버레이 */}
       <div
         className="absolute inset-0 z-[100] bg-black/50 transition-opacity"
         onClick={onClose}
       />
-
-      {/* 바텀 시트 본체 */}
-      <div className="animate-slideUp right-0 bottom-0 left-0 z-[101] w-full rounded-t-[32px] bg-white pt-4 shadow-2xl">
-        {/* 핸들바 (Drag Handle) */}
+      <div className="animate-slideUp absolute right-0 bottom-0 left-0 z-[101] w-full rounded-t-[32px] bg-white pt-4 shadow-2xl">
         <div className="mx-auto mb-6 h-1 w-[32px] rounded-full bg-black" />
-
         <div className="px-6">
           <div className="mb-6 text-[18px] font-semibold text-[#1E1E1E]">
             세부 동물명
           </div>
-
-          {/* 칩(Chip) 리스트 영역 */}
           <div className="mb-8 flex max-h-[40vh] flex-wrap gap-2.5 overflow-y-auto">
             {options.map((option) => (
               <button
@@ -263,12 +265,10 @@ function DetailAnimalBottomSheet({
               </button>
             ))}
           </div>
-
-          {/* 선택 버튼 */}
           <GreenBtn
             name="선택"
             onClick={handleConfirm}
-            disabled={!tempSelected} // 선택된 값이 없으면 비활성화
+            disabled={!tempSelected}
           />
         </div>
       </div>
