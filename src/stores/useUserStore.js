@@ -36,6 +36,14 @@ const useUserStore = create((set, get) => ({
   },
 
   /* =========================
+     Getter: 닉네임 보내기
+  ========================= */
+  getNickname: () => {
+    const profile = get().profile;
+    return profile ? profile.nickname : null;
+  },
+
+  /* =========================
      로그아웃
   ========================= */
   clearProfile: () => {
