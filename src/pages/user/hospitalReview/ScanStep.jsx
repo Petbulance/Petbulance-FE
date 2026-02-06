@@ -5,7 +5,7 @@ import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 import { ReceiptPreview } from '@/components/reviews/ui/ReceiptPreview';
 import { uploadReceiptScan } from '@/apis/reviews/uploadReceiptScan';
 
-export default function ScanStep() {
+export default function ScanStep({ onScanSuccess }) {
   const fileRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [isFailed, setIsFailed] = useState(false);
@@ -36,14 +36,15 @@ export default function ScanStep() {
     setIsUploading(true);
 
     try {
-      const isSuccess = await uploadReceiptScan(file);
+      const response = await uploadReceiptScan(file);
 
-      if (isSuccess) {
-        setParams({ step: 'form1' });
+      if (response.success) {
+        onScanSuccess(response.data);
       } else {
         setIsFailed(true);
       }
     } catch (error) {
+      console.error(error);
       setIsFailed(true);
     } finally {
       setIsUploading(false);
