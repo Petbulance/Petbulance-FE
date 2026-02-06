@@ -6,14 +6,17 @@ export default function ConfirmSelectModal({
   cancelText = '취소',
   onConfirm,
   onCancel,
+  onClose,
 }) {
   if (!open) return null;
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center">
       {/* dim */}
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-
+      <div
+        className="absolute inset-0 touch-none bg-black/50"
+        onClick={onClose || onCancel}
+      />
       {/* modal */}
       <div className="relative w-[420px] rounded-xl bg-white p-5 text-center whitespace-pre-line">
         {/* 타이틀 */}

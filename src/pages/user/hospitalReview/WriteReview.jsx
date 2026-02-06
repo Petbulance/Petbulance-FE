@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'; // useEffect 추가
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
@@ -12,13 +12,14 @@ import { ReceiptVerifiedModal } from '@/components/commons/layout/ReceiptVerifie
 
 export function WriteReview() {
   const [params, setParams] = useSearchParams();
-  const step = params.get('step') ?? 'confirm';
+  const step = params.get('step') ?? 'form1';
   const navigate = useNavigate();
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
-  const [isScanSuccessOpen, setIsScanSuccessOpen] = useState(false); // ✅ 스캔 성공 모달 상태 추가
+  const [isScanSuccessOpen, setIsScanSuccessOpen] = useState(false);
 
   const [reviewId, setReviewId] = useState(null);
+
   const [receiptChecked, setReceiptChecked] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -63,7 +64,6 @@ export function WriteReview() {
   const handleComplete = async () => {
     try {
       const savedReviewId = await postReview(formData, receiptChecked);
-      console.log(savedReviewId);
       if (savedReviewId) {
         setReviewId(savedReviewId);
         setIsSuccessOpen(true);
@@ -95,7 +95,6 @@ export function WriteReview() {
       case 'form3':
         return <ReviewForm_3 {...commonProps} onNext={handleComplete} />;
       case 'scan':
-        // ✅ 자식에게 성공 핸들러 전달
         return <ScanStep onScanSuccess={handleScanSuccess} />;
       default:
         return null;
@@ -104,39 +103,19 @@ export function WriteReview() {
 
   return (
     <div className="relative h-full w-full overflow-hidden">
-      {/* 진입 시 영수증 인증 확인 모달 */}
-      {step === 'confirm' && (
-        <ConfirmSelectModal
-          open={true}
-          title={`후기를 작성하기 전에\n영수증 인증을 진행하시겠어요?`}
-          content={`카드 및 현금으로 결제한 영수증만\n인증 가능합니다.`}
-          confirmText="사진 첨부"
-          cancelText="인증 없이 작성"
-          onConfirm={() => {
-            setParams({ step: 'scan' });
-          }}
-          onCancel={() => {
-            setReceiptChecked(false);
-            setParams({ step: 'form1' });
-          }}
-        />
-      )}
-
       {renderStep()}
 
-      {isScanSuccessOpen && <ReceiptVerifiedModal open={true} />}
+      <ReceiptVerifiedModal open={isScanSuccessOpen} />
 
-      {isSuccessOpen && (
-        <ConfirmSelectModal
-          open={true}
-          title={`소중한 후기가 등록되었습니다.`}
-          content={''}
-          confirmText="작성한 후기 확인"
-          cancelText="닫기"
-          onConfirm={() => navigate(`/index/reviews/${reviewId}`)}
-          onCancel={() => navigate('/index/reviews')}
-        />
-      )}
+      <ConfirmSelectModal
+        open={isSuccessOpen}
+        title={`소중한 후기가 등록되었습니다.`}
+        content={''}
+        confirmText="작성한 후기 확인"
+        cancelText="닫기"
+        onConfirm={() => navigate(`/index/reviews/${reviewId}`)}
+        onCancel={() => navigate('/index/reviews')}
+      />
     </div>
   );
 }
