@@ -34,12 +34,12 @@ export function HosipitalDetail({
   image,
   name,
   openNow,
-  time,
   lat,
   lng,
   userLat,
   userLng,
   phone,
+  todayCloseTime,
   overallRating,
   reviewCount,
   acceptedAnimals,
@@ -84,6 +84,14 @@ export function HosipitalDetail({
     ? Number(overallRating).toFixed(1)
     : '0.0';
 
+  const formattedCloseTime = useMemo(() => {
+    if (!todayCloseTime) return '';
+    const timeParts = todayCloseTime.split(':');
+    return timeParts.length >= 2
+      ? `${timeParts[0]}:${timeParts[1]}`
+      : todayCloseTime;
+  }, [todayCloseTime]);
+
   return (
     <div className="flex items-center gap-3">
       <img
@@ -106,7 +114,9 @@ export function HosipitalDetail({
             {openNow ? '진료 중' : '진료 마감'}
           </span>
           <img src={DotIcon} alt="dot_icon" />
-          <span className="text-[#424242]">{time}에 영업 종료</span>
+          <span className="text-[#424242]">
+            {formattedCloseTime}에 영업 종료
+          </span>
           <img src={DotIcon} alt="dot_icon" />
           <span className="text-[#9E9E9E]">
             {distance ? `${distance}km` : '- km'}

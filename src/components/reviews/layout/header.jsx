@@ -44,7 +44,7 @@ export function HospitalReviewHeader({ onSearch }) {
   return (
     <header className="sticky top-0 z-50 border-b border-[#E0E0E0] bg-white">
       {!isSearching ? (
-        <HospitalReviewDefaultHeader openSearch={openSearch} />
+        <HospitalReviewDefaultHeader />
       ) : (
         <SearchHeader
           closeSearch={closeSearch}

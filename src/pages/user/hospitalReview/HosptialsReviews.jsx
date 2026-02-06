@@ -8,17 +8,17 @@ import { useState } from 'react';
 const POPUP_STEPS = ['confirm', 'scan', 'success', 'form1', 'form2', 'form3'];
 
 export default function HosptialsReviews() {
-  const [searchKeyword, setSearchKeyword] = useState('');
-
-  const [activeSheet, setActiveSheet] = useState(false);
   const [params] = useSearchParams();
   const step = params.get('step');
+
+  const [activeSheet, setActiveSheet] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const reviewContext = {
     activeSheet,
     setActiveSheet,
-    searchKeyword,
-    setSearchKeyword,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
   };
 
   const isPopupStep = step && POPUP_STEPS.includes(step);
@@ -30,7 +30,7 @@ export default function HosptialsReviews() {
       {hideLayout ? (
         <Outlet context={reviewContext} />
       ) : (
-        <HospitalReviewLayout onSearch={setSearchKeyword}>
+        <HospitalReviewLayout setIsDeleteModalOpen={setIsDeleteModalOpen}>
           <Outlet context={reviewContext} />
         </HospitalReviewLayout>
       )}
