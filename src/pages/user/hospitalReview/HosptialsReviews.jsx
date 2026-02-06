@@ -1,4 +1,9 @@
-import { Outlet, useSearchParams } from 'react-router-dom';
+import {
+  Outlet,
+  useSearchParams,
+  useLocation,
+  matchPath,
+} from 'react-router-dom'; // 1. useLocation, matchPath 추가
 
 import { ServiceBanner } from '@/components/commons/banner';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell';
@@ -9,6 +14,7 @@ const POPUP_STEPS = ['confirm', 'scan', 'success', 'form1', 'form2', 'form3'];
 
 export default function HosptialsReviews() {
   const [params] = useSearchParams();
+  const location = useLocation(); // 2. 현재 경로 정보를 가져옴
   const step = params.get('step');
 
   const [activeSheet, setActiveSheet] = useState(false);
@@ -21,9 +27,14 @@ export default function HosptialsReviews() {
     setIsDeleteModalOpen,
   };
 
+  const isEditPage = matchPath(
+    { path: '/index/reviews/:id/edit', end: true },
+    location.pathname
+  );
+
   const isPopupStep = step && POPUP_STEPS.includes(step);
 
-  const hideLayout = isPopupStep || activeSheet;
+  const hideLayout = isPopupStep || activeSheet || isEditPage;
 
   return (
     <LayoutShell banner={<ServiceBanner />}>

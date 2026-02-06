@@ -15,6 +15,7 @@ import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 import { modifyReview } from '@/apis/reviews/modifyReview';
 import { NextBtn } from '@/components/reviews/ui/NextBtn';
 import { SelectField } from '@/components/reviews/ui/SelectField';
+import { EditReviewHeader } from '@/components/reviews/layout/EditReviewHeader';
 
 export function EditReview() {
   const { reviewId } = useParams();
@@ -205,158 +206,160 @@ export function EditReview() {
     );
 
   return (
-    <div className="relative min-h-screen bg-white p-6 pb-[100px]">
-      <h2 className="mb-8 text-[24px] font-bold text-[#424242]">후기 수정</h2>
+    <div className="relative bg-white">
+      <EditReviewHeader label={'후기 수정'} />
 
-      {/* 병원명 입력 */}
-      <div className="relative mb-6" ref={containerRef}>
-        <label className="mb-2 block text-[19px] font-medium text-[#424242]">
-          병원명
-        </label>
-        <input
-          className="w-full rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-[14px] text-[20px] focus:outline-none"
-          placeholder="병원명을 입력하세요"
-          value={searchTerm}
-          onChange={handleInputChange}
-          onFocus={() =>
-            searchTerm && recommendations.length > 0 && setShowDropdown(true)
-          }
-        />
-        {showDropdown && recommendations.length > 0 && (
-          <ul className="absolute z-50 mt-1 max-h-[220px] w-full overflow-y-auto rounded-[8px] border border-[#EEEEEE] bg-white shadow-xl">
-            {recommendations.map((hospital) => (
-              <li
-                key={hospital.id}
-                className="cursor-pointer border-b border-[#F5F5F5] px-4 py-3 last:border-none hover:bg-[#F9F9F9]"
-                onClick={() => handleSelectHospital(hospital)}
-              >
-                <div className="text-[18px] font-medium text-[#424242]">
-                  {hospital.name}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <InputField
-        label="총 비용"
-        value={data.cost || ''}
-        onChange={(val) => handleChange('cost', val)}
-      />
-
-      <SelectField
-        label="동물종"
-        value={data.animalType}
-        options={ANIMAL_CATEGORY_VALUE}
-        onChange={(val) =>
-          setData((prev) => ({ ...prev, animalType: val, animalDetail: '' }))
-        }
-      />
-
-      <SelectField
-        label="세부 동물명"
-        value={data.animalDetail}
-        options={detailOptions}
-        onChange={(val) => handleChange('animalDetail', val)}
-        disabled={!data.animalType}
-      />
-
-      <section className="mt-12 text-center">
-        {categories.map((cat) => (
-          <div key={cat.id} className="mb-10 text-left">
-            <span className="text-[20px] font-semibold text-[#424242]">
-              {cat.label}
-            </span>
-            <div className="mt-4 flex justify-center gap-1">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => handleRating(cat.id, num)}
-                  className="p-1 active:scale-95"
+      <div className="h-dvh overflow-auto p-6 pb-[100px]">
+        {/* 병원명 입력 */}
+        <div className="relative mb-6" ref={containerRef}>
+          <label className="mb-2 block text-[19px] font-medium text-[#424242]">
+            병원명
+          </label>
+          <input
+            className="w-full rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-[14px] text-[20px] focus:outline-none"
+            placeholder="병원명을 입력하세요"
+            value={searchTerm}
+            onChange={handleInputChange}
+            onFocus={() =>
+              searchTerm && recommendations.length > 0 && setShowDropdown(true)
+            }
+          />
+          {showDropdown && recommendations.length > 0 && (
+            <ul className="absolute z-50 mt-1 max-h-[220px] w-full overflow-y-auto rounded-[8px] border border-[#EEEEEE] bg-white shadow-xl">
+              {recommendations.map((hospital) => (
+                <li
+                  key={hospital.id}
+                  className="cursor-pointer border-b border-[#F5F5F5] px-4 py-3 last:border-none hover:bg-[#F9F9F9]"
+                  onClick={() => handleSelectHospital(hospital)}
                 >
-                  <img
-                    src={
-                      num <= data.ratings[cat.id]
-                        ? fill_star_icon
-                        : empty_star_icon
-                    }
-                    alt="star"
-                    className="h-10 w-10"
-                  />
-                </button>
+                  <div className="text-[18px] font-medium text-[#424242]">
+                    {hospital.name}
+                  </div>
+                </li>
               ))}
-            </div>
-          </div>
-        ))}
-      </section>
-
-      <section className="mt-10">
-        <div className="mb-8 flex flex-wrap gap-2.5">
-          {data.images.map((img, index) => (
-            <div key={index} className="relative h-[110px] w-[110px]">
-              <img
-                src={img}
-                alt="review"
-                className="h-full w-full rounded-[8px] border border-[#EEEEEE] object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveImage(index)}
-                className="absolute -top-2 -right-2 z-20"
-              >
-                <img src={circle_x} alt="delete" />
-              </button>
-            </div>
-          ))}
-          {data.images.length < 5 && (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex h-[110px] w-[110px] items-center justify-center rounded-[8px] border border-[#E0E0E0] bg-white"
-            >
-              <img src={add} alt="add" />
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleAddImage}
-                className="hidden"
-              />
-            </button>
+            </ul>
           )}
         </div>
-        <label className="mb-2 block text-[19px] font-medium text-[#424242]">
-          내용
-        </label>
-        <textarea
-          className="h-[200px] w-full resize-none rounded-[8px] border border-[#EEEEEE] p-4 text-[18px] focus:outline-none"
-          value={data.content}
-          onChange={(e) => handleChange('content', e.target.value)}
-        />
-      </section>
 
-      <div className="mt-12">
-        <NextBtn
-          label="수정 완료"
-          onClick={handleUpdateSubmit}
-          isComplete={true}
+        <InputField
+          label="총 비용"
+          value={data.cost || ''}
+          onChange={(val) => handleChange('cost', val)}
         />
+
+        <SelectField
+          label="동물종"
+          value={data.animalType}
+          options={ANIMAL_CATEGORY_VALUE}
+          onChange={(val) =>
+            setData((prev) => ({ ...prev, animalType: val, animalDetail: '' }))
+          }
+        />
+
+        <SelectField
+          label="세부 동물명"
+          value={data.animalDetail}
+          options={detailOptions}
+          onChange={(val) => handleChange('animalDetail', val)}
+          disabled={!data.animalType}
+        />
+
+        <section className="mt-12 text-center">
+          {categories.map((cat) => (
+            <div key={cat.id} className="mb-10 text-left">
+              <span className="text-[20px] font-semibold text-[#424242]">
+                {cat.label}
+              </span>
+              <div className="mt-4 flex justify-center gap-1">
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => handleRating(cat.id, num)}
+                    className="p-1 active:scale-95"
+                  >
+                    <img
+                      src={
+                        num <= data.ratings[cat.id]
+                          ? fill_star_icon
+                          : empty_star_icon
+                      }
+                      alt="star"
+                      className="h-10 w-10"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section className="mt-10">
+          <div className="mb-8 flex flex-wrap gap-2.5">
+            {data.images.map((img, index) => (
+              <div key={index} className="relative h-[110px] w-[110px]">
+                <img
+                  src={img}
+                  alt="review"
+                  className="h-full w-full rounded-[8px] border border-[#EEEEEE] object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute -top-2 -right-2 z-20"
+                >
+                  <img src={circle_x} alt="delete" />
+                </button>
+              </div>
+            ))}
+            {data.images.length < 5 && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-[110px] w-[110px] items-center justify-center rounded-[8px] border border-[#E0E0E0] bg-white"
+              >
+                <img src={add} alt="add" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleAddImage}
+                  className="hidden"
+                />
+              </button>
+            )}
+          </div>
+          <label className="mb-2 block text-[19px] font-medium text-[#424242]">
+            내용
+          </label>
+          <textarea
+            className="h-[200px] w-full resize-none rounded-[8px] border border-[#EEEEEE] p-4 text-[18px] focus:outline-none"
+            value={data.content}
+            onChange={(e) => handleChange('content', e.target.value)}
+          />
+        </section>
+
+        <div className="mt-12">
+          <NextBtn
+            label="수정 완료"
+            onClick={handleUpdateSubmit}
+            isComplete={true}
+          />
+        </div>
+
+        {isSuccessOpen && (
+          <ConfirmSelectModal
+            open={true}
+            title={`후기가 수정되었습니다.`}
+            content={`작성해주신 후기는 검수 완료 후 공개됩니다.`}
+            confirmText="작성한 후기 확인"
+            cancelText="닫기"
+            onConfirm={() => navigate(`/index/reviews/${reviewId}`)}
+            onCancel={() => navigate('/index/reviews')}
+          />
+        )}
       </div>
-
-      {isSuccessOpen && (
-        <ConfirmSelectModal
-          open={true}
-          title={`후기가 수정되었습니다.`}
-          content={`작성해주신 후기는 검수 완료 후 공개됩니다.`}
-          confirmText="작성한 후기 확인"
-          cancelText="닫기"
-          onConfirm={() => navigate(`/index/reviews/${reviewId}`)}
-          onCancel={() => navigate('/index/reviews')}
-        />
-      )}
     </div>
   );
 }
