@@ -210,7 +210,10 @@ export default function ReviewDetailPage() {
           content={''}
           confirmText="수정하기"
           cancelText="삭제하기"
-          onConfirm={() => navigate('edit')}
+          onConfirm={() => {
+            setIsDeleteModalOpen(false);
+            navigate('edit');
+          }}
           onCancel={handleDeleteConfirm}
         />
       )}

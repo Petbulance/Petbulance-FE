@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react'; // useEffect 추가
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 
@@ -8,6 +8,7 @@ import ReviewForm_2 from './form/ReviewForm_2';
 import ReviewForm_3 from './form/ReviewForm_3';
 import ScanStep from './ScanStep';
 import { postReview } from '@/apis/reviews/postReview';
+import { ReceiptVerifiedModal } from '@/components/commons/layout/ReceiptVerifiedModal';
 
 export function WriteReview() {
   const [params, setParams] = useSearchParams();
@@ -15,8 +16,9 @@ export function WriteReview() {
   const navigate = useNavigate();
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
-  const [reviewId, setReviewId] = useState(null);
+  const [isScanSuccessOpen, setIsScanSuccessOpen] = useState(false); // ✅ 스캔 성공 모달 상태 추가
 
+  const [reviewId, setReviewId] = useState(null);
   const [receiptChecked, setReceiptChecked] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -29,6 +31,34 @@ export function WriteReview() {
     images: [],
     content: '',
   });
+
+  const handleMoveToForm1 = () => {
+    setIsScanSuccessOpen(false);
+    setParams({ step: 'form1' });
+  };
+
+  useEffect(() => {
+    let timer;
+    if (isScanSuccessOpen) {
+      timer = setTimeout(() => {
+        handleMoveToForm1();
+      }, 3000);
+    }
+    return () => clearTimeout(timer);
+  }, [isScanSuccessOpen]);
+
+  const handleScanSuccess = (ocrData) => {
+    setReceiptChecked(true);
+
+    setFormData((prev) => ({
+      ...prev,
+      hospitalName: ocrData.hospitalName || '',
+      hospitalId: ocrData.hospitalId || '',
+      cost: ocrData.price ? ocrData.price.toString() : '',
+    }));
+
+    setIsScanSuccessOpen(true);
+  };
 
   const handleComplete = async () => {
     try {
@@ -65,7 +95,8 @@ export function WriteReview() {
       case 'form3':
         return <ReviewForm_3 {...commonProps} onNext={handleComplete} />;
       case 'scan':
-        return <ScanStep />;
+        // ✅ 자식에게 성공 핸들러 전달
+        return <ScanStep onScanSuccess={handleScanSuccess} />;
       default:
         return null;
     }
@@ -82,7 +113,6 @@ export function WriteReview() {
           confirmText="사진 첨부"
           cancelText="인증 없이 작성"
           onConfirm={() => {
-            setReceiptChecked(true);
             setParams({ step: 'scan' });
           }}
           onCancel={() => {
@@ -93,6 +123,8 @@ export function WriteReview() {
       )}
 
       {renderStep()}
+
+      {isScanSuccessOpen && <ReceiptVerifiedModal open={true} />}
 
       {isSuccessOpen && (
         <ConfirmSelectModal

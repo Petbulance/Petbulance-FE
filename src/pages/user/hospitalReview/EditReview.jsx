@@ -353,7 +353,7 @@ export function EditReview() {
           content={`작성해주신 후기는 검수 완료 후 공개됩니다.`}
           confirmText="작성한 후기 확인"
           cancelText="닫기"
-          onConfirm={() => navigate(`/index/reviews/detail/${reviewId}`)}
+          onConfirm={() => navigate(`/index/reviews/${reviewId}`)}
           onCancel={() => navigate('/index/reviews')}
         />
       )}
