@@ -2,8 +2,8 @@ import down_arrow from '@/assets/images/icons/down_arrow2.svg';
 import empty_star_icon from '@/assets/images/icons/star_gray_40.svg';
 import fill_star_icon from '@/assets/images/icons/star_yellow_40.svg';
 import { WriteReviewHeader } from '@/components/reviews/layout/WriteReviewHeader';
+import { NextBtn } from '@/components/reviews/ui/NextBtn';
 
-import { NextBtn } from './ReviewForm_1';
 import { ProgressBar } from '@/components/reviews/ui/ProgressBar';
 
 export default function ReviewForm_2({ data, setData, onNext }) {

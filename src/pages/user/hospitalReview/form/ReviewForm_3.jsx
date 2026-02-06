@@ -2,10 +2,10 @@ import { useRef } from 'react';
 
 import camera_icon from '@/assets/images/icons/camera_icon.svg';
 import { WriteReviewHeader } from '@/components/reviews/layout/WriteReviewHeader';
-import { NextBtn } from './ReviewForm_1';
 import delete_icon from '@/assets/images/icons/circle_x.svg';
 import add_icon from '@/assets/images/icons/add_icon.svg';
 import { ProgressBar } from '@/components/reviews/ui/ProgressBar';
+import { NextBtn } from '@/components/reviews/ui/NextBtn';
 
 export default function ReviewForm_3({ data, setData, onNext }) {
   const fileInputRef = useRef(null);
@@ -128,7 +128,7 @@ export default function ReviewForm_3({ data, setData, onNext }) {
           />
         </div>
 
-        <div className="mt-auto pt-6">
+        <div className="mt-auto mb-8 pt-6">
           <NextBtn
             label="후기 등록하기"
             onClick={onNext}
