@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import { fetchReceiptDetail } from '@/apis/reviews/receipts';
@@ -7,7 +7,6 @@ import { cancelReviewLike, toggleReviewLike } from '@/apis/reviews/reviewLike';
 import green_thumbsUp from '@/assets/images/icons/thumsUp_green.svg';
 import circle_check from '@/assets/images/icons/circle_check.svg';
 import gray_dot from '@/assets/images/icons/gray_dot.svg';
-import see_more from '@/assets/images/icons/see_more.svg';
 import star_empty from '@/assets/images/icons/star_empty.svg';
 import star_fill from '@/assets/images/icons/star_fill.svg';
 import thumbsUp from '@/assets/images/icons/thumsUp.svg';
@@ -15,18 +14,25 @@ import thumbsUp from '@/assets/images/icons/thumsUp.svg';
 import { CategoryButton } from '@/components/hosiptals/ui/HospitalCard/CategoryButton';
 import { ANIMAL_CATEGORY_KO, ANIMAL_NAME_KO } from '@/data/animalSort';
 import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
+import useUserStore from '@/stores/useUserStore';
+import { deleteReviewApi } from '@/apis/reviews/deleteReview';
 
 export default function ReviewDetailPage() {
   const { reviewId } = useParams();
   const navigate = useNavigate();
+
+  const { profile, fetchMyProfile } = useUserStore();
 
   const [review, setReview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
-  // 모달 상태 관리
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { isDeleteModalOpen, setIsDeleteModalOpen } = useOutletContext();
+
+  useEffect(() => {
+    fetchMyProfile();
+  }, [fetchMyProfile]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -51,13 +57,13 @@ export default function ReviewDetailPage() {
   // 삭제 확인 처리
   const handleDeleteConfirm = async () => {
     try {
-      // 실제 삭제 API 연동 필요 (예: await deleteReviewApi(reviewId))
-      console.log('삭제된 리뷰 ID:', reviewId);
+      await deleteReviewApi(reviewId);
+
       alert('리뷰가 삭제되었습니다.');
       setIsDeleteModalOpen(false);
-      navigate('/index/reviews');
+      navigate('/index/reviews', { replace: true });
     } catch (error) {
-      alert('삭제 중 오류가 발생했습니다.');
+      alert('리뷰 삭제 중 오류가 발생했습니다. 다시 시도해 주세요.');
     }
   };
 
@@ -107,6 +113,9 @@ export default function ReviewDetailPage() {
   const detailAnimalKo =
     ANIMAL_NAME_KO[review.detailAnimalType] || review.detailAnimalType;
 
+  const isMyReview =
+    review && profile && review.userNickname === profile.nickname;
+
   return (
     <div className="relative h-full bg-white">
       <div className="flex h-fit flex-col border-b border-[#EEEEEE] bg-white px-6 pt-5 pb-5">
@@ -120,13 +129,6 @@ export default function ReviewDetailPage() {
               <span>{review.createDate?.split('T')[0]}</span>
             </div>
           </div>
-
-          <button
-            className="p-1 active:opacity-50"
-            onClick={() => setIsDeleteModalOpen(true)}
-          >
-            <img src={see_more} alt="더보기" />
-          </button>
         </div>
 
         {/* 병원 정보 및 별점 */}
@@ -201,15 +203,17 @@ export default function ReviewDetailPage() {
         </div>
       </div>
 
-      <ConfirmSelectModal
-        open={isDeleteModalOpen}
-        title={`후기를 수정하거나 삭제하시겠어요?`}
-        content={''}
-        confirmText="수정하기"
-        cancelText="삭제하기"
-        onConfirm={() => navigate('edit')}
-        onCancel={() => setIsDeleteModalOpen(false)}
-      />
+      {isMyReview && (
+        <ConfirmSelectModal
+          open={isDeleteModalOpen}
+          title={`후기를 수정하거나 삭제하시겠어요?`}
+          content={''}
+          confirmText="수정하기"
+          cancelText="삭제하기"
+          onConfirm={() => navigate('edit')}
+          onCancel={handleDeleteConfirm}
+        />
+      )}
     </div>
   );
 }

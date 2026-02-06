@@ -9,11 +9,12 @@ import down_arrow from '@/assets/images/icons/down_arrow2.svg';
 import empty_star_icon from '@/assets/images/icons/star_gray_40.svg';
 import fill_star_icon from '@/assets/images/icons/star_yellow_40.svg';
 
-import { NextBtn, SelectField } from './form/ReviewForm_1';
 import { InputField } from './form/ReviewForm_2';
 import { ANIMAL_CATEGORY_VALUE, ANIMAL_GROUPS_VALUE } from '@/data/animalSort';
 import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 import { modifyReview } from '@/apis/reviews/modifyReview';
+import { NextBtn } from '@/components/reviews/ui/NextBtn';
+import { SelectField } from '@/components/reviews/ui/SelectField';
 
 export function EditReview() {
   const { reviewId } = useParams();
