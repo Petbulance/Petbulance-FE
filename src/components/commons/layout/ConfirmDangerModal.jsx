@@ -10,19 +10,19 @@ export default function ConfirmDangerModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="absolute inset-0 z-50 flex items-center justify-center">
       {/* dim */}
-      <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
+      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
       {/* modal */}
-      <div className="relative w-[420px] rounded-xl bg-white p-5 text-center">
+      <div className="relative w-[420px] rounded-xl bg-white p-8 text-center">
         {title && (
-          <h2 className="text-caption mb-2 text-[19px] font-semibold">
+          <h2 className="mb-3 text-[23px] font-medium text-[#1E1E1E]">
             {title}
           </h2>
         )}
 
         {/* 컨텐츠 */}
-        <p className="mb-4 text-[23px] leading-relaxed text-[#1e1e1e]">
+        <p className="mb-8 text-[19px] leading-relaxed font-medium text-[#9E9E9E]">
           {content}
         </p>
 

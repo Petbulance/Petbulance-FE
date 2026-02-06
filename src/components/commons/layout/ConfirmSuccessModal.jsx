@@ -12,7 +12,7 @@ export default function ConfirmSuccessModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* dim */}
-      <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
+      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
 
       {/* modal */}
       <div className="relative w-[420px] rounded-xl bg-white p-5 text-center">
