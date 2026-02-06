@@ -149,7 +149,7 @@ const router = createBrowserRouter([
         element: <HosptialsReviews />,
         children: [
           { index: true, element: <ReviewMain /> },
-          { path: 'search', element: <ReviewSerch /> },
+          // { path: 'search', element: <ReviewSerch /> },
           { path: 'write', element: <WriteReview /> },
           { path: ':reviewId', element: <ReviewDetailPage /> },
           { path: ':reviewId/edit', element: <EditReview /> },
