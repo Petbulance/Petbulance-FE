@@ -16,36 +16,48 @@ export function ButtonSection({
   onOpenSort,
   onToggleOpen,
 }) {
-  //동물종 레이블 설정 함수
-  const getGroupLabel = (selectedAnimals) => {
+  const getAnimalLabel = (selectedAnimals) => {
     if (!selectedAnimals || selectedAnimals.length === 0) return '동물종';
 
     const firstCode = selectedAnimals[0];
     const firstLabel = ANIMAL_CATEGORY_KO[firstCode] || firstCode;
-
     const count = selectedAnimals.length;
 
     return count > 1 ? `${firstLabel} 외 ${count - 1}` : firstLabel;
   };
 
-  const animalLabel = getGroupLabel(state.animal);
+  const getRegionLabel = (city, region) => {
+    if (!city) return '지역';
+
+    if (!region || !Array.isArray(region) || region.length === 0) {
+      return city;
+    }
+
+    const firstRegion = region[0];
+    const count = region.length;
+
+    return count > 1 ? `${firstRegion} 외 ${count - 1}` : firstRegion;
+  };
+
+  const animalLabel = getAnimalLabel(state.animal);
+  const regionLabel = getRegionLabel(state.city, state.region);
 
   const buttons = [
     {
       id: 'region',
-      label: state.region || state.city || '지역',
-      isHighlighted: false,
+      label: regionLabel,
+      isHighlighted: !!state.city,
       rightIcon: <SelectArrow />,
     },
     {
       id: 'animal',
       label: animalLabel,
-      isHighlighted: false,
+      isHighlighted: state.animal && state.animal.length > 0,
       rightIcon: <SelectArrow />,
     },
     {
       id: 'sort',
-      label: SORT_LABELS[state.sort],
+      label: SORT_LABELS[state.sort] || '정렬',
       isHighlighted: false,
       leftIcon: <SortDropdown />,
     },

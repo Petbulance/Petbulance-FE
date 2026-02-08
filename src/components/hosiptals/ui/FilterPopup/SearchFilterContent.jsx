@@ -1,34 +1,68 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import greenCheck from '@/assets/images/icons/green_check.svg';
-import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 import { CITIES, REGION_DATA } from '@/data/regionData';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 
 import { BottomTab } from './BottomTab';
 import { ResetBtn } from './ResetBtn';
 
 export function SearchFilterContent({ onApply, filterState }) {
   const [temp, setTemp] = useState({
-    city: filterState.city,
-    region: filterState.region,
+    city: filterState.city || '',
+    region: Array.isArray(filterState.region)
+      ? filterState.region
+      : filterState.region
+        ? [filterState.region]
+        : [],
   });
+
+  useEffect(() => {
+    setTemp({
+      city: filterState.city || '',
+      region: Array.isArray(filterState.region)
+        ? filterState.region
+        : filterState.region
+          ? [filterState.region]
+          : [],
+    });
+  }, [filterState]);
 
   const districts = useMemo(() => {
     if (!temp.city) return [];
     return REGION_DATA[temp.city] || [];
   }, [temp.city]);
 
+  // 시/도 클릭 핸들러
   const handleCityClick = (cityValue) => {
-    setTemp({ city: cityValue, region: '' });
+    if (temp.city !== cityValue) {
+      setTemp({ city: cityValue, region: [] });
+    }
   };
 
   const handleRegionClick = (regionValue) => {
-    setTemp((prev) => ({
-      ...prev,
-      region: regionValue === '전체' ? '' : regionValue,
-    }));
+    setTemp((prev) => {
+      const currentRegions = prev.region;
+
+      if (regionValue === '전체') {
+        return { ...prev, region: [] };
+      }
+
+      if (currentRegions.includes(regionValue)) {
+        return {
+          ...prev,
+          region: currentRegions.filter((r) => r !== regionValue),
+        };
+      } else {
+        return {
+          ...prev,
+          region: [...currentRegions, regionValue],
+        };
+      }
+    });
   };
 
+  // 현재 위치 찾기
   const handleCurrentLocation = () => {
     if (!navigator.geolocation) {
       alert('위치 정보를 사용할 수 없는 브라우저입니다.');
@@ -45,7 +79,6 @@ export function SearchFilterContent({ onApply, filterState }) {
           return;
         }
 
-        // 좌표 -> 주소 변환 (Reverse Geocoding)
         naver.maps.Service.reverseGeocode(
           {
             coords: new naver.maps.LatLng(latitude, longitude),
@@ -69,7 +102,7 @@ export function SearchFilterContent({ onApply, filterState }) {
                 if (mappedCity && CITIES.includes(mappedCity)) {
                   setTemp({
                     city: mappedCity,
-                    region: apiRegion,
+                    region: [apiRegion],
                   });
                 } else {
                   alert('지원하지 않는 지역이거나 데이터를 찾을 수 없습니다.');
@@ -88,7 +121,6 @@ export function SearchFilterContent({ onApply, filterState }) {
 
   const matchCityName = (fullCityName) => {
     if (!fullCityName) return '';
-
     const mapping = {
       서울특별시: '서울',
       경기도: '경기',
@@ -111,13 +143,17 @@ export function SearchFilterContent({ onApply, filterState }) {
       제주특별자치도: '제주',
       제주도: '제주',
     };
-
     return mapping[fullCityName] || fullCityName;
+  };
+
+  const handleReset = () => {
+    setTemp({ city: '', region: [] });
   };
 
   return (
     <>
-      <ResetBtn setFilterState={setTemp} />
+      <ResetBtn onReset={handleReset} />
+
       <div className="flex h-[500px] min-h-0 flex-1 gap-4 text-[20px] font-medium">
         {/* 왼쪽: 시/도 */}
         <div className="w-1/3 overflow-y-auto bg-[#F5F5F5]">
@@ -136,26 +172,29 @@ export function SearchFilterContent({ onApply, filterState }) {
           ))}
         </div>
 
-        {/* 오른쪽: 구/군 */}
+        {/* 오른쪽: 구/군 (다중 선택 UI) */}
         <div className="flex-1 overflow-y-auto bg-white">
           {districts.length > 0 ? (
-            districts.map((dist) => (
-              <div
-                key={dist}
-                onClick={() => handleRegionClick(dist)}
-                className={`cursor-pointer border-b px-5 py-3 transition-colors hover:bg-gray-50 ${
-                  temp.region === dist ||
-                  (dist === '전체' && temp.region === '')
-                    ? 'font-bold text-[#2DA969]'
-                    : 'text-[#1E1E1E]'
-                }`}
-              >
-                {dist}
-              </div>
-            ))
+            districts.map((dist) => {
+              const isSelected = temp.region.includes(dist);
+              const isAllSelected = dist === '전체' && temp.region.length === 0;
+              const active = isSelected || isAllSelected;
+
+              return (
+                <div
+                  key={dist}
+                  onClick={() => handleRegionClick(dist)}
+                  className={`flex cursor-pointer items-center justify-between border-b px-5 py-3 transition-colors hover:bg-gray-50 ${
+                    active ? 'font-bold text-[#2DA969]' : 'text-[#1E1E1E]'
+                  }`}
+                >
+                  <span>{dist}</span>
+                </div>
+              );
+            })
           ) : (
             <div className="flex h-full items-center justify-center text-[16px] text-gray-400">
-              시/도를 먼저 선택해주세요.
+              전체 지역을 선택하셨어요.
             </div>
           )}
         </div>
@@ -168,6 +207,7 @@ export function SearchFilterContent({ onApply, filterState }) {
     </>
   );
 }
+
 export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
   const selectedAnimals = useMemo(
     () => filterState.animal || [],

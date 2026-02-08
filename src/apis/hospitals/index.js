@@ -1,13 +1,27 @@
 import api from '../api';
 
+const formatRegionQuery = (city, region) => {
+  if (!city || city === '전체') return undefined;
+
+  const cityPrefix = `${city}시`;
+
+  if (Array.isArray(region) && region.length > 0) {
+    return region.map((r) => `${cityPrefix}${r}`).join(',');
+  }
+
+  if (region) {
+    return `${cityPrefix}${region}`;
+  }
+  return cityPrefix;
+};
+
 export const fetchHospitalsByLocation = async (bounds = [], filterState) => {
   try {
     const { city, region, animal, sort, isOpen } = filterState || {};
 
     console.log('api 병원 조회:', animal, bounds);
 
-    const combinedRegion =
-      city && city !== '전체' ? `${city}시${region || ''}` : '';
+    const combinedRegion = formatRegionQuery(city, region);
 
     const response = await api.get('/hospitals', {
       params: {
@@ -35,8 +49,7 @@ export const fetchHospitalsByName = async (name, filterState) => {
   try {
     const { city, region, animal, sort, isOpen } = filterState || {};
 
-    const combinedRegion =
-      city && city !== '전체' ? `${city}시${region || ''}` : '';
+    const combinedRegion = formatRegionQuery(city, region);
 
     const response = await api.get('/hospitals', {
       params: {

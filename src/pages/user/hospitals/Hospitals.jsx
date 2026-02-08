@@ -14,7 +14,7 @@ export default function Hospitals() {
 
   const [filterState, setFilterState] = useState({
     city: '',
-    region: '',
+    region: [],
     animal: [],
     sort: 'distance',
     isOpen: false,
