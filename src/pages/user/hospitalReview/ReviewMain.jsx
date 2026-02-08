@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // ✅ useRef 추가
 import { useOutletContext, useNavigate } from 'react-router-dom';
 
 import { getFilteredReceipts } from '@/apis/reviews/receipts';
@@ -15,6 +15,8 @@ export function ReviewMain() {
   const { activeSheet, setActiveSheet, filters, setFilters } =
     useOutletContext();
   const navigate = useNavigate();
+
+  const fileRef = useRef(null);
 
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +71,18 @@ export function ReviewMain() {
 
   const handleConfirmVerification = () => {
     setIsWriteModalOpen(false);
-    navigate('/index/reviews/write?step=scan');
+    fileRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    navigate('/index/reviews/write?step=scan', {
+      state: { file: file },
+    });
+
+    e.target.value = '';
   };
 
   const handleSkipVerification = () => {
@@ -83,6 +96,15 @@ export function ReviewMain() {
         isWriteModalOpen || isSortOpen ? 'overflow-hidden' : ''
       }`}
     >
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        // capture="environment"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       <ReviewFilterBar
         onOpenSheet={setActiveSheet}
         currentFilters={filters}
