@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { Camera } from '@/assets/images/icons/Camera';
 import { Check } from '@/assets/images/icons/Check';
 import down_arrow from '@/assets/images/icons/down_arrow.svg';
@@ -25,12 +24,27 @@ export function ReviewFilterBar({
         : firstAnimalKo;
   }
 
+  const getRegionLabel = () => {
+    const { city, region } = currentFilters;
+
+    if (!city) return '지역';
+
+    if (!region || !Array.isArray(region) || region.length === 0) {
+      return city;
+    }
+
+    const firstRegion = region[0];
+    const count = region.length;
+
+    return count > 1 ? `${firstRegion} 외 ${count - 1}` : firstRegion;
+  };
+
   const currentSortLabel = sortLabels?.[currentFilters?.sort] || '최신순';
 
   const buttons = [
     {
       id: 'region',
-      label: currentFilters?.city ? currentFilters.region || '전체' : '지역',
+      label: getRegionLabel(),
       isHighlighted: !!currentFilters?.city,
       rightIcon: <SelectArrow />,
     },

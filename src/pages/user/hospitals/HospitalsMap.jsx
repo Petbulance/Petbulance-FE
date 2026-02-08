@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // 1. useSearchParams 추가
+import { useSearchParams } from 'react-router-dom';
 
 import ListIcon from '@/assets/images/icons/ListIcon.svg';
 import MapIcon from '@/assets/images/icons/MapIcon.svg';
@@ -18,7 +18,6 @@ import { HospitalCardList } from '@/components/hosiptals/ui/HospitalCardList';
 import { useHospitalFilter } from '@/hooks/useHospitalFilter';
 
 export default function HospitalsMap() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
@@ -137,7 +136,11 @@ export default function HospitalsMap() {
                 <NoHospitalResult />
               </div>
             ) : (
-              <HospitalCardList hospitals={hospitals} />
+              <HospitalCardList
+                hospitals={hospitals}
+                userLat={myLocation.lat}
+                userLng={myLocation.lng}
+              />
             )}
           </div>
 

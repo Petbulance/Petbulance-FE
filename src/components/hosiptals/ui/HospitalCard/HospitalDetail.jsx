@@ -39,6 +39,7 @@ export function HosipitalDetail({
   userLat,
   userLng,
   phone,
+  time,
   todayCloseTime,
   overallRating,
   reviewCount,
@@ -98,13 +99,17 @@ export function HosipitalDetail({
     ? Number(overallRating).toFixed(1)
     : '0.0';
 
-  let formattedCloseTime = '';
+  let formattedTimeDisplay = '';
   if (todayCloseTime) {
     const timeParts = todayCloseTime.split(':');
-    formattedCloseTime =
+
+    formattedTimeDisplay =
       timeParts.length >= 2
-        ? `${timeParts[0]}:${timeParts[1]}`
-        : todayCloseTime;
+        ? `${timeParts[0]}:${timeParts[1]}에 영업 종료`
+        : `${todayCloseTime}에 영업 종료`;
+  } else if (time && time.includes('~')) {
+    const endTime = time.split('~')[1].trim();
+    formattedTimeDisplay = `${endTime}에 영업 종료`;
   }
 
   return (
@@ -119,7 +124,7 @@ export function HosipitalDetail({
           <div className="text-[19px] font-semibold text-[#1E1E1E]">{name}</div>
           <div className="flex items-center justify-center gap-0.5 text-[16px] font-medium">
             <img src={Star} alt="star_icon" />
-            <span className="text-[#424242]">{formattedRating || '0.0'}</span>
+            <span className="text-[#424242]">{formattedRating}</span>
             <span className="text-[#9E9E9E]">({reviewCount || 0})</span>
           </div>
         </div>
@@ -129,12 +134,10 @@ export function HosipitalDetail({
             {openNow ? '진료 중' : '진료 마감'}
           </span>
 
-          {formattedCloseTime && (
+          {formattedTimeDisplay && (
             <>
               <img src={DotIcon} alt="dot_icon" />
-              <span className="text-[#424242]">
-                {formattedCloseTime}에 영업 종료
-              </span>
+              <span className="text-[#424242]">{formattedTimeDisplay}</span>
             </>
           )}
 

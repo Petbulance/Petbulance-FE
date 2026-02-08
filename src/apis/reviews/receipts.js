@@ -18,16 +18,31 @@ export const fetchHospitalReviews = async (hospitalId, params = {}) => {
 };
 
 export const getFilteredReceipts = async (params = {}) => {
-  const combinedRegion =
-    params.city && params.city !== '전체'
-      ? `${params.city}시${params.region || ''}`
-      : '';
+  const formatRegion = (city, region) => {
+    if (!city || city === '전체') return '';
+
+    const cityPrefix = `${city}시`;
+
+    if (Array.isArray(region) && region.length > 0) {
+      return region.map((r) => `${cityPrefix}${r}`).join(',');
+    }
+
+    if (region) {
+      return `${cityPrefix}${region}`;
+    }
+
+    return cityPrefix;
+  };
+
+  const combinedRegion = formatRegion(params.city, params.region);
 
   try {
     const response = await api.get('/receipts/filter', {
       params: {
         region: combinedRegion,
-        animalType: params.animal,
+        animalType: Array.isArray(params.animal)
+          ? params.animal.join(',')
+          : params.animal,
         receipt: params.receipt,
         images: params.image,
         sort: params.sort,

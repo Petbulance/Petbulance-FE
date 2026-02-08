@@ -13,7 +13,6 @@ export function ReviewAnimalFilterSheet({ filterState, onApply }) {
 
   const handleAnimalClick = (englishCode) => {
     setTempSelected((prevList) => {
-      // 이미 선택된 거면 제거, 아니면 추가
       if (prevList.includes(englishCode)) {
         return prevList.filter((item) => item !== englishCode);
       } else {
@@ -23,8 +22,6 @@ export function ReviewAnimalFilterSheet({ filterState, onApply }) {
   };
 
   const handleApplyClick = () => {
-    // 2. 부모에게 보낼 때는 객체 형태로 포장해서 전송
-    // ReviewMain의 handleApplyFilter가 { ...prev, ...newData } 로 받기 때문
     onApply({ animal: tempSelected });
   };
 
@@ -33,7 +30,6 @@ export function ReviewAnimalFilterSheet({ filterState, onApply }) {
       <div className="min-h-0 flex-1 overflow-y-auto px-10 text-[25px] font-medium">
         <div className="bg-white">
           {Object.entries(ANIMAL_CATEGORY_KO).map(([code, name]) => {
-            // 로컬 상태(tempSelected)를 기준으로 체크 표시 확인
             const isActive = tempSelected.includes(code);
 
             return (
@@ -55,7 +51,6 @@ export function ReviewAnimalFilterSheet({ filterState, onApply }) {
         </div>
       </div>
 
-      {/* 3. 버튼 클릭 시 handleApplyClick 실행 */}
       <GreenBtn name="후기 보기" onClick={handleApplyClick} />
     </div>
   );

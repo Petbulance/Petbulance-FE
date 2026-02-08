@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { HospitalCard } from '@/components/hosiptals/ui/HospitalCard/HospitalCard';
 
-export function HospitalCardList({ hospitals }) {
+export function HospitalCardList({ hospitals, userLat, userLng }) {
   const navigate = useNavigate();
 
   return (
@@ -15,11 +15,15 @@ export function HospitalCardList({ hospitals }) {
             name={h.name}
             status={h.isOpenNow}
             time={h.openHours}
-            distance={h.distanceMeters}
+            userLat={userLat}
+            userLng={userLng}
+            lat={h.lat}
+            lng={h.lng}
             phoneNumber={h.phone}
             rating={h.rating}
             reviews={h.reviewCount}
             kinds={h.types}
+            tags={h.tags}
             onClick={() => navigate(`/index/hospitals/${h.hospitalId}`)}
           />
         ))}

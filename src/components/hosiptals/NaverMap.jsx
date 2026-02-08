@@ -1,18 +1,14 @@
-import React, { useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { fetchHospitalsByLocation } from '@/apis/hospitals';
 import marker_closed from '@/assets/images/icons/close_hospital_marker.svg';
 import current_location_btn from '@/assets/images/icons/current_location_btn.svg';
 import current_location_marker from '@/assets/images/icons/current_location_marker.svg';
 import marker_open from '@/assets/images/icons/open_hospital_marker.svg';
 import selected_marker from '@/assets/images/icons/selected_marker.svg';
+import selected_close_marker from '@/assets/images/icons/selected_close_marker.svg';
 
 import { loadNaverMap } from '@/lib/loadNaverMap';
 import { CurrentHospitalBtn } from './ui/CurrentHospitalBtn';
-
-let mapInstance = null;
-let mapElement = null;
-let currentLocationMarker = null;
 
 const NaverMap = React.memo(
   ({
@@ -23,96 +19,120 @@ const NaverMap = React.memo(
     filterState,
     setFilterState,
   }) => {
-    const elRef = useRef(null);
+    const mapInstance = useRef(null);
+    const mapElement = useRef(null);
     const hospitalMarkersRef = useRef([]);
-    const [params] = useSearchParams();
+    const currentLocationMarker = useRef(null);
 
-    // 마커 완전 삭제 함수
+    // 지도 로드 상태 관리
+    const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+    // 마커 삭제
     const clearMarkers = useCallback(() => {
       if (hospitalMarkersRef.current.length > 0) {
         hospitalMarkersRef.current.forEach((marker) => {
-          if (marker) {
-            marker.setMap(null);
-            if (window.naver && window.naver.maps) {
-              window.naver.maps.Event.clearInstanceListeners(marker);
-            }
-          }
+          marker.setMap(null);
         });
         hospitalMarkersRef.current = [];
       }
     }, []);
 
-    // 위치 가져오기 함수
-    const getUserLocation = () => {
-      return new Promise((resolve) => {
-        if (!navigator.geolocation) {
-          resolve(null);
-          return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            resolve({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            });
-          },
-          (err) => {
-            console.warn('위치 정보를 가져올 수 없습니다. (권한 거부 등)', err);
-            resolve(null);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0,
-          }
-        );
-      });
-    };
-
-    //지역 필터 초기화 함수
-    const resetLocationFilter = () => {
-      setFilterState((prev) => ({
-        ...prev,
-        city: '',
-        region: '',
-      }));
-    };
-
-    // 병원 검색 함수
+    // 병원 검색
     const handleSearchHospitals = useCallback(async () => {
-      if (!mapInstance) return;
+      if (!mapInstance.current) return;
 
-      // 1. 지도 정보 가져오기
-      const center = mapInstance.getCenter();
-      const bounds = mapInstance.getBounds();
+      const bounds = mapInstance.current.getBounds();
       const sw = bounds.getSW();
       const ne = bounds.getNE();
 
       try {
-        setHospitals([]);
-
-        // 사용자 현위치 가져오기
-        const userPos = await getUserLocation();
-
-        const searchLat = userPos ? userPos.lat : center.lat();
-        const searchLng = userPos ? userPos.lng : center.lng();
-
         const data = await fetchHospitalsByLocation(
           [sw.lat(), sw.lng(), ne.lat(), ne.lng()],
           filterState
         );
-
         setHospitals(data.list || []);
-        setSelectedHospital(null);
       } catch (err) {
         console.error('병원 검색 실패:', err);
+        setHospitals([]);
       }
-    }, [filterState, setHospitals, setSelectedHospital]);
+    }, [filterState, setHospitals]);
 
-    // 현위치 조회
+    // 지도 이동 (필터 변경 시)
+    useEffect(() => {
+      const naver = window.naver;
+      if (!isMapLoaded || !mapInstance.current || !naver?.maps?.Service) return;
+
+      const { city, region } = filterState;
+
+      if (!city || city === '전체') return;
+
+      let addressesToSearch = [];
+      let isWholeCity = false;
+
+      if (Array.isArray(region) && region.length > 0) {
+        addressesToSearch = region.map((r) => `${city} ${r}`);
+      } else if (region && region !== '전체') {
+        addressesToSearch = [`${city} ${region}`];
+      } else {
+        // 지역이 없거나 전체인 경우 -> 시/도 검색
+        addressesToSearch = [city];
+        isWholeCity = true;
+      }
+
+      // 주소 -> 좌표 변환
+      const searchPromises = addressesToSearch.map((query) => {
+        return new Promise((resolve) => {
+          naver.maps.Service.geocode({ query }, (status, response) => {
+            if (
+              status === naver.maps.Service.Status.OK &&
+              response.v2?.addresses?.length > 0
+            ) {
+              const { x, y } = response.v2.addresses[0];
+              resolve(new naver.maps.LatLng(Number(y), Number(x)));
+            } else {
+              resolve(null);
+            }
+          });
+        });
+      });
+
+      Promise.all(searchPromises).then((results) => {
+        const validCoords = results.filter((coord) => coord !== null);
+
+        if (validCoords.length > 0) {
+          if (validCoords.length === 1) {
+            const targetCoord = validCoords[0];
+
+            mapInstance.current.setCenter(targetCoord);
+
+            const zoomLevel = isWholeCity ? 7 : 13;
+            mapInstance.current.setZoom(zoomLevel);
+          } else {
+            const bounds = new naver.maps.LatLngBounds();
+            validCoords.forEach((coord) => bounds.extend(coord));
+
+            mapInstance.current.fitBounds(bounds, {
+              top: 50,
+              right: 20,
+              bottom: 50,
+              left: 20,
+            });
+          }
+
+          setTimeout(() => handleSearchHospitals(), 500);
+        }
+      });
+    }, [
+      filterState.city,
+      filterState.region,
+      isMapLoaded,
+      handleSearchHospitals,
+    ]);
+
+    // 현위치 이동
     const handleCurrentLocation = useCallback(() => {
-      if (!window.naver || !mapInstance || !navigator.geolocation) return;
+      if (!window.naver || !mapInstance.current || !navigator.geolocation)
+        return;
 
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -121,16 +141,16 @@ const NaverMap = React.memo(
             pos.coords.longitude
           );
 
-          mapInstance.setCenter(currentPos);
-          mapInstance.setZoom(14);
+          mapInstance.current.setCenter(currentPos);
+          mapInstance.current.setZoom(14);
 
-          if (currentLocationMarker) {
-            currentLocationMarker.setPosition(currentPos);
-            currentLocationMarker.setMap(mapInstance);
+          if (currentLocationMarker.current) {
+            currentLocationMarker.current.setPosition(currentPos);
+            currentLocationMarker.current.setMap(mapInstance.current);
           } else {
-            currentLocationMarker = new window.naver.maps.Marker({
+            currentLocationMarker.current = new window.naver.maps.Marker({
               position: currentPos,
-              map: mapInstance,
+              map: mapInstance.current,
               zIndex: 100,
               icon: {
                 url: current_location_marker,
@@ -140,131 +160,69 @@ const NaverMap = React.memo(
               },
             });
           }
-          handleSearchHospitals();
+          // 초기화 후 검색
+          setFilterState((prev) => ({ ...prev, city: '', region: '' }));
+          setTimeout(handleSearchHospitals, 300);
         },
         (err) => {
           console.error('위치 조회 에러:', err);
-          handleSearchHospitals();
         }
       );
-    }, [handleSearchHospitals]);
-
-    // 필터 변경 감지
-    useEffect(() => {
-      if (!mapInstance) return;
-      handleSearchHospitals();
-    }, [
-      filterState.isOpen,
-      filterState.sort,
-      filterState.animal,
-      handleSearchHospitals,
-    ]);
-
-    // 지역 변경 감지
-    useEffect(() => {
-      const naver = window.naver;
-      if (!mapInstance || !naver?.maps?.Service?.geocode) return;
-
-      const { city, region } = filterState;
-      if (!city || city === '전체') return;
-
-      const isWholeCity =
-        !region ||
-        region === '전체' ||
-        (Array.isArray(region) && region.length === 0);
-      const regionText = Array.isArray(region)
-        ? region.join(' ')
-        : region === '전체'
-          ? ''
-          : region || '';
-      const addressQuery = `${city} ${regionText}`.trim();
-
-      naver.maps.Service.geocode(
-        { query: addressQuery },
-        (status, response) => {
-          if (
-            status !== naver.maps.Service.Status.OK ||
-            !response.v2?.addresses?.length
-          )
-            return;
-
-          const { x, y } = response.v2.addresses[0];
-          const newPoint = new naver.maps.LatLng(parseFloat(y), parseFloat(x));
-
-          clearMarkers();
-
-          mapInstance.setCenter(newPoint);
-          mapInstance.setZoom(isWholeCity ? 11 : 14);
-
-          setTimeout(() => handleSearchHospitals(), 300);
-        }
-      );
-    }, [
-      filterState.city,
-      filterState.region,
-      clearMarkers,
-      handleSearchHospitals,
-    ]);
+    }, [handleSearchHospitals, setFilterState]);
 
     // 지도 초기화
     useEffect(() => {
       const keyId = import.meta.env.VITE_NAVER_MAP_CLIENT_ID;
 
+      if (mapInstance.current) return;
+
       loadNaverMap(keyId).then((naver) => {
-        if (!elRef.current) return;
+        if (!mapElement.current) return;
 
-        if (!mapInstance) {
-          mapElement = document.createElement('div');
-          mapElement.style.width = '100%';
-          mapElement.style.height = '100%';
+        const map = new naver.maps.Map(mapElement.current, {
+          center: new naver.maps.LatLng(37.5665851, 126.9782038),
+          zoom: 14,
+          scaleControl: false,
+          logoControl: false,
+          mapDataControl: false,
+          zoomControl: false,
+        });
 
-          mapInstance = new naver.maps.Map(mapElement, {
-            center: new naver.maps.LatLng(37.5665851, 126.9782038),
-            zoom: 14,
-          });
+        mapInstance.current = map;
 
-          naver.maps.Event.addListener(mapInstance, 'click', () =>
-            setSelectedHospital(null)
-          );
-        }
-
-        if (elRef.current && !elRef.current.contains(mapElement)) {
-          elRef.current.appendChild(mapElement);
-          setTimeout(() => {
-            window.naver.maps.Event.trigger(mapInstance, 'resize');
-          }, 100);
-        }
-
-        const animalType = new URLSearchParams(window.location.search).get(
-          'animalType'
+        naver.maps.Event.addListener(map, 'click', () =>
+          setSelectedHospital(null)
         );
-        if (animalType) {
-          setFilterState((prev) => ({ ...prev, animal: [animalType] }));
-          setTimeout(handleCurrentLocation, 200);
-        } else {
-          handleSearchHospitals();
+
+        setIsMapLoaded(true);
+
+        if (!filterState.city) {
+          handleCurrentLocation();
         }
       });
     }, []);
 
     // 마커 렌더링
     useEffect(() => {
-      if (!mapInstance) return;
-
+      if (!mapInstance.current) return;
       clearMarkers();
 
       if (hospitals && hospitals.length > 0) {
         const newMarkers = hospitals.map((hospital) => {
-          const markerImg =
-            selectedHospital?.hospitalId === hospital.hospitalId
+          const isSelected =
+            selectedHospital?.hospitalId === hospital.hospitalId;
+
+          const markerImg = isSelected
+            ? hospital.isOpenNow
               ? selected_marker
-              : hospital.isOpenNow
-                ? marker_open
-                : marker_closed;
+              : selected_close_marker
+            : hospital.isOpenNow
+              ? marker_open
+              : marker_closed;
 
           const marker = new window.naver.maps.Marker({
             position: new window.naver.maps.LatLng(hospital.lat, hospital.lng),
-            map: mapInstance,
+            map: mapInstance.current,
             icon: {
               url: markerImg,
               size: new window.naver.maps.Size(60, 60),
@@ -275,34 +233,26 @@ const NaverMap = React.memo(
 
           window.naver.maps.Event.addListener(marker, 'click', () => {
             setSelectedHospital(hospital);
-            mapInstance.panTo(
+            mapInstance.current.panTo(
               new window.naver.maps.LatLng(hospital.lat, hospital.lng)
             );
           });
 
           return marker;
         });
-
         hospitalMarkersRef.current = newMarkers;
       }
-
-      return () => {
-        clearMarkers();
-      };
-    }, [hospitals, selectedHospital, setSelectedHospital, clearMarkers]);
+    }, [hospitals, selectedHospital, clearMarkers, setSelectedHospital]);
 
     return (
       <div className="relative h-full w-full">
         <div
-          ref={elRef}
+          ref={mapElement}
           className="h-[calc(100dvh-63px-56px)] w-full bg-gray-100"
         />
         <CurrentHospitalBtn onClick={handleSearchHospitals} />
         <button
-          onClick={() => {
-            resetLocationFilter();
-            handleCurrentLocation();
-          }}
+          onClick={handleCurrentLocation}
           className="absolute right-5 bottom-50 z-[1000] active:scale-95"
         >
           <img src={current_location_btn} alt="location" />
