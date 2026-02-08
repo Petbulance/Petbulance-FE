@@ -9,20 +9,20 @@ export default function ReviewSortModal({
   if (!open) return null;
 
   const sortOptions = [
+    { label: '최신순', value: '' },
     { label: '추천순', value: 'likeCount' },
-    { label: '최신순', value: 'createdAt' },
-    { label: '좋아요순', value: 'totalRating' },
+    { label: '별점 높은 순', value: 'rating' },
   ];
   return (
-    <div className="absolute inset-0 z-[3000] flex items-center justify-center px-10">
+    <div className="absolute inset-0 z-[3000] flex h-dvh items-center justify-center px-10">
       {/* 배경 (딤 처리) */}
       <div
-        className="absolute inset-0 bg-black/60 transition-opacity"
+        className="absolute inset-0 touch-none bg-black/50"
         onClick={onClose}
       />
 
       {/* 모달 본체 */}
-      <div className="relative w-full overflow-hidden rounded-[16px] bg-white px-6 py-8">
+      <div className="relative w-[420px] rounded-[16px] bg-white px-6 py-8 whitespace-pre-line">
         <h2 className="mb-8 text-left text-[25px] font-semibold text-[#1E1E1E]">
           어떤 순서로 정렬할까요?
         </h2>

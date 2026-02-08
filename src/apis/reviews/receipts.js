@@ -29,6 +29,8 @@ export const getFilteredReceipts = async (params = {}) => {
         region: combinedRegion,
         animalType: params.animal,
         receipt: params.receipt,
+        images: params.image,
+        sort: params.sort,
       },
     });
 

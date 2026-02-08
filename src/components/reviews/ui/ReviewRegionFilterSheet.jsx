@@ -4,7 +4,7 @@ import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { ResetBtn } from '@/components/hosiptals/ui/FilterPopup/ResetBtn';
 import { CITIES, REGION_DATA } from '@/data/regionData';
 
-export function ReviewRegionFilterSheet({ onApply, filterState }) {
+export function ReviewRegionFilterSheet({ filterState, onApply }) {
   const [temp, setTemp] = useState({
     city: filterState.city,
     region: filterState.region,
@@ -73,7 +73,14 @@ export function ReviewRegionFilterSheet({ onApply, filterState }) {
 
       <GreenBtn
         name="후기 보기"
-        onClick={() => onApply(temp.city, temp.region)}
+        onClick={() => {
+          const payload = {
+            city: temp.city,
+            region: temp.region,
+          };
+          console.log('🟡 [자식] 보내는 데이터:', payload);
+          onApply(payload);
+        }}
       />
     </>
   );

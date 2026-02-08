@@ -11,6 +11,7 @@ export function ReviewFilterBar({
   onOpenSheet,
   currentFilters = {},
   onToggleFilter,
+  onSortClick,
 }) {
   const selectedAnimals = currentFilters?.animal || [];
   let animalLabel = '동물종';
@@ -81,7 +82,10 @@ export function ReviewFilterBar({
         ))}
       </div>
 
-      <button className="ml-4 flex shrink-0 items-center gap-1 text-[18px] font-medium text-[#1E1E1E]">
+      <button
+        onClick={onSortClick}
+        className="ml-4 flex shrink-0 items-center gap-1 text-[18px] font-medium text-[#1E1E1E]"
+      >
         {currentSortLabel}
         <img src={down_arrow} alt="toggle" />
       </button>

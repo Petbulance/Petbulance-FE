@@ -14,13 +14,25 @@ const POPUP_STEPS = ['confirm', 'scan', 'success', 'form1', 'form2', 'form3'];
 
 export default function HosptialsReviews() {
   const [params] = useSearchParams();
-  const location = useLocation(); // 2. 현재 경로 정보를 가져옴
+  const location = useLocation();
   const step = params.get('step');
 
   const [activeSheet, setActiveSheet] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  const [filters, setFilters] = useState({
+    city: '',
+    region: '',
+    animal: [],
+    image: false,
+    receipt: false,
+    cursorId: 0,
+    sort: '',
+  });
+
   const reviewContext = {
+    filters,
+    setFilters,
     activeSheet,
     setActiveSheet,
     isDeleteModalOpen,
