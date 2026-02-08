@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import api from '@/apis/api.jsx';
 import UserManagementList from '@/components/admin/views/usermanagement/UserManagementList.jsx';
@@ -7,13 +7,14 @@ import UserManagementSearch from '@/components/admin/views/usermanagement/UserMa
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // ✅ 검색 조건 state
-  const [search, setSearch] = useState({
+  const initialSearch = {
     keyword: '',
     provider: 'ALL',
     status: 'ALL',
-  });
+  };
+
+  // ✅ 검색 조건 state
+  const [search, setSearch] = useState(initialSearch);
 
   /* =========================
    API 호출
@@ -46,6 +47,11 @@ export default function UserManagement() {
     fetchUsers(search);
   };
 
+  const handleReset = () => {
+    setSearch(initialSearch);
+    fetchUsers(initialSearch);
+  };
+
   /* =========================
    계정 삭제
 ========================= */ const handleDelete = async (userId) => {
@@ -66,6 +72,7 @@ export default function UserManagement() {
         search={search}
         onChange={setSearch}
         onSearch={handleSearch}
+        onReset={handleReset}
       />
 
       <UserManagementList
