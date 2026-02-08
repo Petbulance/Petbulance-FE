@@ -40,7 +40,7 @@ export default function SupportMyInquiry() {
           pageSize: PAGE_SIZE,
         },
       });
-
+      console.log(res);
       const { content, hasNext: next } = res.data.data;
 
       setQnaList((prev) => [...prev, ...content]);
@@ -82,6 +82,12 @@ export default function SupportMyInquiry() {
       )}
       {/* ================= 리스트 ================= */}
       <div className="h-full overflow-y-auto pb-32">
+        {!loading && qnaList.length === 0 && (
+          <div className="flex h-full items-center justify-center text-sm text-gray-400">
+            문의가 없습니다.
+          </div>
+        )}
+
         {qnaList.map((item) => (
           <button
             key={item.qnaId}
