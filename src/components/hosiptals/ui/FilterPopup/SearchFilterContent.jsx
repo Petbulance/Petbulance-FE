@@ -8,6 +8,7 @@ import { BottomTab } from './BottomTab';
 import { ResetBtn } from './ResetBtn';
 
 export function SearchFilterContent({ onApply, filterState }) {
+  // 초기 상태 설정
   const [temp, setTemp] = useState({
     city: filterState.city || '',
     region: Array.isArray(filterState.region)
@@ -17,6 +18,7 @@ export function SearchFilterContent({ onApply, filterState }) {
         : [],
   });
 
+  // 필터 상태가 외부에서 변경될 경우 동기화
   useEffect(() => {
     setTemp({
       city: filterState.city || '',
@@ -28,41 +30,52 @@ export function SearchFilterContent({ onApply, filterState }) {
     });
   }, [filterState]);
 
+  // 선택된 시/도의 전체 구 리스트
   const districts = useMemo(() => {
     if (!temp.city) return [];
     return REGION_DATA[temp.city] || [];
   }, [temp.city]);
 
-  // 시/도 클릭 핸들러
+  // '전체'를 제외한 순수 구 이름 배열 (일괄 선택 로직용)
+  const pureDistricts = useMemo(() => {
+    return districts.filter((d) => d !== '전체');
+  }, [districts]);
+
   const handleCityClick = (cityValue) => {
     if (temp.city !== cityValue) {
       setTemp({ city: cityValue, region: [] });
     }
   };
 
+  // 구/군 클릭 핸들러
   const handleRegionClick = (regionValue) => {
     setTemp((prev) => {
       const currentRegions = prev.region;
 
       if (regionValue === '전체') {
-        return { ...prev, region: [] };
+        const isCurrentlyAll = currentRegions.length === pureDistricts.length;
+        return {
+          ...prev,
+          region: isCurrentlyAll ? [] : [...pureDistricts],
+        };
       }
 
+      let nextRegions;
       if (currentRegions.includes(regionValue)) {
-        return {
-          ...prev,
-          region: currentRegions.filter((r) => r !== regionValue),
-        };
+        nextRegions = currentRegions.filter((r) => r !== regionValue);
       } else {
-        return {
-          ...prev,
-          region: [...currentRegions, regionValue],
-        };
+        nextRegions = [...currentRegions, regionValue];
       }
+
+      return { ...prev, region: nextRegions };
     });
   };
 
-  // 현재 위치 찾기
+  const handleReset = () => {
+    setTemp({ city: '', region: [] });
+  };
+
+  // 위치 기반 주소 매칭 로직
   const handleCurrentLocation = () => {
     if (!navigator.geolocation) {
       alert('위치 정보를 사용할 수 없는 브라우저입니다.');
@@ -89,24 +102,20 @@ export function SearchFilterContent({ onApply, filterState }) {
               return alert('주소를 찾을 수 없습니다.');
             }
 
-            const result = response.v2.address;
+            const result = response.v2.results[0]?.region;
+            if (result) {
+              const apiCity = result.area1.name;
+              const apiRegion = result.area2.name;
 
-            if (result && result.jibunAddress) {
-              const addressItems = response.v2.results[0]?.region;
-              if (addressItems) {
-                const apiCity = addressItems.area1.name;
-                const apiRegion = addressItems.area2.name;
+              const mappedCity = matchCityName(apiCity);
 
-                const mappedCity = matchCityName(apiCity);
-
-                if (mappedCity && CITIES.includes(mappedCity)) {
-                  setTemp({
-                    city: mappedCity,
-                    region: [apiRegion],
-                  });
-                } else {
-                  alert('지원하지 않는 지역이거나 데이터를 찾을 수 없습니다.');
-                }
+              if (mappedCity && CITIES.includes(mappedCity)) {
+                setTemp({
+                  city: mappedCity,
+                  region: [apiRegion],
+                });
+              } else {
+                alert('지원하지 않는 지역이거나 데이터를 찾을 수 없습니다.');
               }
             }
           }
@@ -146,16 +155,12 @@ export function SearchFilterContent({ onApply, filterState }) {
     return mapping[fullCityName] || fullCityName;
   };
 
-  const handleReset = () => {
-    setTemp({ city: '', region: [] });
-  };
-
   return (
     <>
       <ResetBtn onReset={handleReset} />
 
       <div className="flex h-[500px] min-h-0 flex-1 gap-4 text-[20px] font-medium">
-        {/* 왼쪽: 시/도 */}
+        {/* 왼쪽: 시/도 목록 */}
         <div className="w-1/3 overflow-y-auto bg-[#F5F5F5]">
           {CITIES.map((city) => (
             <div
@@ -172,20 +177,23 @@ export function SearchFilterContent({ onApply, filterState }) {
           ))}
         </div>
 
-        {/* 오른쪽: 구/군 (다중 선택 UI) */}
+        {/* 오른쪽: 구/군 목록 */}
         <div className="flex-1 overflow-y-auto bg-white">
           {districts.length > 0 ? (
             districts.map((dist) => {
-              const isSelected = temp.region.includes(dist);
-              const isAllSelected = dist === '전체' && temp.region.length === 0;
-              const active = isSelected || isAllSelected;
+              const isAllChecked =
+                pureDistricts.length > 0 &&
+                temp.region.length === pureDistricts.length;
+
+              const isActive =
+                dist === '전체' ? isAllChecked : temp.region.includes(dist);
 
               return (
                 <div
                   key={dist}
                   onClick={() => handleRegionClick(dist)}
                   className={`flex cursor-pointer items-center justify-between border-b px-5 py-3 transition-colors hover:bg-gray-50 ${
-                    active ? 'font-bold text-[#2DA969]' : 'text-[#1E1E1E]'
+                    isActive ? 'font-bold text-[#2DA969]' : 'text-[#1E1E1E]'
                   }`}
                 >
                   <span>{dist}</span>
@@ -194,7 +202,7 @@ export function SearchFilterContent({ onApply, filterState }) {
             })
           ) : (
             <div className="flex h-full items-center justify-center text-[16px] text-gray-400">
-              전체 지역을 선택하셨어요.
+              시/도를 먼저 선택해주세요.
             </div>
           )}
         </div>
@@ -208,6 +216,8 @@ export function SearchFilterContent({ onApply, filterState }) {
   );
 }
 
+// ---------------------------------------------------------
+// AnimalTypeContent
 export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
   const selectedAnimals = useMemo(
     () => filterState.animal || [],
@@ -221,10 +231,7 @@ export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
         ? currentList.filter((item) => item !== englishCode)
         : [...currentList, englishCode];
 
-      return {
-        ...prev,
-        animal: newList,
-      };
+      return { ...prev, animal: newList };
     });
   };
 
@@ -234,7 +241,6 @@ export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
         <div className="bg-white">
           {Object.entries(ANIMAL_CATEGORY_KO).map(([code, name]) => {
             const isActive = selectedAnimals.includes(code);
-
             return (
               <button
                 key={code}
@@ -254,7 +260,7 @@ export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
         </div>
       </div>
 
-      <div className="sticky right-0 left-0 z-50 px-8 pt-4">
+      <div className="sticky right-0 left-0 z-50 px-8 pt-4 pb-4">
         <button
           onClick={() => onApply(selectedAnimals)}
           className="w-full rounded-[16px] bg-[#2DA969] py-5 text-[27px] font-medium text-white shadow-lg transition-transform hover:bg-[#258d58] active:scale-[0.98]"
