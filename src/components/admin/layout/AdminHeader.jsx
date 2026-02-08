@@ -1,8 +1,14 @@
 import { Bell } from 'lucide-react';
 
+import useAdminStore from '@/stores/useAdminStore.js';
+
 export default function AdminHeader({ currentMenu, menus }) {
   const currentLabel =
     menus.find((m) => m.id === currentMenu)?.label || '관리자';
+  const adminProfile = useAdminStore((state) => state.adminProfile);
+  const displayName =
+    adminProfile?.nickname || adminProfile?.username || '관리자';
+  const displayInitial = (displayName?.charAt(0) || 'A').toUpperCase();
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-gray-100 bg-white/80 px-8 backdrop-blur-md">
@@ -20,11 +26,11 @@ export default function AdminHeader({ currentMenu, menus }) {
 
         <div className="flex h-8 items-center gap-3 border-l pl-6">
           <div className="text-right leading-tight">
-            <p className="text-xs font-black">김대표</p>
+            <p className="text-xs font-black">{displayName}</p>
             <p className="text-[10px] text-gray-400">Master Admin</p>
           </div>
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-tr from-blue-600 to-indigo-600 font-bold text-white shadow-sm">
-            K
+            {displayInitial}
           </div>
         </div>
       </div>

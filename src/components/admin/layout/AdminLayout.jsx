@@ -13,6 +13,8 @@ import {
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import useAdminStore from '@/stores/useAdminStore.js';
+
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
 
@@ -20,6 +22,7 @@ export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+  const clearAdminProfile = useAdminStore((state) => state.clearAdminProfile);
 
   const menuItems = [
     {
@@ -65,11 +68,12 @@ export default function AdminLayout() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('admin_token');
     if (!token) {
+      clearAdminProfile();
       navigate('/admin/auth/login', { replace: true });
     }
-  }, [navigate, location.pathname]);
+  }, [clearAdminProfile, navigate, location.pathname]);
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-[#1E293B]">

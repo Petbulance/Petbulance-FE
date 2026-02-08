@@ -100,11 +100,7 @@ export default function MyPage() {
           <Item
             Icon={Security}
             label="권한"
-            textClassName="text-red-500"
-            onClick={
-              () => alert('API 개발 중')
-              // requireLogin('/index/mypage/authorization')
-            }
+            onClick={() => requireLogin('/index/mypage/authorization')}
           />
         </Group>
 
@@ -137,7 +133,7 @@ export default function MyPage() {
           <Item
             Icon={Headset}
             label="문의 및 고객센터"
-            onClick={() => navigate('/index/mypage/support')}
+            onClick={() => requireLogin('/index/mypage/support')}
           />
           <Item
             Icon={Information}

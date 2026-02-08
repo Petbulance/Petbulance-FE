@@ -6,10 +6,15 @@ const api = axios.create({
 });
 api.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem('access_token');
+    const requestUrl = config.url ?? '';
+    const isAdminRequest =
+      requestUrl.startsWith('/admin') || requestUrl.includes('/admin/');
+    const tokenKey = isAdminRequest ? 'admin_token' : 'access_token';
+    const token = localStorage.getItem(tokenKey);
+
     try {
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
     } catch (error) {

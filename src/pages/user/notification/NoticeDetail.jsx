@@ -37,6 +37,13 @@ const NOTICE_CTA_MAP = {
       to: 'https://forms.gle/A3XMJbxn3guJoBYz6',
     },
   ],
+  95: [
+    {
+      text: '오류 제보하기',
+      type: 'internal',
+      to: '/index/mypage/support',
+    },
+  ],
 };
 
 export default function NoticeDetail() {
@@ -50,6 +57,7 @@ export default function NoticeDetail() {
       setLoading(true);
       const response = await api.get(`/notices/${id}`);
       setNoticeDetailData(response.data.data);
+      console.log('공지사항', response.data.data);
     } catch (error) {
       console.error(error);
       setNoticeDetailData(null);
