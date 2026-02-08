@@ -1,45 +1,66 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom'; // ✅ Context 사용을 위해 추가
 
 import { fetchHospitalsByName } from '@/apis/hospitals';
 import { registerRecentKeyword } from '@/apis/hospitals/searchHistory';
 import SortModal from '@/components/commons/layout/SortModal';
 import { ButtonSection } from '@/components/hosiptals/ui/ButtonSection';
 import { HospitalFilterModalContainer } from '@/components/hosiptals/ui/FilterPopup';
+
+import { HospitalCardList } from '@/components/hosiptals/ui/HospitalCardList';
+import { SearchBody } from '@/components/hosiptals/ui/HospitalSearch/SearchBody';
+import { NoSearchResult } from '@/components/hosiptals/ui/HospitalSearch/noSearchResult';
 import {
   AnimalTypeContent,
   SearchFilterContent,
 } from '@/components/hosiptals/ui/FilterPopup/SearchFilterContent';
-import { HospitalCardList } from '@/components/hosiptals/ui/HospitalCardList';
-import { SearchBody } from '@/components/hosiptals/ui/HospitalSearch/SearchBody';
-import { useHospitalFilter } from '@/hooks/useHospitalFilter';
-import { NoSearchResult } from '@/components/hosiptals/ui/HospitalSearch/noSearchResult';
 
 export function HospitalSearch() {
-  const { searchKeyword } = useHospitalFilter();
+  const {
+    filterState,
+    setFilterState,
+    activeSheet,
+    setActiveSheet,
+    searchKeyword,
+  } = useOutletContext();
 
-  const [localFilter, setLocalFilter] = useState({
-    city: '',
-    region: '',
-    animal: '',
-    sort: 'distance',
-    isOpen: false,
+  const [userLocation, setUserLocation] = useState({
+    lat: null,
+    lng: null,
   });
-
-  const { activeSheet, setActiveSheet } = useHospitalFilter();
 
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
   const [isSortOpen, setIsSortOpen] = useState(false);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error('위치 정보를 가져오는데 실패했습니다.', error);
+      }
+    );
+  }, []);
 
   const handleSearchAPI = useCallback(async () => {
     if (!searchKeyword) return;
 
     setIsLoading(true);
     try {
-      const data = await fetchHospitalsByName(searchKeyword, localFilter);
-      setSearchResults(data.list || []);
+      const data = await fetchHospitalsByName(searchKeyword, {
+        ...filterState,
+        userLat: userLocation.lat,
+        userLng: userLocation.lng,
+      });
 
+      setSearchResults(data.list || []);
       await registerRecentKeyword(searchKeyword);
     } catch (error) {
       console.error('검색 중 오류 발생:', error);
@@ -47,22 +68,22 @@ export function HospitalSearch() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchKeyword, localFilter]);
+  }, [searchKeyword, filterState, userLocation]);
 
   useEffect(() => {
     handleSearchAPI();
   }, [handleSearchAPI]);
 
   const handleToggleOpen = () =>
-    setLocalFilter((prev) => ({ ...prev, isOpen: !prev.isOpen }));
+    setFilterState((prev) => ({ ...prev, isOpen: !prev.isOpen }));
 
   const handleApplyFilter = (newData) => {
-    setLocalFilter((prev) => ({ ...prev, ...newData }));
+    setFilterState((prev) => ({ ...prev, ...newData }));
     setActiveSheet(null);
   };
 
   const handleSortChange = (value) => {
-    setLocalFilter((prev) => ({ ...prev, sort: value }));
+    setFilterState((prev) => ({ ...prev, sort: value }));
     setIsSortOpen(false);
   };
 
@@ -71,7 +92,7 @@ export function HospitalSearch() {
   return (
     <div className="relative flex h-dvh flex-col overflow-hidden bg-white">
       <ButtonSection
-        state={localFilter}
+        state={filterState}
         onOpenSheet={setActiveSheet}
         onOpenSort={() => setIsSortOpen(true)}
         onToggleOpen={handleToggleOpen}
@@ -79,13 +100,17 @@ export function HospitalSearch() {
 
       <main className="no-scrollbar flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center">
-            로딩 중...
+          <div className="flex h-full items-center justify-center font-medium text-gray-500">
+            병원을 찾고 있어요...
           </div>
         ) : searchKeyword ? (
           searchResults.length > 0 ? (
             <div className="min-h-full bg-white py-4">
-              <HospitalCardList hospitals={searchResults} />
+              <HospitalCardList
+                hospitals={searchResults}
+                userLat={userLocation.lat}
+                userLng={userLocation.lng}
+              />
             </div>
           ) : (
             <div className="mt-35 px-8">
@@ -100,7 +125,7 @@ export function HospitalSearch() {
       <SortModal
         open={isSortOpen}
         onClose={() => setIsSortOpen(false)}
-        selectedSort={localFilter.sort}
+        selectedSort={filterState.sort}
         onSelect={handleSortChange}
       />
 
@@ -113,14 +138,13 @@ export function HospitalSearch() {
           >
             {activeSheet === 'region' ? (
               <SearchFilterContent
-                filterState={localFilter}
-                setFilterState={setLocalFilter}
+                filterState={filterState}
                 onApply={(city, region) => handleApplyFilter({ city, region })}
               />
             ) : (
               <AnimalTypeContent
-                filterState={localFilter}
-                setFilterState={setLocalFilter}
+                filterState={filterState}
+                setFilterState={setFilterState}
                 onApply={(animalArray) =>
                   handleApplyFilter({ animal: animalArray })
                 }
