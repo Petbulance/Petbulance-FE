@@ -74,7 +74,6 @@ const NaverMap = React.memo(
       } else if (region && region !== '전체') {
         addressesToSearch = [`${city} ${region}`];
       } else {
-        // 지역이 없거나 전체인 경우 -> 시/도 검색
         addressesToSearch = [city];
         isWholeCity = true;
       }
@@ -105,7 +104,7 @@ const NaverMap = React.memo(
 
             mapInstance.current.setCenter(targetCoord);
 
-            const zoomLevel = isWholeCity ? 7 : 13;
+            const zoomLevel = isWholeCity ? 7 : 8;
             mapInstance.current.setZoom(zoomLevel);
           } else {
             const bounds = new naver.maps.LatLngBounds();

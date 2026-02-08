@@ -8,7 +8,6 @@ import { BottomTab } from './BottomTab';
 import { ResetBtn } from './ResetBtn';
 
 export function SearchFilterContent({ onApply, filterState }) {
-  // 초기 상태 설정
   const [temp, setTemp] = useState({
     city: filterState.city || '',
     region: Array.isArray(filterState.region)
@@ -18,7 +17,6 @@ export function SearchFilterContent({ onApply, filterState }) {
         : [],
   });
 
-  // 필터 상태가 외부에서 변경될 경우 동기화
   useEffect(() => {
     setTemp({
       city: filterState.city || '',
@@ -30,13 +28,11 @@ export function SearchFilterContent({ onApply, filterState }) {
     });
   }, [filterState]);
 
-  // 선택된 시/도의 전체 구 리스트
   const districts = useMemo(() => {
     if (!temp.city) return [];
     return REGION_DATA[temp.city] || [];
   }, [temp.city]);
 
-  // '전체'를 제외한 순수 구 이름 배열 (일괄 선택 로직용)
   const pureDistricts = useMemo(() => {
     return districts.filter((d) => d !== '전체');
   }, [districts]);
@@ -47,7 +43,6 @@ export function SearchFilterContent({ onApply, filterState }) {
     }
   };
 
-  // 구/군 클릭 핸들러
   const handleRegionClick = (regionValue) => {
     setTemp((prev) => {
       const currentRegions = prev.region;
@@ -71,11 +66,18 @@ export function SearchFilterContent({ onApply, filterState }) {
     });
   };
 
+  const handleApply = () => {
+    const isAllChecked =
+      pureDistricts.length > 0 && temp.region.length === pureDistricts.length;
+
+    const finalRegion = isAllChecked ? [] : temp.region;
+    onApply(temp.city, finalRegion);
+  };
+
   const handleReset = () => {
     setTemp({ city: '', region: [] });
   };
 
-  // 위치 기반 주소 매칭 로직
   const handleCurrentLocation = () => {
     if (!navigator.geolocation) {
       alert('위치 정보를 사용할 수 없는 브라우저입니다.');
@@ -106,7 +108,6 @@ export function SearchFilterContent({ onApply, filterState }) {
             if (result) {
               const apiCity = result.area1.name;
               const apiRegion = result.area2.name;
-
               const mappedCity = matchCityName(apiCity);
 
               if (mappedCity && CITIES.includes(mappedCity)) {
@@ -158,9 +159,7 @@ export function SearchFilterContent({ onApply, filterState }) {
   return (
     <>
       <ResetBtn onReset={handleReset} />
-
       <div className="flex h-[500px] min-h-0 flex-1 gap-4 text-[20px] font-medium">
-        {/* 왼쪽: 시/도 목록 */}
         <div className="w-1/3 overflow-y-auto bg-[#F5F5F5]">
           {CITIES.map((city) => (
             <div
@@ -177,14 +176,12 @@ export function SearchFilterContent({ onApply, filterState }) {
           ))}
         </div>
 
-        {/* 오른쪽: 구/군 목록 */}
         <div className="flex-1 overflow-y-auto bg-white">
           {districts.length > 0 ? (
             districts.map((dist) => {
               const isAllChecked =
                 pureDistricts.length > 0 &&
                 temp.region.length === pureDistricts.length;
-
               const isActive =
                 dist === '전체' ? isAllChecked : temp.region.includes(dist);
 
@@ -208,16 +205,11 @@ export function SearchFilterContent({ onApply, filterState }) {
         </div>
       </div>
 
-      <BottomTab
-        showSite={handleCurrentLocation}
-        showHospital={() => onApply(temp.city, temp.region)}
-      />
+      <BottomTab showSite={handleCurrentLocation} showHospital={handleApply} />
     </>
   );
 }
 
-// ---------------------------------------------------------
-// AnimalTypeContent
 export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
   const selectedAnimals = useMemo(
     () => filterState.animal || [],
@@ -230,7 +222,6 @@ export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
       const newList = currentList.includes(englishCode)
         ? currentList.filter((item) => item !== englishCode)
         : [...currentList, englishCode];
-
       return { ...prev, animal: newList };
     });
   };
@@ -259,7 +250,6 @@ export function AnimalTypeContent({ onApply, filterState, setFilterState }) {
           })}
         </div>
       </div>
-
       <div className="sticky right-0 left-0 z-50 px-8 pt-4 pb-4">
         <button
           onClick={() => onApply(selectedAnimals)}
