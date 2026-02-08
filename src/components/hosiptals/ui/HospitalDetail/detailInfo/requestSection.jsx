@@ -1,9 +1,15 @@
 import info_icon from '@/assets/images/icons/info_icon.svg';
 import right_arrow from '@/assets/images/icons/right_arrow.svg';
+import { useNavigate } from 'react-router-dom';
 
 export function RequestSection() {
+  const navigate = useNavigate();
+
   return (
-    <div className="flex cursor-pointer items-center justify-between px-6 py-8 active:bg-gray-50">
+    <div
+      onClick={() => navigate('/index/mypage/support')}
+      className="flex cursor-pointer items-center justify-between px-6 py-8 active:bg-gray-50"
+    >
       <div className="flex items-center gap-5">
         <img src={info_icon} alt="info" className="h-10 w-10" />
         <div>
