@@ -176,7 +176,7 @@ export default function NotificationSetting() {
           />
         </div>
         <div className="py-3 text-center text-[18px] font-semibold text-gray-700">
-          이벤트·혜택·프로모션 소식을 받아요
+          해당 기능은 앱에서만 사용하는 기능입니다.
         </div>
       </div>
     </div>
