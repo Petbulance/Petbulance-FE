@@ -6,8 +6,8 @@ export function ServiceBanner() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative w-md rounded-[10px] bg-emerald-100 shadow-lg">
-      <img src={bannerImg} alt="배너" className="w-full rounded-lg" />
+    <div className="relative max-h-[calc(100dvh-2rem)] w-[min(28rem,calc((100dvh-2rem)*0.586))] overflow-hidden rounded-[10px] bg-emerald-100 shadow-lg">
+      <img src={bannerImg} alt="배너" className="h-auto w-full rounded-lg" />
 
       {/* 버튼 영역 */}
       <button

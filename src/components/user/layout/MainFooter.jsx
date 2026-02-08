@@ -20,7 +20,7 @@ export default function MainFooter() {
   const location = useLocation();
 
   return (
-    <footer className="sticky bottom-0 border-t bg-white">
+    <footer className="z-10 shrink-0 border-t bg-white pb-[env(safe-area-inset-bottom)]">
       <ul className="flex justify-around py-2">
         {MENUS.map((menu) => {
           const isActive = location.pathname.startsWith(menu.path);
