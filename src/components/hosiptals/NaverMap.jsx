@@ -5,6 +5,7 @@ import current_location_btn from '@/assets/images/icons/current_location_btn.svg
 import current_location_marker from '@/assets/images/icons/current_location_marker.svg';
 import marker_open from '@/assets/images/icons/open_hospital_marker.svg';
 import selected_marker from '@/assets/images/icons/selected_marker.svg';
+import selected_close_marker from '@/assets/images/icons/selected_close_marker.svg';
 
 import { loadNaverMap } from '@/lib/loadNaverMap';
 import { CurrentHospitalBtn } from './ui/CurrentHospitalBtn';
@@ -56,6 +57,7 @@ const NaverMap = React.memo(
       }
     }, [filterState, setHospitals]);
 
+    // 지도 이동 (필터 변경 시)
     useEffect(() => {
       const naver = window.naver;
       if (!isMapLoaded || !mapInstance.current || !naver?.maps?.Service) return;
@@ -207,12 +209,16 @@ const NaverMap = React.memo(
 
       if (hospitals && hospitals.length > 0) {
         const newMarkers = hospitals.map((hospital) => {
-          const markerImg =
-            selectedHospital?.hospitalId === hospital.hospitalId
+          const isSelected =
+            selectedHospital?.hospitalId === hospital.hospitalId;
+
+          const markerImg = isSelected
+            ? hospital.isOpenNow
               ? selected_marker
-              : hospital.isOpenNow
-                ? marker_open
-                : marker_closed;
+              : selected_close_marker
+            : hospital.isOpenNow
+              ? marker_open
+              : marker_closed;
 
           const marker = new window.naver.maps.Marker({
             position: new window.naver.maps.LatLng(hospital.lat, hospital.lng),
