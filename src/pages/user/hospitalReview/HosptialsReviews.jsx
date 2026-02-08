@@ -22,7 +22,7 @@ export default function HosptialsReviews() {
 
   const [filters, setFilters] = useState({
     city: '',
-    region: '',
+    region: [],
     animal: [],
     image: false,
     receipt: false,
