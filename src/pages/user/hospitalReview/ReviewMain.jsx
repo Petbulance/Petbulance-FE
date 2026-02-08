@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom'; // useNavigate 추가
+import { useOutletContext, useNavigate } from 'react-router-dom';
 
 import { getFilteredReceipts } from '@/apis/reviews/receipts';
 import { HospitalFilterModalContainer } from '@/components/hosiptals/ui/FilterPopup';
@@ -8,26 +8,23 @@ import { ReviewContent } from '@/components/reviews/ui/ReviewContent';
 import { ReviewFilterBar } from '@/components/reviews/ui/ReviewFilterBar';
 import { ReviewRegionFilterSheet } from '@/components/reviews/ui/ReviewRegionFilterSheet';
 import { WriteBtn } from '@/components/reviews/ui/WriteBtn';
-import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal'; // 모달 import
+import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
+import ReviewSortModal from '@/components/hosiptals/ui/HospitalDetail/review/ReviewSortModal';
 
 export function ReviewMain() {
-  const { activeSheet, setActiveSheet } = useOutletContext();
-  const navigate = useNavigate(); // 네비게이션 훅
+  const { activeSheet, setActiveSheet, filters, setFilters } =
+    useOutletContext();
+  const navigate = useNavigate();
 
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // 정렬 모달 상태
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  // 글쓰기 모달 상태
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
 
-  const [filters, setFilters] = useState({
-    city: '',
-    region: '',
-    animal: [],
-    image: false,
-    receipt: false,
-    cursorId: 0,
-  });
-
+  // 토글 필터 핸들러
   const handleToggleFilter = (id) => {
     setFilters((prev) => {
       const filterKey =
@@ -37,17 +34,22 @@ export function ReviewMain() {
     });
   };
 
-  const handleApplyFilter = (newFilters) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...newFilters,
-      cursorId: 0,
-    }));
+  // 정렬 선택 핸들러
+  const handleSortSelect = (sortValue) => {
+    setFilters((prev) => ({ ...prev, sort: sortValue, cursorId: 0 }));
+    setIsSortOpen(false);
+  };
+
+  // 필터 적용 핸들러
+  const handleApplyFilter = (newData) => {
+    setFilters((prev) => ({ ...prev, ...newData }));
     setActiveSheet(null);
   };
 
+  // 데이터 페칭
   useEffect(() => {
     const fetchReviews = async () => {
+      console.log('현재 필터:', filters);
       setIsLoading(true);
       try {
         const data = await getFilteredReceipts(filters);
@@ -65,13 +67,11 @@ export function ReviewMain() {
     setIsWriteModalOpen(true);
   };
 
-  //사진 첨부 선택 시 -> scan 단계로 이동
   const handleConfirmVerification = () => {
     setIsWriteModalOpen(false);
     navigate('/index/reviews/write?step=scan');
   };
 
-  //인증 없이 작성 선택 시 -> 단계로 이동
   const handleSkipVerification = () => {
     setIsWriteModalOpen(false);
     navigate('/index/reviews/write?step=form1');
@@ -79,29 +79,35 @@ export function ReviewMain() {
 
   return (
     <div
-      className={`relative h-full w-full bg-white ${isWriteModalOpen ? 'overflow-hidden' : ''}`}
+      className={`relative h-full w-full bg-white ${
+        isWriteModalOpen || isSortOpen ? 'overflow-hidden' : ''
+      }`}
     >
-      {!activeSheet && (
-        <>
-          <ReviewFilterBar
-            onOpenSheet={setActiveSheet}
-            currentFilters={filters}
-            onToggleFilter={handleToggleFilter}
-          />
+      <ReviewFilterBar
+        onOpenSheet={setActiveSheet}
+        currentFilters={filters}
+        onToggleFilter={handleToggleFilter}
+        onSortClick={() => setIsSortOpen(true)}
+      />
 
-          <ReviewContent data={reviews} />
+      <ReviewSortModal
+        open={isSortOpen}
+        onClose={() => setIsSortOpen(false)}
+        selectedSort={filters.sort}
+        onSelect={handleSortSelect}
+      />
 
-          <div className="pointer-events-none sticky bottom-4 flex justify-end px-4">
-            <WriteBtn onClick={handleWriteClick} />
-          </div>
-        </>
-      )}
+      <ReviewContent data={reviews} />
 
-      {/* 필터 시트  */}
+      <div className="pointer-events-none sticky bottom-4 flex justify-end px-4">
+        <WriteBtn onClick={handleWriteClick} />
+      </div>
+
+      {/* 필터 시트 */}
       {activeSheet && (
         <div className="absolute inset-0 z-[2000] bg-white">
           <HospitalFilterModalContainer
-            onClose={() => setActiveSheet(null)}
+            onClose={() => setActiveSheet(false)}
             mode={activeSheet}
             onModeChange={setActiveSheet}
           >
@@ -120,6 +126,7 @@ export function ReviewMain() {
         </div>
       )}
 
+      {/* 리뷰 작성 모달 */}
       <ConfirmSelectModal
         open={isWriteModalOpen}
         title={`후기를 작성하기 전에\n영수증 인증을 진행하시겠어요?`}
