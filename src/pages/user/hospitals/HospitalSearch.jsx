@@ -130,7 +130,7 @@ export function HospitalSearch() {
       />
 
       {activeSheet && (
-        <div className="absolute inset-0 z-[2000] bg-white">
+        <div className="absolute inset-0 z-[2000]">
           <HospitalFilterModalContainer
             onClose={closeSheet}
             mode={activeSheet}

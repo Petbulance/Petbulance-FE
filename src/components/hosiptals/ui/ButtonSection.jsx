@@ -30,7 +30,7 @@ export function ButtonSection({
     if (!city) return '지역';
 
     if (!region || !Array.isArray(region) || region.length === 0) {
-      return city;
+      return `${city}`;
     }
 
     const firstRegion = region[0];
