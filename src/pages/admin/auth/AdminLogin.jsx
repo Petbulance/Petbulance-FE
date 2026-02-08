@@ -29,7 +29,7 @@ export default function AdminLogin() {
       const token = data.access_token;
 
       if (token) {
-        localStorage.setItem('access_token', token);
+        localStorage.setItem('admin_token', token);
       }
 
       const adminSource = data.admin ?? data.profile ?? data.user ?? data;

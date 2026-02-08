@@ -68,7 +68,7 @@ export default function AdminLayout() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('admin_token');
     if (!token) {
       clearAdminProfile();
       navigate('/admin/auth/login', { replace: true });
