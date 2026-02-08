@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import api from '@/apis/api.jsx';
 import HospitalForm from '@/components/admin/views/Hosptial/HospitalForm.jsx';
@@ -18,6 +18,22 @@ const parseTimeRange = (value) => {
   if (!match) return [null, null];
 
   return [`${match[1]}:00`, `${match[2]}:00`];
+};
+
+const parseTagsByHash = (value) => {
+  if (!value) return [];
+
+  const byHash = value.includes('#')
+    ? value
+        .split('#')
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+    : value
+        .split(/[,\s]+/)
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+
+  return byHash.map((tag) => `#${tag.replace(/^#/, '')}`);
 };
 
 export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
@@ -112,22 +128,6 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
   const histories = currentHospital.hospitalHistories ?? [];
 
   /* =========================
-     운영시간 표시용
-  ========================= */
-  const hours = useMemo(() => {
-    const map = {};
-    form?.worktimes?.forEach((w) => {
-      const idx = DAY_MAP.indexOf(w.dayOfWeek);
-      if (idx !== -1) {
-        map[idx] = w.isOpen
-          ? `${w.openTime?.slice(0, 5)}~${w.closeTime?.slice(0, 5)}`
-          : '휴무';
-      }
-    });
-    return map;
-  }, [form?.worktimes]);
-
-  /* =========================
      공통 변경 처리
   ========================= */
   const updateField = (key, value) => {
@@ -176,7 +176,7 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
     const payload = {
       hospitalName: form.name,
       phoneNumber: form.phoneNumber,
-      tags: form.tag ? form.tag.split(',').map((t) => t.trim()) : [],
+      tags: parseTagsByHash(form.tag),
       information: form.information,
       address: form.address,
       streetAddress: form.streetAddress,
@@ -277,7 +277,6 @@ export default function HospitalDetail({ hospitalId, mode = 'edit' }) {
         {hospitalTab === 'info' ? (
           <HospitalForm
             form={form}
-            hours={hours}
             onChangeField={updateField}
             onChangeWorkTime={updateWorkTime}
           />

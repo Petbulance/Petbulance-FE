@@ -100,11 +100,7 @@ export default function MyPage() {
           <Item
             Icon={Security}
             label="권한"
-            textClassName="text-red-500"
-            onClick={
-              () => alert('API 개발 중')
-              // requireLogin('/index/mypage/authorization')
-            }
+            onClick={() => requireLogin('/index/mypage/authorization')}
           />
         </Group>
 
