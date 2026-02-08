@@ -88,7 +88,7 @@ export default function HomeBanner() {
                 <img
                   src={banner.imageUrl}
                   alt="banner"
-                  className="h-40 w-full object-cover"
+                  className="h-auto w-full object-contain"
                 />
 
                 {/* 오버레이 */}
