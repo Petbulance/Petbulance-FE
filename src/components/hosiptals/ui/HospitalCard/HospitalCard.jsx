@@ -10,7 +10,7 @@ export function HospitalCard({
   lng,
   userLat,
   userLng,
-  // distance,
+  tags,
   phoneNumber,
   rating,
   reviews,
@@ -28,7 +28,7 @@ export function HospitalCard({
         lng={lng}
         userLat={userLat}
         userLng={userLng}
-        // distanceMeter={distance}
+        tags={tags}
         phone={phoneNumber}
         overallRating={rating}
         reviewCount={reviews}

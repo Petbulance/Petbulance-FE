@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'; // useMemo 추가
+import { useEffect, useMemo } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { registerRecentViewedHospital } from '@/apis/hospitals/searchHistory';
@@ -42,7 +42,7 @@ export function HosipitalDetail({
   todayCloseTime,
   overallRating,
   reviewCount,
-  acceptedAnimals,
+  tags = [],
 }) {
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -50,8 +50,22 @@ export function HosipitalDetail({
   const isHospitalIndexPage = pathname.includes(`/index/hospitals/${id}`);
 
   const MAX_SHOW = 4;
-  const hasMore = acceptedAnimals?.length > MAX_SHOW;
-  const visibleAnimals = acceptedAnimals?.slice(0, MAX_SHOW);
+  const hasMore = tags?.length > MAX_SHOW;
+  const visibleTags = tags?.slice(0, MAX_SHOW);
+
+  // 태그 타입별 색상 매핑 함수
+  const getTagStyle = (type) => {
+    switch (type) {
+      case 'WORKTYPE':
+        return 'bg-[#FBE1DA]';
+      case 'ANIMALTYPE':
+        return 'bg-[#FAF5B8]';
+      case 'LOCATIONTYPE':
+        return 'bg-[#E8EBED]';
+      default:
+        return 'bg-[#FAF5B8]';
+    }
+  };
 
   const distance = useMemo(() => {
     if (!lat || !lng || !userLat || !userLng) return null;
@@ -84,13 +98,14 @@ export function HosipitalDetail({
     ? Number(overallRating).toFixed(1)
     : '0.0';
 
-  const formattedCloseTime = useMemo(() => {
-    if (!todayCloseTime) return '';
+  let formattedCloseTime = '';
+  if (todayCloseTime) {
     const timeParts = todayCloseTime.split(':');
-    return timeParts.length >= 2
-      ? `${timeParts[0]}:${timeParts[1]}`
-      : todayCloseTime;
-  }, [todayCloseTime]);
+    formattedCloseTime =
+      timeParts.length >= 2
+        ? `${timeParts[0]}:${timeParts[1]}`
+        : todayCloseTime;
+  }
 
   return (
     <div className="flex items-center gap-3">
@@ -113,10 +128,16 @@ export function HosipitalDetail({
           <span className={openNow ? 'text-[#067DFD]' : 'text-[#BDBDBD]'}>
             {openNow ? '진료 중' : '진료 마감'}
           </span>
-          <img src={DotIcon} alt="dot_icon" />
-          <span className="text-[#424242]">
-            {formattedCloseTime}에 영업 종료
-          </span>
+
+          {formattedCloseTime && (
+            <>
+              <img src={DotIcon} alt="dot_icon" />
+              <span className="text-[#424242]">
+                {formattedCloseTime}에 영업 종료
+              </span>
+            </>
+          )}
+
           <img src={DotIcon} alt="dot_icon" />
           <span className="text-[#9E9E9E]">
             {distance ? `${distance}km` : '- km'}
@@ -138,14 +159,22 @@ export function HosipitalDetail({
 
         {isHospitalIndexPage ? (
           <div className="mt-1.5 flex w-[308px] flex-wrap items-center gap-1">
-            {acceptedAnimals.map((kind, idx) => (
-              <CategoryButton key={`${kind}-${idx}`} kind={kind} />
+            {tags.map((tag, idx) => (
+              <CategoryButton
+                key={`${tag.value}-${idx}`}
+                kind={tag.value}
+                style={getTagStyle(tag.type)}
+              />
             ))}
           </div>
         ) : (
           <div className="mt-1.5 flex w-[308px] items-center gap-1 overflow-hidden">
-            {visibleAnimals?.map((kind, idx) => (
-              <CategoryButton key={`${kind}-${idx}`} kind={kind} />
+            {visibleTags?.map((tag, idx) => (
+              <CategoryButton
+                key={`${tag.value}-${idx}`}
+                kind={tag.value}
+                style={getTagStyle(tag.type)}
+              />
             ))}
             {hasMore && <img src={hide_icon} alt="more" />}
           </div>

@@ -30,11 +30,11 @@ export function HospitalInfoSlide({
               lng={card.lng}
               userLat={userLat}
               userLng={userLng}
-              // distance={card.distanceMeters}
               phoneNumber={card.phone}
               rating={card.rating}
               reviews={card.reviewCount}
               kinds={card.types}
+              tags={card.tags}
               onClick={() => navigate(`/index/hospitals/${card.hospitalId}`)}
             />
           </div>
