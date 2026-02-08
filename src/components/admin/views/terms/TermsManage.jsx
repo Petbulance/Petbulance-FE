@@ -103,7 +103,7 @@ export default function TermsManage() {
                       onClick={() => navigate(`/admin/terms/${term.termsType}`)}
                       className="text-blue-600 hover:underline"
                     >
-                      수정
+                      상세보기
                     </button>
                   </td>
                 </tr>

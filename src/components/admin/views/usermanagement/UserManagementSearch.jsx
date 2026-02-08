@@ -1,6 +1,11 @@
-import { Search } from 'lucide-react';
+import { RotateCcw, Search } from 'lucide-react';
 
-export default function UserManagementSearch({ search, onChange, onSearch }) {
+export default function UserManagementSearch({
+  search,
+  onChange,
+  onSearch,
+  onReset,
+}) {
   return (
     <div className="flex flex-wrap items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
       {/* 키워드 */}
@@ -47,6 +52,14 @@ export default function UserManagementSearch({ search, onChange, onSearch }) {
         className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
       >
         검색
+      </button>
+
+      <button
+        onClick={onReset}
+        className="flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+      >
+        <RotateCcw size={14} />
+        초기화
       </button>
     </div>
   );

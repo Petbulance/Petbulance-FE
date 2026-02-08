@@ -16,6 +16,7 @@ export default function HospitalView() {
   const [totalPages, setTotalPages] = useState(0);
   const [hospitals, setHospitals] = useState([]);
   const [selectedHospitalId, setSelectedHospitalId] = useState(null);
+  const [keywordInput, setKeywordInput] = useState('');
   const [keyword, setKeyword] = useState('');
   const navigate = useNavigate();
   /* =========================
@@ -24,11 +25,14 @@ export default function HospitalView() {
   useEffect(() => {
     const fetchHospitals = async () => {
       try {
-        const res = await api.get('/admin/hospital', {
+        const endpoint = keyword
+          ? `/admin/hospital/${encodeURIComponent(keyword)}`
+          : '/admin/hospital';
+
+        const res = await api.get(endpoint, {
           params: {
             page: page - 1,
             size: PAGE_SIZE,
-            keyword,
           },
         });
 
@@ -54,6 +58,17 @@ export default function HospitalView() {
     fetchHospitals();
   }, [page, keyword]);
 
+  const handleSearch = () => {
+    setPage(1);
+    setKeyword(keywordInput.trim());
+  };
+
+  const handleReset = () => {
+    setPage(1);
+    setKeywordInput('');
+    setKeyword('');
+  };
+
   return (
     <div className="animate-in fade-in space-y-6 duration-500">
       {/* ===== 상단 헤더 ===== */}
@@ -73,17 +88,33 @@ export default function HospitalView() {
           {/* 검색 */}
 
           <div className="border-b border-gray-100 bg-gray-50/50 p-4">
-            <div className="relative">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <input
-                className="w-full rounded-lg border border-gray-200 py-2 pr-4 pl-9 text-sm outline-none focus:border-blue-500"
-                placeholder="병원명 검색..."
-                value={keyword}
-                onChange={(e) => {
-                  setPage(1);
-                  setKeyword(e.target.value);
-                }}
-              />
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  className="w-full rounded-lg border border-gray-200 py-2 pr-4 pl-9 text-sm outline-none focus:border-blue-500"
+                  placeholder="병원명 검색..."
+                  value={keywordInput}
+                  onChange={(e) => {
+                    setKeywordInput(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSearch();
+                  }}
+                />
+              </div>
+              <button
+                onClick={handleSearch}
+                className="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+              >
+                검색
+              </button>
+              <button
+                onClick={handleReset}
+                className="rounded border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                초기화
+              </button>
             </div>
           </div>
 
@@ -98,25 +129,36 @@ export default function HospitalView() {
               </thead>
 
               <tbody className="divide-y divide-gray-50">
-                {hospitals.map((h) => (
-                  <tr
-                    key={h.id}
-                    onClick={() => setSelectedHospitalId(h.id)}
-                    className={`cursor-pointer transition ${
-                      h.id === selectedHospitalId
-                        ? 'border border-l-blue-600 bg-blue-50'
-                        : 'border border-transparent hover:bg-blue-50/50'
-                    }`}
-                  >
-                    <td className="px-4 py-3">
-                      <div className="font-semibold">{h.name}</div>
-                      <div className="mt-0.5 text-xs text-gray-400">
-                        {h.address || '주소 없음'}
-                      </div>
+                {hospitals.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={2}
+                      className="px-4 py-12 text-center text-sm text-gray-400"
+                    >
+                      검색 결과가 없습니다.
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-500">{h.id}</td>
                   </tr>
-                ))}
+                ) : (
+                  hospitals.map((h) => (
+                    <tr
+                      key={h.id}
+                      onClick={() => setSelectedHospitalId(h.id)}
+                      className={`cursor-pointer transition ${
+                        h.id === selectedHospitalId
+                          ? 'border border-l-blue-600 bg-blue-50'
+                          : 'border border-transparent hover:bg-blue-50/50'
+                      }`}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="font-semibold">{h.name}</div>
+                        <div className="mt-0.5 text-xs text-gray-400"></div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-500">
+                        {h.id}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

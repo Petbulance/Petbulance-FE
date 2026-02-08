@@ -117,7 +117,6 @@ const WorkTimes = ({ worktimes, onChange }) => (
 
 export default function HospitalForm({
   form,
-  hours,
   onChangeField,
   onChangeWorkTime,
 }) {
@@ -163,7 +162,7 @@ export default function HospitalForm({
         />
 
         <Input
-          label="태그 (쉼표 구분)"
+          label="태그 (#으로 구분)"
           value={form.tag}
           onChange={(v) => onChangeField('tag', v)}
         />
