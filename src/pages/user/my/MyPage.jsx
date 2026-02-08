@@ -133,7 +133,7 @@ export default function MyPage() {
           <Item
             Icon={Headset}
             label="문의 및 고객센터"
-            onClick={() => navigate('/index/mypage/support')}
+            onClick={() => requireLogin('/index/mypage/support')}
           />
           <Item
             Icon={Information}
