@@ -110,9 +110,7 @@ export default function HospitalView() {
                   >
                     <td className="px-4 py-3">
                       <div className="font-semibold">{h.name}</div>
-                      <div className="mt-0.5 text-xs text-gray-400">
-                        {h.address || '주소 없음'}
-                      </div>
+                      <div className="mt-0.5 text-xs text-gray-400"></div>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">{h.id}</td>
                   </tr>
