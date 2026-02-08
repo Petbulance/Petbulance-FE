@@ -136,7 +136,11 @@ export default function HospitalsMap() {
                 <NoHospitalResult />
               </div>
             ) : (
-              <HospitalCardList hospitals={hospitals} />
+              <HospitalCardList
+                hospitals={hospitals}
+                userLat={myLocation.lat}
+                userLng={myLocation.lng}
+              />
             )}
           </div>
 
