@@ -3,7 +3,6 @@ import { useMemo, useState, useEffect } from 'react';
 import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { ResetBtn } from '@/components/hosiptals/ui/FilterPopup/ResetBtn';
 import { CITIES, REGION_DATA } from '@/data/regionData';
-import greenCheck from '@/assets/images/icons/green_check.svg';
 
 export function ReviewRegionFilterSheet({ filterState, onApply }) {
   const [temp, setTemp] = useState({
@@ -117,7 +116,7 @@ export function ReviewRegionFilterSheet({ filterState, onApply }) {
             })
           ) : (
             <div className="flex h-full items-center justify-center text-[16px] text-gray-400">
-              시/도를 먼저 선택해주세요.
+              전체 지역을 선택하셨어요.
             </div>
           )}
         </div>
