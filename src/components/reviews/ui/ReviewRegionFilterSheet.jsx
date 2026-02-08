@@ -1,9 +1,9 @@
-import { useMemo, useState, useEffect } from 'react'; // useEffect 추가
+import { useMemo, useState, useEffect } from 'react';
 
 import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { ResetBtn } from '@/components/hosiptals/ui/FilterPopup/ResetBtn';
 import { CITIES, REGION_DATA } from '@/data/regionData';
-import greenCheck from '@/assets/images/icons/green_check.svg'; // ✅ 체크 아이콘 import
+import greenCheck from '@/assets/images/icons/green_check.svg';
 
 export function ReviewRegionFilterSheet({ filterState, onApply }) {
   const [temp, setTemp] = useState({
@@ -26,10 +26,16 @@ export function ReviewRegionFilterSheet({ filterState, onApply }) {
     });
   }, [filterState]);
 
+  // 해당 시/도의 전체 데이터
   const districts = useMemo(() => {
     if (!temp.city) return [];
     return REGION_DATA[temp.city] || [];
   }, [temp.city]);
+
+  // '전체'를 제외한 순수 지역구 목록
+  const pureDistricts = useMemo(() => {
+    return districts.filter((d) => d !== '전체');
+  }, [districts]);
 
   const handleCityClick = (cityValue) => {
     if (temp.city !== cityValue) {
@@ -42,20 +48,21 @@ export function ReviewRegionFilterSheet({ filterState, onApply }) {
       const currentRegions = prev.region;
 
       if (regionValue === '전체') {
-        return { ...prev, region: [] };
+        const isCurrentlyAll = currentRegions.length === pureDistricts.length;
+        return {
+          ...prev,
+          region: isCurrentlyAll ? [] : [...pureDistricts],
+        };
       }
 
+      let nextRegions;
       if (currentRegions.includes(regionValue)) {
-        return {
-          ...prev,
-          region: currentRegions.filter((r) => r !== regionValue),
-        };
+        nextRegions = currentRegions.filter((r) => r !== regionValue);
       } else {
-        return {
-          ...prev,
-          region: [...currentRegions, regionValue],
-        };
+        nextRegions = [...currentRegions, regionValue];
       }
+
+      return { ...prev, region: nextRegions };
     });
   };
 
@@ -85,19 +92,23 @@ export function ReviewRegionFilterSheet({ filterState, onApply }) {
           ))}
         </div>
 
+        {/* 오른쪽: 구/군 */}
         <div className="flex-1 overflow-y-auto bg-white">
           {districts.length > 0 ? (
             districts.map((dist) => {
-              const isSelected = temp.region.includes(dist);
-              const isAllSelected = dist === '전체' && temp.region.length === 0;
-              const active = isSelected || isAllSelected;
+              const isAllChecked =
+                pureDistricts.length > 0 &&
+                temp.region.length === pureDistricts.length;
+
+              const isActive =
+                dist === '전체' ? isAllChecked : temp.region.includes(dist);
 
               return (
                 <div
                   key={dist}
                   onClick={() => handleRegionClick(dist)}
                   className={`flex cursor-pointer items-center justify-between border-b px-5 py-3 transition-colors hover:bg-gray-50 ${
-                    active ? 'font-bold text-[#2DA969]' : 'text-[#1E1E1E]'
+                    isActive ? 'font-bold text-[#2DA969]' : 'text-[#1E1E1E]'
                   }`}
                 >
                   <span>{dist}</span>
@@ -115,9 +126,13 @@ export function ReviewRegionFilterSheet({ filterState, onApply }) {
       <GreenBtn
         name="후기 보기"
         onClick={() => {
+          const isAllSelected =
+            temp.region.length === pureDistricts.length ||
+            temp.region.length === 0;
+
           const payload = {
             city: temp.city,
-            region: temp.region,
+            region: isAllSelected ? [] : temp.region,
           };
           onApply(payload);
         }}

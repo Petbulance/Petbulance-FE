@@ -29,8 +29,8 @@ export function ReviewFilterBar({
 
     if (!city) return '지역';
 
-    if (!region || !Array.isArray(region) || region.length === 0) {
-      return city;
+    if (!region || region.length === 0) {
+      return `${city}`;
     }
 
     const firstRegion = region[0];
