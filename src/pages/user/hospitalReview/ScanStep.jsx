@@ -93,7 +93,7 @@ export default function ScanStep({ onScanSuccess }) {
           open={true}
           title="영수증을 인식하지 못했어요."
           content={`텍스트가 명확하거나 빛 반사가 없는 사진을 첨\n부해주세요.`}
-          confirmText="다시 촬영"
+          confirmText="사진 첨부"
           cancelText="인증 없이 작성"
           onConfirm={handleRetry}
           onCancel={() => setParams({ step: 'form1' })}
