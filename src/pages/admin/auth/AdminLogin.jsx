@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
+import useAdminStore from '@/stores/useAdminStore.js';
 
 export default function AdminLogin() {
   const [adminId, setAdminId] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const setAdminProfile = useAdminStore((state) => state.setAdminProfile);
 
   const navigate = useNavigate();
 
@@ -23,11 +25,19 @@ export default function AdminLogin() {
     try {
       const response = await api.post('/admin/login', payload);
       console.log(response);
-      const token = response?.data.data.access_token;
+      const data = response?.data?.data ?? {};
+      const token = data.access_token;
 
       if (token) {
         localStorage.setItem('access_token', token);
       }
+
+      const adminSource = data.admin ?? data.profile ?? data.user ?? data;
+      const adminProfile = {
+        nickname: adminSource?.nickname ?? '',
+        username: adminSource?.username ?? adminId,
+      };
+      setAdminProfile(adminProfile);
 
       setTimeout(() => navigate('/admin'), 500);
     } catch (error) {
