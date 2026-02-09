@@ -54,7 +54,6 @@ export function HosipitalDetail({
   const hasMore = tags?.length > MAX_SHOW;
   const visibleTags = tags?.slice(0, MAX_SHOW);
 
-  // 태그 타입별 색상 매핑 함수
   const getTagStyle = (type) => {
     switch (type) {
       case 'WORKTYPE':
@@ -69,29 +68,28 @@ export function HosipitalDetail({
   };
 
   const distance = useMemo(() => {
-    if (!lat || !lng || !userLat || !userLng) return null;
+    const uLat = parseFloat(userLat);
+    const uLng = parseFloat(userLng);
+    const hLat = parseFloat(lat);
+    const hLng = parseFloat(lng);
 
-    const dist = getDistanceFromLatLonInKm(
-      Number(userLat),
-      Number(userLng),
-      Number(lat),
-      Number(lng)
-    );
+    if (isNaN(uLat) || isNaN(uLng) || isNaN(hLat) || isNaN(hLng)) {
+      return null;
+    }
 
-    return dist.toFixed(1);
+    const dist = getDistanceFromLatLonInKm(uLat, uLng, hLat, hLng);
+    return isNaN(dist) ? null : dist.toFixed(1);
   }, [lat, lng, userLat, userLng]);
 
   useEffect(() => {
     const recordHistory = async () => {
       if (!id) return;
-
       try {
         await registerRecentViewedHospital(Number(id));
       } catch (error) {
         console.error('최근 본 병원 등록 실패:', error);
       }
     };
-
     recordHistory();
   }, [id]);
 
@@ -102,7 +100,6 @@ export function HosipitalDetail({
   let formattedTimeDisplay = '';
   if (todayCloseTime) {
     const timeParts = todayCloseTime.split(':');
-
     formattedTimeDisplay =
       timeParts.length >= 2
         ? `${timeParts[0]}:${timeParts[1]}에 영업 종료`
@@ -143,7 +140,7 @@ export function HosipitalDetail({
 
           <img src={DotIcon} alt="dot_icon" />
           <span className="text-[#9E9E9E]">
-            {distance ? `${distance}km` : '- km'}
+            {distance !== null ? `${distance}km` : '- km'}
           </span>
         </div>
 

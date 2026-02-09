@@ -40,7 +40,7 @@ export default function HospitalsMap() {
   const [myLocation, setMyLocation] = useState({
     lat: null,
     lng: null,
-    isLoaded: !navigator.geolocation,
+    isLoaded: false,
   });
 
   const isListOpen = searchParams.get('view') === 'list';
@@ -58,7 +58,16 @@ export default function HospitalsMap() {
   };
 
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      setMyLocation((prev) => ({ ...prev, isLoaded: true }));
+      return;
+    }
+
+    const geoOptions = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    };
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -71,7 +80,8 @@ export default function HospitalsMap() {
       (error) => {
         console.error('위치 파악 실패', error);
         setMyLocation((prev) => ({ ...prev, isLoaded: true }));
-      }
+      },
+      geoOptions
     );
   }, []);
 
