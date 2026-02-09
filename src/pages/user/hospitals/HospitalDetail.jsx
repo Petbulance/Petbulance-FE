@@ -21,46 +21,61 @@ export function HospitalDetail() {
 
   useEffect(() => {
     const getDetail = async () => {
-      setIsLoading(true);
+      try {
+        const data = await fetchHospitalDetail(id);
+        setHospital(data);
+      } catch (error) {
+        console.error('상세 정보 조회 실패', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const getPosition = () => {
+      if (!navigator.geolocation) return;
 
       navigator.geolocation.getCurrentPosition(
-        async (pos) => {
+        (pos) => {
           setUserLocation({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           });
-
-          try {
-            const data = await fetchHospitalDetail(id);
-            setHospital(data);
-          } catch (error) {
-            console.error('상세 정보 조회 실패', error);
-          } finally {
-            setIsLoading(false);
-          }
         },
-        async (err) => {
-          console.error('위치 정보 차단됨', err);
-          try {
-            const data = await fetchHospitalDetail(id);
-            setHospital(data);
-          } catch (error) {
-            console.error('상세 정보 조회 실패', error);
-          } finally {
-            setIsLoading(false);
-          }
+        (err) => {
+          console.error('위치 정보 취득 실패', err);
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 60000,
         }
       );
     };
 
-    if (id) getDetail();
+    if (id) {
+      getDetail();
+      getPosition();
+    }
   }, [id]);
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (!hospital) return <div>정보를 찾을 수 없습니다.</div>;
+  if (isLoading)
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#F5F5F5]">
+        <div className="text-lg font-medium text-gray-500">
+          정보를 불러오는 중입니다...
+        </div>
+      </div>
+    );
+
+  if (!hospital)
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div>정보를 찾을 수 없습니다.</div>
+      </div>
+    );
 
   return (
-    <div className="relative flex flex-col bg-[#F5F5F5]">
+    <div className="relative flex min-h-screen flex-col bg-[#F5F5F5]">
       <div className="bg-white px-8 py-10">
         <HosipitalDetail
           {...hospital}
@@ -68,10 +83,20 @@ export function HospitalDetail() {
           userLng={userLocation.lng}
         />
       </div>
+
       <DetailTabMenu activeTab={activeTab} onChangeTab={setActiveTab} />
+
       <div className="flex-1">
-        {activeTab === 'detail' && <DetailContent hospitalData={hospital} />}
-        {activeTab === 'review' && <ReviewContent />}
+        {activeTab === 'detail' && (
+          <div className="animate-fade-in">
+            <DetailContent hospitalData={hospital} />
+          </div>
+        )}
+        {activeTab === 'review' && (
+          <div className="animate-fade-in">
+            <ReviewContent />
+          </div>
+        )}
       </div>
     </div>
   );

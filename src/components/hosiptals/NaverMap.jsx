@@ -127,7 +127,7 @@ const NaverMap = React.memo(
       const geoOptions = {
         enableHighAccuracy: true,
         timeout: 5000,
-        maximumAge: 0
+        maximumAge: 0,
       };
 
       navigator.geolocation.getCurrentPosition(
