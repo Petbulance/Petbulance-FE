@@ -5,9 +5,8 @@ import { SelectButton } from './SelectButton';
 import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 
 const SORT_LABELS = {
-  distance: '가까운 순',
-  rating: '평점 높은 순',
   reviewCount: '리뷰 많은 순',
+  rating: '평점 높은 순',
 };
 
 export function ButtonSection({

@@ -16,7 +16,7 @@ export default function Hospitals() {
     city: '',
     region: [],
     animal: [],
-    sort: 'distance',
+    sort: '',
     isOpen: false,
   });
 
