@@ -1,11 +1,6 @@
 import { ChevronLeft, Handshake, MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import { Badge } from '@/components/admin/ui/Badge.jsx';
@@ -45,8 +40,11 @@ export default function CustomerCenterDetail() {
 
         if (type === 'oneonone') {
           console.log('1:1');
-          // 🔁 QNA (현재 롤백 상태)
-          response = await api.get(`/qna/${id}`);
+          response = await api.get(`/qna/${id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('admin_token')}`,
+            },
+          });
           const detail = response.data.data;
           console.log('1:1 데이터 받아와', detail);
           setData({
