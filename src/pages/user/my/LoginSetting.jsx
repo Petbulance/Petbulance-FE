@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
 import googleIcon from '@/assets/images/logo/googleLogo.svg';
 import kakaoIcon from '@/assets/images/logo/kakaoLogo.svg';
 import naverIcon from '@/assets/images/logo/naverLogo.svg';
@@ -26,8 +28,10 @@ const SNS_INFO = {
 };
 
 export default function LoginSetting() {
-  const { profile, fetchMyProfile, loading } = useUserStore();
+  const navigate = useNavigate();
+  const { profile, fetchMyProfile, clearProfile } = useUserStore();
   const [autoLogin, setAutoLogin] = useState(true);
+  const [pendingAction, setPendingAction] = useState('');
   const stateRef = useRef(Math.random().toString(36).substring(2));
   const state = stateRef.current;
 
@@ -68,7 +72,7 @@ export default function LoginSetting() {
       state,
     });
     window.naverLogin.init();
-  }, []);
+  }, [state]);
 
   if (!profile) {
     return <Spinner fullScreen message="로그인 정보를 불러오는 중이에요" />;
@@ -87,6 +91,7 @@ export default function LoginSetting() {
   const currentAccount = snsAccounts.find(
     (a) => a.provider === currentProvider
   );
+  const connectedCount = snsAccounts.filter((a) => a.connected).length;
 
   const connectableAccounts = snsAccounts.filter(
     (a) => a.provider !== currentProvider
@@ -112,6 +117,54 @@ export default function LoginSetting() {
         return;
       default:
         localStorage.removeItem('social_connect_mode');
+    }
+  };
+
+  const getServerMessage = (error, fallback) =>
+    error?.response?.data?.data?.message ||
+    error?.response?.data?.message ||
+    fallback;
+
+  const handleLogout = async () => {
+    setPendingAction('logout');
+    try {
+      await api.get('/auth/logout');
+      alert('로그아웃 되었습니다.');
+    } catch (error) {
+      console.error('로그아웃 실패', error);
+      alert(getServerMessage(error, '로그아웃에 실패했습니다.'));
+      return;
+    } finally {
+      setPendingAction('');
+    }
+
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('temp_access_token');
+    clearProfile();
+    navigate('/index/auth/login', { replace: true });
+  };
+
+  const handleDisconnect = async (provider) => {
+    if (connectedCount <= 1) {
+      alert('유일한 로그인 수단은 해제할 수 없습니다.');
+      return;
+    }
+
+    const platform = provider.toUpperCase();
+    setPendingAction(`disconnect-${provider}`);
+
+    try {
+      await api.delete(`/users/social/disconnect/${platform}`);
+      await fetchMyProfile();
+      alert(`${SNS_INFO[provider].label} 계정 연결이 해제되었습니다.`);
+    } catch (error) {
+      console.error('소셜 연결 해제 실패', error);
+      alert(
+        getServerMessage(error, '연결 해제에 실패했습니다. 다시 시도해 주세요.')
+      );
+    } finally {
+      setPendingAction('');
     }
   };
 
@@ -156,7 +209,11 @@ export default function LoginSetting() {
               </p>
             </div>
 
-            <button className="rounded-md border px-3 py-1 text-[15px] text-gray-700">
+            <button
+              onClick={handleLogout}
+              disabled={pendingAction === 'logout'}
+              className="rounded-md border px-3 py-1 text-[15px] text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
               로그아웃
             </button>
           </div>
@@ -197,9 +254,14 @@ export default function LoginSetting() {
             </div>
 
             <button
+              disabled={pendingAction === `disconnect-${account.provider}`}
               className="rounded-md border px-3 py-1 text-[15px] text-gray-700"
               onClick={() => {
-                if (!account.connected) handleConnect(account.provider);
+                if (!account.connected) {
+                  handleConnect(account.provider);
+                  return;
+                }
+                handleDisconnect(account.provider);
               }}
             >
               {account.connected ? '연결해제' : '연결'}
