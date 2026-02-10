@@ -67,6 +67,21 @@ export function WriteReview() {
       if (savedReviewId) {
         setReviewId(savedReviewId);
         setIsSuccessOpen(true);
+
+        // ✅ [GTM] 후기 제출 완료 이벤트
+        if (typeof window !== 'undefined') {
+          const { expertise, kindness, facility } = formData.ratings;
+          const avgRating =
+            (Number(expertise) + Number(kindness) + Number(facility)) / 3;
+
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'submit_review',
+            hospital_id: String(formData.hospitalId),
+            rating: Number(avgRating.toFixed(1)),
+            from_screen: 'review_form',
+          });
+        }
       }
     } catch (error) {
       alert('후기 등록에 실패했습니다. 잠시 후 다시 시도해주세요.');
