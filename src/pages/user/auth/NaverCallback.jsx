@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import Spinner from '@/components/commons/Spinner.jsx';
+import { isDebugModeEnabled, withDebugQuery } from '@/utils/gtm';
 
 export default function NaverCallback() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function NaverCallback() {
       if (!status) {
         console.error('네이버 SDK status=false');
         localStorage.removeItem('social_connect_mode');
-        navigate('/index/auth/login');
+        navigate(withDebugQuery('/index/auth/login'));
         return;
       }
       console.log('nL', naverLogin);
@@ -38,7 +39,7 @@ export default function NaverCallback() {
       if (!naverAccessToken) {
         console.error('네이버 access_token 없음');
         localStorage.removeItem('social_connect_mode');
-        navigate('/index/auth/login');
+        navigate(withDebugQuery('/index/auth/login'));
         return;
       }
 
@@ -57,7 +58,7 @@ export default function NaverCallback() {
             localStorage.removeItem('social_connect_mode');
             localStorage.removeItem('com.naver.nid.access_token');
             localStorage.removeItem('com.naver.nid.oauth.state_token');
-            navigate('/index/mypage/loginsetting');
+            navigate(withDebugQuery('/index/mypage/loginsetting'));
           }
           return;
         }
@@ -69,6 +70,13 @@ export default function NaverCallback() {
 
         console.log('res', res);
         const { accessToken, refreshToken, isNewUser } = res.data.data;
+        const debugMode = isDebugModeEnabled();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'login_success',
+          login_method: 'naver',
+          ...(debugMode ? { debug_mode: true } : {}),
+        });
 
         if (isNewUser) {
           localStorage.setItem('temp_access_token', accessToken);
@@ -88,7 +96,7 @@ export default function NaverCallback() {
         );
         localStorage.removeItem('com.naver.nid.access_token');
         localStorage.removeItem('com.naver.nid.oauth.state_token');
-        navigate('/index/auth/signupcomplete');
+        navigate(withDebugQuery('/index/auth/signupcomplete'));
       } catch (e) {
         console.error('서버 로그인 실패', e);
         if (isConnectMode) {
@@ -96,9 +104,9 @@ export default function NaverCallback() {
           localStorage.removeItem('social_connect_mode');
           localStorage.removeItem('com.naver.nid.access_token');
           localStorage.removeItem('com.naver.nid.oauth.state_token');
-          navigate('/index/mypage/loginsetting');
+          navigate(withDebugQuery('/index/mypage/loginsetting'));
         } else {
-          navigate('/index/auth/login');
+          navigate(withDebugQuery('/index/auth/login'));
         }
       }
     });

@@ -5,6 +5,7 @@ import api from '@/apis/api.jsx';
 import partyIcon from '@/assets/images/pageImages/partyImg.svg';
 import TermsBottomSheet from '@/components/user/ui/TermsBottomSheet.jsx';
 import useUserStore from '@/stores/useUserStore';
+import { isDebugModeEnabled } from '@/utils/gtm';
 
 export default function SignupComplete() {
   const [open, setOpen] = useState(false);
@@ -17,6 +18,27 @@ export default function SignupComplete() {
   const runPostLoginInit = () => {
     fetchMyProfile(); // ⭐ 여기서 전역 저장
     getMyTerms();
+  };
+
+  const pushSignupCompleteEvent = () => {
+    let signUpMethod = 'kakao';
+
+    try {
+      const recent = JSON.parse(localStorage.getItem('recent_login') || '{}');
+      if (recent?.provider) {
+        signUpMethod = String(recent.provider).toLowerCase();
+      }
+    } catch {
+      signUpMethod = 'kakao';
+    }
+
+    const debugMode = isDebugModeEnabled();
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'sign_up_complete',
+      sign_up_method: signUpMethod,
+      ...(debugMode ? { debug_mode: true } : {}),
+    });
   };
 
   /* ===============================
@@ -72,6 +94,8 @@ export default function SignupComplete() {
      - 최종 토큰이 있으면 프로필/약관 조회
   =============================== */
   useEffect(() => {
+    pushSignupCompleteEvent();
+
     const hasFinalToken = !!localStorage.getItem('access_token');
     if (hasFinalToken) {
       runPostLoginInit();
