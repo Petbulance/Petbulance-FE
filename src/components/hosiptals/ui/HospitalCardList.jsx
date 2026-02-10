@@ -32,6 +32,7 @@ export function HospitalCardList({ hospitals, userLat, userLng, fromScreen }) {
             kinds={h.types}
             tags={h.tags}
             onClick={() => handleCardClick(h.hospitalId)}
+            fromScreen={fromScreen}
           />
         ))}
       </div>

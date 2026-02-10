@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom'; // ✅ Context 사용을 위해 추가
+import { useCallback, useEffect, useState, useRef } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import { fetchHospitalsByName } from '@/apis/hospitals';
 import { registerRecentKeyword } from '@/apis/hospitals/searchHistory';
@@ -34,6 +34,8 @@ export function HospitalSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
+  const prevKeywordRef = useRef('');
+
   useEffect(() => {
     if (!navigator.geolocation) return;
 
@@ -55,9 +57,15 @@ export function HospitalSearch() {
 
     setIsLoading(true);
 
-    // ✅ [GTM] 병원 검색 시작 이벤트 호출
+    let currentSearchType = 'filter';
+
+    if (searchKeyword !== prevKeywordRef.current) {
+      currentSearchType = 'keyword';
+      prevKeywordRef.current = searchKeyword;
+    }
+
     pushDataLayer('search_hospital_start', {
-      search_type: 'keyword',
+      search_type: currentSearchType,
       from_screen: 'search_result',
     });
 
@@ -76,7 +84,12 @@ export function HospitalSearch() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchKeyword, filterState, userLocation]);
+  }, [
+    searchKeyword,
+    JSON.stringify(filterState),
+    userLocation.lat,
+    userLocation.lng,
+  ]);
 
   useEffect(() => {
     handleSearchAPI();

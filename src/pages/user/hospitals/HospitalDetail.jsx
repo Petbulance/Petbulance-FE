@@ -11,7 +11,7 @@ export function HospitalDetail() {
   const { id } = useParams();
   const location = useLocation();
 
-  const fromScreen = location.state?.from_screen || 'map';
+  const fromScreen = location.state?.from_screen || 'hospital_detail';
 
   const [hospital, setHospital] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,6 +94,7 @@ export function HospitalDetail() {
           {...hospital}
           userLat={userLocation.lat}
           userLng={userLocation.lng}
+          fromScreen="hospital_detail"
         />
       </div>
 
