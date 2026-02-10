@@ -86,9 +86,9 @@ export function HospitalSearch() {
     }
   }, [
     searchKeyword,
-    JSON.stringify(filterState), 
-    userLocation.lat
-    userLocation.lng
+    JSON.stringify(filterState),
+    userLocation.lat,
+    userLocation.lng,
   ]);
 
   useEffect(() => {
