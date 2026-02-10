@@ -16,6 +16,7 @@ export function HospitalCard({
   reviews,
   kinds = [],
   onClick,
+  fromScreen,
 }) {
   return (
     <HosipitalDetailWrap onClick={onClick}>
@@ -33,6 +34,7 @@ export function HospitalCard({
         overallRating={rating}
         reviewCount={reviews}
         acceptedAnimals={kinds}
+        fromScreen={fromScreen}
       />
     </HosipitalDetailWrap>
   );

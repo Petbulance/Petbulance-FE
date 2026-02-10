@@ -76,6 +76,7 @@ export function HospitalInfoSlide({
                     kinds={h.types}
                     tags={h.tags}
                     onClick={() => handleCardClick(h.hospitalId)}
+                    fromScreen={fromScreen}
                   />
                 </div>
               </SwiperSlide>

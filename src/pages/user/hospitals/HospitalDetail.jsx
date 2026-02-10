@@ -94,6 +94,7 @@ export function HospitalDetail() {
           {...hospital}
           userLat={userLocation.lat}
           userLng={userLocation.lng}
+          fromScreen="detail"
         />
       </div>
 

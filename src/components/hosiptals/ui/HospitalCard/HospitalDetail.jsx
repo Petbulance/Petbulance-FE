@@ -44,6 +44,7 @@ export function HosipitalDetail({
   overallRating,
   reviewCount,
   tags = [],
+  fromScreen,
 }) {
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -80,6 +81,18 @@ export function HosipitalDetail({
     const dist = getDistanceFromLatLonInKm(uLat, uLng, hLat, hLng);
     return isNaN(dist) ? null : dist.toFixed(1);
   }, [lat, lng, userLat, userLng]);
+
+  // ✅ [GTM] 전화 버튼 클릭 핸들러
+  const handleCallClick = () => {
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'click_call_hospital',
+        hospital_id: String(id),
+        from_screen: fromScreen,
+      });
+    }
+  };
 
   useEffect(() => {
     const recordHistory = async () => {
@@ -146,7 +159,11 @@ export function HosipitalDetail({
 
         <div className="flex items-center gap-1 font-[#067DFD] text-[15px] font-semibold text-[#067DFD]">
           <img src={PhoneIcon} alt="PhoneIcon" />
-          <a href={`tel:${phone}`} className="hover:underline">
+          <a
+            href={`tel:${phone}`}
+            className="hover:underline"
+            onClick={handleCallClick}
+          >
             {phone}
           </a>
           <button
