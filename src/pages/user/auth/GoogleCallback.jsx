@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import Spinner from '@/components/commons/Spinner.jsx';
+import { isDebugModeEnabled, withDebugQuery } from '@/utils/gtm';
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function GoogleCallback() {
 
     if (!code) {
       localStorage.removeItem('social_connect_mode');
-      navigate('/index/auth/login');
+      navigate(withDebugQuery('/index/auth/login'));
       return;
     }
 
@@ -57,7 +58,7 @@ export default function GoogleCallback() {
             alert('실패');
           } finally {
             localStorage.removeItem('social_connect_mode');
-            navigate('/index/mypage/loginsetting');
+            navigate(withDebugQuery('/index/mypage/loginsetting'));
           }
           return;
         }
@@ -68,6 +69,13 @@ export default function GoogleCallback() {
         });
         console.log('데이터', JWTres);
         const { accessToken, refreshToken, isNewUser } = JWTres.data.data;
+        const debugMode = isDebugModeEnabled();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'login_success',
+          login_method: 'google',
+          ...(debugMode ? { debug_mode: true } : {}),
+        });
 
         if (isNewUser) {
           localStorage.setItem('temp_access_token', accessToken);
@@ -85,15 +93,15 @@ export default function GoogleCallback() {
             at: Date.now(),
           })
         );
-        navigate('/index/auth/signupcomplete');
+        navigate(withDebugQuery('/index/auth/signupcomplete'));
       } catch (e) {
         console.error('구글 로그인 실패', e);
         if (isConnectMode) {
           alert('실패');
           localStorage.removeItem('social_connect_mode');
-          navigate('/index/mypage/loginsetting');
+          navigate(withDebugQuery('/index/mypage/loginsetting'));
         } else {
-          navigate('/index/auth/login');
+          navigate(withDebugQuery('/index/auth/login'));
         }
       }
     };

@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import googleLogo from '@/assets/images/logo/google-color-svgrepo-com.svg';
 import kakaoLogo from '@/assets/images/logo/kakao-svgrepo-com.svg';
 import naverLogo from '@/assets/images/logo/NAVER_LOGO.png';
 import logo from '@/assets/images/logo/pet_logo.png';
+import { syncDebugModeFromQuery } from '@/utils/gtm';
 
 export default function SocialSignUp() {
   const stateRef = useRef(Math.random().toString(36).substring(2));
   const state = stateRef.current;
+  const location = useLocation();
 
   const [recentLogin, setRecentLogin] = useState(null);
 
@@ -47,6 +50,10 @@ export default function SocialSignUp() {
   const handleGoogleLogin = () => {
     window.location.href = GOOGLE_AUTH_URL;
   };
+
+  useEffect(() => {
+    syncDebugModeFromQuery(location.search);
+  }, [location.search]);
 
   useEffect(() => {
     window.naverLogin = new window.naver.LoginWithNaverId({

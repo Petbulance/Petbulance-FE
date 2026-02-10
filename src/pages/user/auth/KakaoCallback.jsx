@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import Spinner from '@/components/commons/Spinner.jsx';
+import { isDebugModeEnabled, withDebugQuery } from '@/utils/gtm';
 
 export default function KakaoCallback() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function KakaoCallback() {
     const authCode = new URL(window.location.href).searchParams.get('code');
     if (!authCode) {
       localStorage.removeItem('social_connect_mode');
-      navigate('/index/auth/login');
+      navigate(withDebugQuery('/index/auth/login'));
       return;
     }
 
@@ -50,7 +51,7 @@ export default function KakaoCallback() {
             alert('실패');
           } finally {
             localStorage.removeItem('social_connect_mode');
-            navigate('/index/mypage/loginsetting');
+            navigate(withDebugQuery('/index/mypage/loginsetting'));
           }
           return;
         }
@@ -61,6 +62,13 @@ export default function KakaoCallback() {
         });
         console.log('데이터', JWTres);
         const { accessToken, refreshToken, isNewUser } = JWTres.data.data;
+        const debugMode = isDebugModeEnabled();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'login_success',
+          login_method: 'kakao',
+          ...(debugMode ? { debug_mode: true } : {}),
+        });
 
         if (isNewUser) {
           localStorage.setItem('temp_access_token', accessToken);
@@ -78,15 +86,15 @@ export default function KakaoCallback() {
             at: Date.now(),
           })
         );
-        navigate('/index/auth/signupcomplete');
+        navigate(withDebugQuery('/index/auth/signupcomplete'));
       } catch (e) {
         console.error('카카오 로그인 실패', e);
         if (isConnectMode) {
           alert('실패');
           localStorage.removeItem('social_connect_mode');
-          navigate('/index/mypage/loginsetting');
+          navigate(withDebugQuery('/index/mypage/loginsetting'));
         } else {
-          navigate('/index/auth/login');
+          navigate(withDebugQuery('/index/auth/login'));
         }
       }
     };
