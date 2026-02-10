@@ -15,6 +15,7 @@ export function HospitalInfoSlide({
   selectedHospital,
   userLat,
   userLng,
+  fromScreen,
 }) {
   const navigate = useNavigate();
   const [swiperInstance, setSwiperInstance] = useState(null);
@@ -31,6 +32,12 @@ export function HospitalInfoSlide({
   }, [selectedHospital, swiperInstance, hospitals]);
 
   if (!hospitals || hospitals.length === 0) return null;
+
+  const handleCardClick = (id) => {
+    navigate(`/index/hospitals/${id}`, {
+      state: { from_screen: fromScreen },
+    });
+  };
 
   return (
     <div className="absolute right-0 bottom-0 left-0 z-[1500] flex w-full justify-center overflow-hidden pb-6">
@@ -68,7 +75,7 @@ export function HospitalInfoSlide({
                     reviews={h.reviewCount}
                     kinds={h.types}
                     tags={h.tags}
-                    onClick={() => navigate(`/index/hospitals/${h.hospitalId}`)}
+                    onClick={() => handleCardClick(h.hospitalId)}
                   />
                 </div>
               </SwiperSlide>

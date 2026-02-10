@@ -14,6 +14,7 @@ import {
   AnimalTypeContent,
   SearchFilterContent,
 } from '@/components/hosiptals/ui/FilterPopup/SearchFilterContent';
+import { pushDataLayer } from '@/lib/gtm';
 
 export function HospitalSearch() {
   const {
@@ -53,6 +54,13 @@ export function HospitalSearch() {
     if (!searchKeyword) return;
 
     setIsLoading(true);
+
+    // ✅ [GTM] 병원 검색 시작 이벤트 호출
+    pushDataLayer('search_hospital_start', {
+      search_type: 'keyword',
+      from_screen: 'search_result',
+    });
+
     try {
       const data = await fetchHospitalsByName(searchKeyword, {
         ...filterState,
@@ -110,6 +118,7 @@ export function HospitalSearch() {
                 hospitals={searchResults}
                 userLat={userLocation.lat}
                 userLng={userLocation.lng}
+                fromScreen="search_result"
               />
             </div>
           ) : (

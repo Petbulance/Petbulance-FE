@@ -133,6 +133,7 @@ export default function HospitalsMap() {
               selectedHospital={selectedHospital}
               userLat={myLocation.lat}
               userLng={myLocation.lng}
+              fromScreen="map"
             />
           )}
         </>
@@ -150,6 +151,7 @@ export default function HospitalsMap() {
                 hospitals={hospitals}
                 userLat={myLocation.lat}
                 userLng={myLocation.lng}
+                fromScreen="list"
               />
             )}
           </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { fetchHospitalDetail } from '@/apis/hospitals/hospitalDetail';
 import { HosipitalDetail } from '@/components/hosiptals/ui/HospitalCard/HospitalDetail';
@@ -9,6 +9,9 @@ import { ReviewContent } from '@/components/hosiptals/ui/HospitalDetail/review';
 
 export function HospitalDetail() {
   const { id } = useParams();
+  const location = useLocation();
+
+  const fromScreen = location.state?.from_screen || 'map';
 
   const [hospital, setHospital] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,6 +25,16 @@ export function HospitalDetail() {
   useEffect(() => {
     const getDetail = async () => {
       try {
+        // ✅ [GTM] 병원 상세 진입 이벤트
+        if (typeof window !== 'undefined') {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            event: 'view_hospital_detail',
+            hospital_id: String(id),
+            from_screen: fromScreen,
+          });
+        }
+
         const data = await fetchHospitalDetail(id);
         setHospital(data);
       } catch (error) {

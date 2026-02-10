@@ -2,8 +2,15 @@ import { useNavigate } from 'react-router-dom';
 
 import { HospitalCard } from '@/components/hosiptals/ui/HospitalCard/HospitalCard';
 
-export function HospitalCardList({ hospitals, userLat, userLng }) {
+export function HospitalCardList({ hospitals, userLat, userLng, fromScreen }) {
   const navigate = useNavigate();
+
+  const handleCardClick = (id) => {
+    console.log('스크린', fromScreen);
+    navigate(`/index/hospitals/${id}`, {
+      state: { from_screen: fromScreen },
+    });
+  };
 
   return (
     <div className="h-full min-h-0">
@@ -24,7 +31,7 @@ export function HospitalCardList({ hospitals, userLat, userLng }) {
             reviews={h.reviewCount}
             kinds={h.types}
             tags={h.tags}
-            onClick={() => navigate(`/index/hospitals/${h.hospitalId}`)}
+            onClick={() => handleCardClick(h.hospitalId)}
           />
         ))}
       </div>
