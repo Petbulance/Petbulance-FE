@@ -51,9 +51,8 @@ export function HosipitalDetail({
 
   const isHospitalIndexPage = pathname.includes(`/index/hospitals/${id}`);
 
-  const MAX_SHOW = 4;
-  const hasMore = tags?.length > MAX_SHOW;
-  const visibleTags = tags?.slice(0, MAX_SHOW);
+  const MAX_RENDER_LIMIT = 5;
+  const renderTags = tags.slice(0, MAX_RENDER_LIMIT);
 
   const getTagStyle = (type) => {
     switch (type) {
@@ -82,7 +81,6 @@ export function HosipitalDetail({
     return isNaN(dist) ? null : dist.toFixed(1);
   }, [lat, lng, userLat, userLng]);
 
-  // ✅ [GTM] 전화 버튼 클릭 핸들러
   const handleCallClick = () => {
     if (typeof window !== 'undefined') {
       window.dataLayer = window.dataLayer || [];
@@ -121,6 +119,26 @@ export function HosipitalDetail({
     const endTime = time.split('~')[1].trim();
     formattedTimeDisplay = `${endTime}에 영업 종료`;
   }
+
+  const getResponsiveTagClass = (index) => {
+    const baseClass = 'shrink-0';
+
+    // 인덱스별 표시 조건
+    if (index < 2) {
+      return `${baseClass} block`;
+    }
+    if (index === 2) {
+      return `${baseClass} hidden min-[414px]:block`;
+    }
+    if (index === 3) {
+      return `${baseClass} hidden min-[520px]:block`;
+    }
+    if (index === 4) {
+      return `${baseClass} hidden min-[620px]:block`;
+    }
+
+    return `${baseClass} hidden`;
+  };
 
   return (
     <div className="flex items-center gap-3">
@@ -185,15 +203,54 @@ export function HosipitalDetail({
             ))}
           </div>
         ) : (
-          <div className="mt-1.5 flex w-[308px] items-center gap-1 overflow-hidden">
-            {visibleTags?.map((tag, idx) => (
-              <CategoryButton
+          <div className="mt-1.5 flex w-full max-w-full items-center gap-1 overflow-hidden">
+            {renderTags.map((tag, idx) => (
+              <div
                 key={`${tag.value}-${idx}`}
-                kind={tag.value}
-                style={getTagStyle(tag.type)}
-              />
+                className={getResponsiveTagClass(idx)}
+              >
+                <CategoryButton
+                  kind={tag.value}
+                  style={getTagStyle(tag.type)}
+                />
+              </div>
             ))}
-            {hasMore && <img src={hide_icon} alt="more" />}
+
+            {/* 너비 < 414px (기본): 태그 2개 초과 시 아이콘 표시 */}
+            {tags.length > 2 && (
+              <img
+                src={hide_icon}
+                alt="more"
+                className="block shrink-0 min-[414px]:hidden"
+              />
+            )}
+
+            {/* 414px <= 너비 < 520px: 태그 3개 초과 시 아이콘 표시 */}
+            {tags.length > 3 && (
+              <img
+                src={hide_icon}
+                alt="more"
+                className="hidden shrink-0 min-[414px]:block min-[520px]:hidden"
+              />
+            )}
+
+            {/* 520px <= 너비 < 620px: 태그 4개 초과 시 아이콘 표시 */}
+            {tags.length > 4 && (
+              <img
+                src={hide_icon}
+                alt="more"
+                className="hidden shrink-0 min-[520px]:block min-[620px]:hidden"
+              />
+            )}
+
+            {/* 너비 >= 620px: 태그 5개 초과 시 아이콘 표시 */}
+            {tags.length > 5 && (
+              <img
+                src={hide_icon}
+                alt="more"
+                className="hidden shrink-0 min-[620px]:block"
+              />
+            )}
           </div>
         )}
       </div>
