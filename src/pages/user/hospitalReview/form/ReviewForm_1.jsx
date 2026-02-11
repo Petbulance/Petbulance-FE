@@ -5,20 +5,26 @@ import { ANIMAL_CATEGORY_VALUE, ANIMAL_GROUPS_VALUE } from '@/data/animalSort';
 import down_arrow from '@/assets/images/icons/down_arrow2.svg';
 import { WriteReviewHeader } from '@/components/reviews/layout/WriteReviewHeader';
 import { InputField } from './ReviewForm_2';
-import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { NextBtn } from '@/components/reviews/ui/NextBtn';
 import { SelectField } from '@/components/reviews/ui/SelectField';
+import { GreenBtn } from '@/components/commons/button/greenBtn'; // 바텀시트 내부용
 
-export default function ReviewForm_1({ data, setData, onNext }) {
+export default function ReviewForm_1({
+  data,
+  setData,
+  onNext,
+  isHospitalFixed,
+}) {
   const [searchTerm, setSearchTerm] = useState(data.hospitalName || '');
   const [recommendations, setRecommendations] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const containerRef = useRef(null);
 
   useEffect(() => {
+    if (isHospitalFixed) return;
+
     if (!searchTerm.trim() || searchTerm === data.hospitalName) {
       return;
     }
@@ -34,20 +40,22 @@ export default function ReviewForm_1({ data, setData, onNext }) {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, data.hospitalName]);
+  }, [searchTerm, data.hospitalName, isHospitalFixed]);
 
   const handleInputChange = (e) => {
+    if (isHospitalFixed) return;
+
     const value = e.target.value;
     setSearchTerm(value);
 
-    if (data.hospitalId) {
-      setData((prev) => ({ ...prev, hospitalId: null }));
+    // 사용자가 입력값을 변경하면 기존 선택된 병원 ID 초기화
+    if (data.hospitalId || (data.hospitalName && value !== data.hospitalName)) {
+      setData((prev) => ({ ...prev, hospitalId: null, hospitalName: '' }));
     }
 
     if (!value.trim()) {
       setRecommendations([]);
       setShowDropdown(false);
-      setData((prev) => ({ ...prev, hospitalName: '', hospitalId: null }));
     }
   };
 
@@ -55,15 +63,16 @@ export default function ReviewForm_1({ data, setData, onNext }) {
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
         setShowDropdown(false);
-
-        if (!data.hospitalId) {
-          setSearchTerm('');
+        if (!isHospitalFixed && !data.hospitalId) {
+          if (searchTerm !== data.hospitalName) {
+            setSearchTerm('');
+          }
         }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [data.hospitalId]);
+  }, [data.hospitalId, data.hospitalName, searchTerm, isHospitalFixed]);
 
   const handleSelectHospital = (hospital) => {
     setData((prev) => ({
@@ -106,43 +115,51 @@ export default function ReviewForm_1({ data, setData, onNext }) {
           </label>
           <div className="relative">
             <input
-              className="w-full rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-[14px] text-[20px] placeholder:text-[#BDBDBD] focus:outline-none"
+              // ✅ 고정 여부에 따른 스타일 분기
+              className={`w-full rounded-[8px] border border-[#EEEEEE] bg-white px-4 py-[14px] text-[20px] focus:outline-none placeholder:text-[#BDBDBD]${
+                isHospitalFixed && 'cursor-not-allowed'
+              }`}
               placeholder="검색하여 선택해주세요."
               value={searchTerm}
               onChange={handleInputChange}
+              readOnly={isHospitalFixed}
               onFocus={() => {
-                // 검색어가 있을 때만 드롭다운 열기
-                if (searchTerm) setShowDropdown(true);
+                if (!isHospitalFixed && !data.hospitalId && searchTerm) {
+                  setShowDropdown(true);
+                }
               }}
             />
           </div>
 
-          {showDropdown && searchTerm && (
-            <ul className="custom-scrollbar absolute z-50 mt-2 max-h-[220px] w-full overflow-y-auto rounded-[8px] border border-[#EEEEEE] bg-white shadow-lg">
-              {recommendations.length > 0 ? (
-                recommendations.map((hospital) => (
-                  <li
-                    key={hospital.id}
-                    className="cursor-pointer border-b border-[#F5F5F5] px-4 py-3 transition-colors last:border-none hover:bg-[#F9F9F9]"
-                    onClick={() => handleSelectHospital(hospital)}
-                  >
-                    <div className="text-[18px] font-medium text-[#424242]">
-                      {hospital.name}
-                    </div>
-                    {hospital.address && (
-                      <div className="truncate text-[14px] text-[#9E9E9E]">
-                        {hospital.address}
+          {!isHospitalFixed &&
+            showDropdown &&
+            searchTerm &&
+            !data.hospitalId && (
+              <ul className="custom-scrollbar absolute z-50 mt-2 max-h-[220px] w-full overflow-y-auto rounded-[8px] border border-[#EEEEEE] bg-white shadow-lg">
+                {recommendations.length > 0 ? (
+                  recommendations.map((hospital) => (
+                    <li
+                      key={hospital.id}
+                      className="cursor-pointer border-b border-[#F5F5F5] px-4 py-3 transition-colors last:border-none hover:bg-[#F9F9F9]"
+                      onClick={() => handleSelectHospital(hospital)}
+                    >
+                      <div className="text-[18px] font-medium text-[#424242]">
+                        {hospital.name}
                       </div>
-                    )}
+                      {hospital.address && (
+                        <div className="truncate text-[14px] text-[#9E9E9E]">
+                          {hospital.address}
+                        </div>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-3 text-center text-[18px] text-[#BDBDBD]">
+                    검색 결과가 없습니다.
                   </li>
-                ))
-              ) : (
-                <li className="px-4 py-3 text-center text-[18px] text-[#BDBDBD]">
-                  검색 결과가 없습니다.
-                </li>
-              )}
-            </ul>
-          )}
+                )}
+              </ul>
+            )}
         </div>
 
         {/* 2. 비용 입력 */}
@@ -225,7 +242,7 @@ export default function ReviewForm_1({ data, setData, onNext }) {
   );
 }
 
-// 바텀 시트 컴포넌트는 기존 코드 유지
+// 바텀 시트 컴포넌트
 function DetailAnimalBottomSheet({
   options,
   selectedValue,

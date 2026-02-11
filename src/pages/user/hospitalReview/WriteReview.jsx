@@ -1,30 +1,35 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 
 import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
+import { fetchHospitalDetail } from '@/apis/hospitals/hospitalDetail';
+import { postReview } from '@/apis/reviews/postReview';
+import { ReceiptVerifiedModal } from '@/components/commons/layout/ReceiptVerifiedModal';
 
 import ReviewForm_1 from './form/ReviewForm_1';
 import ReviewForm_2 from './form/ReviewForm_2';
 import ReviewForm_3 from './form/ReviewForm_3';
 import ScanStep from './ScanStep';
-import { postReview } from '@/apis/reviews/postReview';
-import { ReceiptVerifiedModal } from '@/components/commons/layout/ReceiptVerifiedModal';
 
 export function WriteReview() {
   const [params, setParams] = useSearchParams();
   const step = params.get('step') ?? 'form1';
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const passedHospitalId = location.state?.hospitalId;
+  const passedHospitalName = location.state?.hospitalName;
+
+  const isHospitalFixed = !!passedHospitalId;
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [isScanSuccessOpen, setIsScanSuccessOpen] = useState(false);
-
   const [reviewId, setReviewId] = useState(null);
-
   const [receiptChecked, setReceiptChecked] = useState(false);
 
   const [formData, setFormData] = useState({
-    hospitalName: '',
-    hospitalId: '',
+    hospitalName: passedHospitalName || '', // 초기값 우선 사용
+    hospitalId: passedHospitalId || '', // 초기값 우선 사용
     cost: '',
     animalType: '',
     animalDetail: '',
@@ -32,6 +37,25 @@ export function WriteReview() {
     images: [],
     content: '',
   });
+
+  useEffect(() => {
+    const prefillHospitalInfo = async () => {
+      if (!passedHospitalId || formData.hospitalName) return;
+
+      try {
+        const data = await fetchHospitalDetail(passedHospitalId);
+        setFormData((prev) => ({
+          ...prev,
+          hospitalId: String(data.hospitalId),
+          hospitalName: data.name,
+        }));
+      } catch (error) {
+        console.error('병원 정보 프리필 실패:', error);
+      }
+    };
+
+    prefillHospitalInfo();
+  }, [passedHospitalId, formData.hospitalName]);
 
   const handleMoveToForm1 = () => {
     setIsScanSuccessOpen(false);
@@ -50,14 +74,12 @@ export function WriteReview() {
 
   const handleScanSuccess = (ocrData) => {
     setReceiptChecked(true);
-
     setFormData((prev) => ({
       ...prev,
       hospitalName: ocrData.hospitalName || '',
       hospitalId: ocrData.hospitalId || '',
       cost: ocrData.price ? ocrData.price.toString() : '',
     }));
-
     setIsScanSuccessOpen(true);
   };
 
@@ -68,7 +90,6 @@ export function WriteReview() {
         setReviewId(savedReviewId);
         setIsSuccessOpen(true);
 
-        // ✅ [GTM] 후기 제출 완료 이벤트
         if (typeof window !== 'undefined') {
           const { expertise, kindness, facility } = formData.ratings;
           const avgRating =
@@ -97,6 +118,7 @@ export function WriteReview() {
         return (
           <ReviewForm_1
             {...commonProps}
+            isHospitalFixed={isHospitalFixed}
             onNext={() => setParams(new URLSearchParams({ step: 'form2' }))}
           />
         );

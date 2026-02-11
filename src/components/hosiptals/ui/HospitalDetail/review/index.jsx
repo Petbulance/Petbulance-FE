@@ -1,17 +1,20 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { fetchHospitalReviews } from '@/apis/reviews/receipts';
 import { GreenBtn } from '@/components/commons/button/greenBtn';
 import { sortLabels } from '@/data/reviewSort';
+import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal'; // ✅ 모달 import
 
 import { ReviewCard } from './ReviewCard';
 import { ReviewFilterBar } from './reviewFilterBar';
 import ReviewSortModal from './ReviewSortModal';
 import { NoReviewResult } from './noReviewResult';
 
-export function ReviewContent() {
+export function ReviewContent({ hospitalName }) {
   const { id: hospitalId } = useParams();
+  const navigate = useNavigate();
+  const fileRef = useRef(null);
 
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +22,8 @@ export function ReviewContent() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState('createdAt');
   const [isPhotoOnly, setIsPhotoOnly] = useState(false);
+
+  const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
 
   const loadReviews = useCallback(async () => {
     if (!hospitalId) return;
@@ -46,8 +51,50 @@ export function ReviewContent() {
     loadReviews();
   }, [loadReviews]);
 
+  const handleWriteClick = () => {
+    setIsWriteModalOpen(true);
+  };
+
+  const handleConfirmVerification = () => {
+    setIsWriteModalOpen(false);
+    fileRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    navigate('/index/reviews/write?step=scan', {
+      state: {
+        file: file,
+        hospitalId: hospitalId,
+        hospitalName: hospitalName,
+      },
+    });
+
+    e.target.value = '';
+  };
+
+  const handleSkipVerification = () => {
+    setIsWriteModalOpen(false);
+    navigate('/index/reviews/write?step=form1', {
+      state: {
+        hospitalId: hospitalId,
+        hospitalName: hospitalName,
+      },
+    });
+  };
+
   return (
     <div className="flex h-dvh flex-col bg-white">
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       <ReviewFilterBar
         isPhotoOnly={isPhotoOnly}
         setIsPhotoOnly={setIsPhotoOnly}
@@ -64,7 +111,7 @@ export function ReviewContent() {
         }}
       />
 
-      <div className="flex-1">
+      <div className="flex-1 overflow-y-auto">
         {isLoading ? (
           <div className="flex justify-center py-20 text-gray-400">
             리뷰를 불러오는 중입니다...
@@ -81,8 +128,19 @@ export function ReviewContent() {
       </div>
 
       <div className="sticky bottom-0 bg-white p-4">
-        <GreenBtn name="병원 후기 작성하기" />
+        <GreenBtn name="병원 후기 작성하기" onClick={handleWriteClick} />
       </div>
+
+      <ConfirmSelectModal
+        open={isWriteModalOpen}
+        title={`후기를 작성하기 전에\n영수증 인증을 진행하시겠어요?`}
+        content={`카드 및 현금으로 결제한 영수증만\n인증 가능합니다.`}
+        confirmText="사진 첨부"
+        cancelText="인증 없이 작성"
+        onConfirm={handleConfirmVerification}
+        onCancel={handleSkipVerification}
+        onClose={() => setIsWriteModalOpen(false)}
+      />
     </div>
   );
 }

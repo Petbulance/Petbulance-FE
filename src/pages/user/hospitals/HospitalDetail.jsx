@@ -108,7 +108,7 @@ export function HospitalDetail() {
         )}
         {activeTab === 'review' && (
           <div className="animate-fade-in">
-            <ReviewContent />
+            <ReviewContent hospitalName={hospital.name} />
           </div>
         )}
       </div>
