@@ -136,7 +136,7 @@ export function HospitalSearch() {
             </div>
           ) : (
             <div className="mt-35 px-8">
-              <NoSearchResult />
+              <NoSearchResult keyword={searchKeyword} />
             </div>
           )
         ) : (
