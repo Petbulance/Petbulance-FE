@@ -18,6 +18,7 @@ export default function MainHeader({ title }) {
       className={`sticky top-0 z-50 px-4 py-3 ${
         isMyPage ? 'bg-gray-100' : 'bg-white shadow-sm'
       }`}
+      onClick={() => window.location.reload()}
     >
       <div className="flex items-center justify-between">
         {/* 타이틀 */}
@@ -25,7 +26,7 @@ export default function MainHeader({ title }) {
           className={`cursor-pointer pl-[8px] text-[25px] font-semibold ${
             isHome ? 'text-[#2DA969]' : 'text-gray-900'
           }`}
-          onClick={() => navigate('/index/home')}
+          onClick={() => window.location.reload()}
         >
           {title}
         </h1>
