@@ -147,7 +147,7 @@ export default function TermsBottomSheet({ open, onClose, onConsented }) {
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="fixed top-auto bottom-0 left-1/2 h-[472px] max-h-[90vh] w-full -translate-x-1/2 translate-y-0 rounded-t-3xl bg-white p-0">
+        <DialogContent className="fixed top-1/2 left-1/2 h-[472px] max-h-[90vh] w-[calc(100vw-2rem)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-white p-0">
           {/* 내부 레이아웃 */}
           <div className="flex max-h-[90vh] flex-col px-6 py-6">
             {/* 헤더 (고정) */}
