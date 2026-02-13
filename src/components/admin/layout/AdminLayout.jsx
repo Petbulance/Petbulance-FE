@@ -70,6 +70,7 @@ export default function AdminLayout() {
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (!token) {
+      localStorage.removeItem('admin_refresh_token');
       clearAdminProfile();
       navigate('/admin/auth/login', { replace: true });
     }

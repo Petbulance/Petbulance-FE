@@ -26,10 +26,14 @@ export default function AdminLogin() {
       const response = await api.post('/admin/login', payload);
       console.log(response);
       const data = response?.data?.data ?? {};
-      const token = data.access_token;
+      const token = data.access_token ?? data.accessToken;
+      const refreshToken = data.refresh_token ?? data.refreshToken;
 
       if (token) {
         localStorage.setItem('admin_token', token);
+      }
+      if (refreshToken) {
+        localStorage.setItem('admin_refresh_token', refreshToken);
       }
 
       const adminSource = data.admin ?? data.profile ?? data.user ?? data;
