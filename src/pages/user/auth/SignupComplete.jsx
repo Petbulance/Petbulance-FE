@@ -34,11 +34,13 @@ export default function SignupComplete() {
 
     const debugMode = isDebugModeEnabled();
     window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
+    const gaPayload = {
       event: 'sign_up_complete',
       sign_up_method: signUpMethod,
       ...(debugMode ? { debug_mode: true } : {}),
-    });
+    };
+    console.log('[GA] sign_up_complete payload', gaPayload);
+    window.dataLayer.push(gaPayload);
   };
 
   /* ===============================

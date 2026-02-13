@@ -71,11 +71,13 @@ export default function GoogleCallback() {
         const { accessToken, refreshToken, isNewUser } = JWTres.data.data;
         const debugMode = isDebugModeEnabled();
         window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
+        const gaPayload = {
           event: 'login_success',
           login_method: 'google',
           ...(debugMode ? { debug_mode: true } : {}),
-        });
+        };
+        console.log('[GA] login_success payload', gaPayload);
+        window.dataLayer.push(gaPayload);
 
         if (isNewUser) {
           localStorage.setItem('temp_access_token', accessToken);

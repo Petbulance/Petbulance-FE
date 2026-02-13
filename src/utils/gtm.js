@@ -1,9 +1,11 @@
 export function pushDL(eventName, params = {}) {
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
+  const payload = {
     event: eventName,
     ...params,
-  });
+  };
+  console.log('[GA] pushDL payload', payload);
+  window.dataLayer.push(payload);
 }
 
 const DEBUG_MODE_KEY = 'ga_debug_mode';
@@ -23,7 +25,9 @@ export function setDebugMode(enabled) {
   }
 
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ debug_mode: !!enabled });
+  const payload = { debug_mode: !!enabled };
+  console.log('[GA] debug_mode payload', payload);
+  window.dataLayer.push(payload);
 
   if (typeof window.gtag === 'function') {
     window.gtag('set', { debug_mode: !!enabled });

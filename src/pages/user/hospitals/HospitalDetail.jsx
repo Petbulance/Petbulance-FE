@@ -28,11 +28,13 @@ export function HospitalDetail() {
         // ✅ [GTM] 병원 상세 진입 이벤트
         if (typeof window !== 'undefined') {
           window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({
+          const gaPayload = {
             event: 'view_hospital_detail',
             hospital_id: String(id),
             from_screen: fromScreen,
-          });
+          };
+          console.log('[GA] view_hospital_detail payload', gaPayload);
+          window.dataLayer.push(gaPayload);
         }
 
         const data = await fetchHospitalDetail(id);

@@ -96,12 +96,14 @@ export function WriteReview() {
             (Number(expertise) + Number(kindness) + Number(facility)) / 3;
 
           window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({
+          const gaPayload = {
             event: 'submit_review',
             hospital_id: String(formData.hospitalId),
             rating: Number(avgRating.toFixed(1)),
             from_screen: 'review_form',
-          });
+          };
+          console.log('[GA] submit_review payload', gaPayload);
+          window.dataLayer.push(gaPayload);
         }
       }
     } catch (error) {
