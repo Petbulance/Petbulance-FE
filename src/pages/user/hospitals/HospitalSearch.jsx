@@ -71,7 +71,7 @@ export function HospitalSearch() {
     setIsLoading(true);
 
     pushDataLayer('search_hospital_start', {
-      search_method: '목록',
+      search_type: '목록',
       pet_type: petTypeLabel,
       region: regionLabel,
       filter_operating: Boolean(filterState.isOpen),

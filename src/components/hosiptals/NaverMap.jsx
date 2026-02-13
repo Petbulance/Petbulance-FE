@@ -54,7 +54,7 @@ const NaverMap = React.memo(
           : filterState.city || '';
 
       pushDataLayer('search_hospital_start', {
-        search_method: '지도',
+        search_type: '지도',
         pet_type: petTypeLabel,
         region: regionLabel,
         filter_operating: Boolean(filterState.isOpen),
