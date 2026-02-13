@@ -21,6 +21,7 @@ export default function TermsPage() {
       setError(false);
 
       const res = await api.get('/terms');
+      console.log('term', res.data);
       setTerms(res.data.data ?? []);
     } catch (e) {
       console.error('약관 목록 조회 실패', e);
