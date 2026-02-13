@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom'; // ✅ 1. import 추가
+
 import { fetchHospitalsByLocation } from '@/apis/hospitals';
 import marker_closed from '@/assets/images/icons/close_hospital_marker.svg';
 import current_location_btn from '@/assets/images/icons/current_location_btn.svg';
@@ -7,8 +8,8 @@ import current_location_marker from '@/assets/images/icons/current_location_mark
 import marker_open from '@/assets/images/icons/open_hospital_marker.svg';
 import selected_close_marker from '@/assets/images/icons/selected_close_marker.svg';
 import selected_marker from '@/assets/images/icons/selected_marker.svg';
-import { pushDataLayer } from '@/lib/gtm';
 import { loadNaverMap } from '@/lib/loadNaverMap';
+
 import { CurrentHospitalBtn } from './ui/CurrentHospitalBtn';
 
 const NaverMap = React.memo(
@@ -27,7 +28,6 @@ const NaverMap = React.memo(
 
     const [searchParams] = useSearchParams();
     const hasProcessedParams = useRef(false);
-    const hasClickedCurrentSearch = useRef(false);
 
     const [isMapLoaded, setIsMapLoaded] = useState(false);
 
@@ -260,21 +260,13 @@ const NaverMap = React.memo(
       }
     }, [hospitals, selectedHospital, clearMarkers, setSelectedHospital]);
 
-    const handleCurrentLocationSearchClick = () => {
-      pushDataLayer('search_map_current_location', {
-        is_first_search: !hasClickedCurrentSearch.current,
-      });
-      hasClickedCurrentSearch.current = true;
-      handleSearchHospitals();
-    };
-
     return (
       <div className="relative h-full w-full">
         <div
           ref={mapElement}
           className="h-[calc(100dvh-63px-56px)] w-full bg-gray-100"
         />
-        <CurrentHospitalBtn onClick={handleCurrentLocationSearchClick} />
+        <CurrentHospitalBtn onClick={handleSearchHospitals} />
         <button
           onClick={handleCurrentLocation}
           className="absolute right-5 bottom-50 z-[1000] active:scale-95"
