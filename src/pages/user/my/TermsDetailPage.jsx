@@ -5,8 +5,6 @@ import api from '@/apis/api.jsx';
 import Spinner from '@/components/commons/Spinner.jsx';
 import { Switch } from '@/components/ui/switch.jsx';
 
-const OPTIONAL_TERM_TYPES = new Set(['MARKETING', 'LOCATION']);
-
 const toBool = (value) =>
   value === true || value === 'true' || value === 'AGREE';
 
@@ -26,8 +24,7 @@ export default function TermsDetailPage() {
   const [updatingOptionalAgree, setUpdatingOptionalAgree] = useState(false);
 
   const termType = (data?.termsType || id || '').toUpperCase();
-  const isOptionalTerm =
-    data?.required === false || OPTIONAL_TERM_TYPES.has(termType);
+  const isOptionalTerm = data?.required === false;
 
   /* =========================
      약관 상세 조회
@@ -83,9 +80,21 @@ export default function TermsDetailPage() {
      선택 약관 동의 변경
   ========================= */
   const updateOptionalConsent = async (nextValue) => {
-    const _nextValue = nextValue;
-    await api.delete(`/terms/${termType}`, {});
-    return _nextValue;
+    if (nextValue) {
+      if (!data?.id) {
+        throw new Error('TERM_ID_MISSING');
+      }
+
+      await api.post('/terms/consents', {
+        termsId: [data.id],
+      });
+      console.log('term on');
+      return true;
+    }
+
+    await api.delete(`/terms/${termType}`);
+    console.log('term off');
+    return false;
   };
 
   const handleOptionalToggle = async (nextValue) => {
