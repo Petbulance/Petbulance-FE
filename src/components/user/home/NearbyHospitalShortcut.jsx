@@ -1,4 +1,3 @@
-import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import allIcon from '@/assets/images/icons/icon-all.png';
@@ -7,6 +6,7 @@ import birdIcon from '@/assets/images/icons/icon-bird.png';
 import fishIcon from '@/assets/images/icons/icon-fish.png';
 import mammalIcon from '@/assets/images/icons/icon-mammal.png';
 import reptileIcon from '@/assets/images/icons/icon-reptile.png';
+import { pushDataLayer } from '@/lib/gtm';
 
 const ICON_MAP = {
   전체: allIcon,
@@ -31,6 +31,8 @@ export default function NearbyHospitalShortcut() {
   const categories = ['전체', '소형포유류', '조류', '파충류', '양서류', '어류'];
 
   const handleClick = (category) => {
+    pushDataLayer('select_pet_category_home', { pet_type: category });
+
     const animalType = CATEGORY_TO_TYPE[category];
 
     if (!animalType) {

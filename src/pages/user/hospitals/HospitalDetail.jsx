@@ -12,6 +12,12 @@ export function HospitalDetail() {
   const location = useLocation();
 
   const fromScreen = location.state?.from_screen || 'hospital_detail';
+  const fromScreenLabelMap = {
+    map: '지도',
+    list: '목록',
+    search_result: '검색결과',
+    hospital_detail: '상세',
+  };
 
   const [hospital, setHospital] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,20 +31,24 @@ export function HospitalDetail() {
   useEffect(() => {
     const getDetail = async () => {
       try {
+        const data = await fetchHospitalDetail(id);
+        setHospital(data);
+
         // ✅ [GTM] 병원 상세 진입 이벤트
         if (typeof window !== 'undefined') {
           window.dataLayer = window.dataLayer || [];
           const gaPayload = {
             event: 'view_hospital_detail',
             hospital_id: String(id),
-            from_screen: fromScreen,
+            from_screen: fromScreenLabelMap[fromScreen] || fromScreen,
+            has_review: Number(data?.reviewCount || 0) > 0,
+            is_operating_now: Boolean(
+              data?.isOpenNow ?? data?.openNow ?? false
+            ),
           };
           console.log('[GA] view_hospital_detail payload', gaPayload);
           window.dataLayer.push(gaPayload);
         }
-
-        const data = await fetchHospitalDetail(id);
-        setHospital(data);
       } catch (error) {
         console.error('상세 정보 조회 실패', error);
       } finally {

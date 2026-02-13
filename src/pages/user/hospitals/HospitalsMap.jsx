@@ -46,6 +46,16 @@ export default function HospitalsMap() {
   const isListOpen = searchParams.get('view') === 'list';
 
   const openList = () => {
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      const gaPayload = {
+        event: 'switch_to_list_view',
+        from_view: '지도',
+      };
+      console.log('[GA] switch_to_list_view payload', gaPayload);
+      window.dataLayer.push(gaPayload);
+    }
+
     const newParams = new URLSearchParams(searchParams);
     newParams.set('view', 'list');
     setSearchParams(newParams);

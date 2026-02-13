@@ -1,11 +1,21 @@
 import { GreenBtn } from '@/components/commons/button/greenBtn';
+import { pushDataLayer } from '@/lib/gtm';
 
 import { BusinessHoursSection } from './businessHoursSection';
+import { HospitalIntroSection } from './hospitalIntroSection';
 import { LocationSection } from './locationSection';
 import { RequestSection } from './requestSection';
-import { HospitalIntroSection } from './hospitalIntroSection';
 
 export function DetailContent({ hospitalData }) {
+  const handleCallInquiryClick = () => {
+    pushDataLayer('click_call_hospital', {
+      hospital_id: String(hospitalData?.hospitalId || ''),
+      from_screen: 'detail_cta',
+      call_type: '직접전화',
+    });
+    window.location.href = `tel:${hospitalData.phone}`;
+  };
+
   return (
     <div className="bg-white">
       <LocationSection hospitalData={hospitalData} />
@@ -14,10 +24,7 @@ export function DetailContent({ hospitalData }) {
       <Divider />
       <RequestSection />
 
-      <GreenBtn
-        name="전화 문의하기"
-        onClick={() => (window.location.href = `tel:${hospitalData.phone}`)}
-      />
+      <GreenBtn name="전화 문의하기" onClick={handleCallInquiryClick} />
     </div>
   );
 }

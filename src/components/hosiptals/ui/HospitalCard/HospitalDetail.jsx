@@ -44,7 +44,6 @@ export function HosipitalDetail({
   overallRating,
   reviewCount,
   tags = [],
-  fromScreen,
 }) {
   const { id } = useParams();
   const { pathname } = useLocation();
@@ -84,11 +83,14 @@ export function HosipitalDetail({
   const handleCallClick = () => {
     if (typeof window !== 'undefined') {
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
+      const gaPayload = {
         event: 'click_call_hospital',
         hospital_id: String(id),
-        from_screen: fromScreen,
-      });
+        from_screen: 'detail_cta',
+        call_type: '직접전화',
+      };
+      console.log('[GA] click_call_hospital payload', gaPayload);
+      window.dataLayer.push(gaPayload);
     }
   };
 

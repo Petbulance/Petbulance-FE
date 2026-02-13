@@ -6,14 +6,14 @@ import { registerRecentKeyword } from '@/apis/hospitals/searchHistory';
 import SortModal from '@/components/commons/layout/SortModal';
 import { ButtonSection } from '@/components/hosiptals/ui/ButtonSection';
 import { HospitalFilterModalContainer } from '@/components/hosiptals/ui/FilterPopup';
-
-import { HospitalCardList } from '@/components/hosiptals/ui/HospitalCardList';
-import { SearchBody } from '@/components/hosiptals/ui/HospitalSearch/SearchBody';
-import { NoSearchResult } from '@/components/hosiptals/ui/HospitalSearch/noSearchResult';
 import {
   AnimalTypeContent,
   SearchFilterContent,
 } from '@/components/hosiptals/ui/FilterPopup/SearchFilterContent';
+import { HospitalCardList } from '@/components/hosiptals/ui/HospitalCardList';
+import { NoSearchResult } from '@/components/hosiptals/ui/HospitalSearch/noSearchResult';
+import { SearchBody } from '@/components/hosiptals/ui/HospitalSearch/SearchBody';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 import { pushDataLayer } from '@/lib/gtm';
 
 export function HospitalSearch() {
@@ -36,6 +36,19 @@ export function HospitalSearch() {
 
   const prevKeywordRef = useRef('');
 
+  const petTypeLabel = filterState.animal?.[0]
+    ? ANIMAL_CATEGORY_KO[filterState.animal[0]] || filterState.animal[0]
+    : '';
+  const regionLabel =
+    Array.isArray(filterState.region) && filterState.region.length > 0
+      ? filterState.region.join(', ')
+      : filterState.city || '';
+  const hasFilter =
+    Boolean(filterState.isOpen) ||
+    Boolean(filterState.city) ||
+    (Array.isArray(filterState.region) && filterState.region.length > 0) ||
+    (Array.isArray(filterState.animal) && filterState.animal.length > 0);
+
   useEffect(() => {
     if (!navigator.geolocation) return;
 
@@ -57,17 +70,16 @@ export function HospitalSearch() {
 
     setIsLoading(true);
 
-    let currentSearchType = 'filter';
+    pushDataLayer('search_hospital_start', {
+      search_method: '목록',
+      pet_type: petTypeLabel,
+      region: regionLabel,
+      filter_operating: Boolean(filterState.isOpen),
+    });
 
     if (searchKeyword !== prevKeywordRef.current) {
-      currentSearchType = 'keyword';
       prevKeywordRef.current = searchKeyword;
     }
-
-    pushDataLayer('search_hospital_start', {
-      search_type: currentSearchType,
-      from_screen: 'search_result',
-    });
 
     try {
       const data = await fetchHospitalsByName(searchKeyword, {
@@ -77,6 +89,11 @@ export function HospitalSearch() {
       });
 
       setSearchResults(data.list || []);
+      pushDataLayer('view_search_results', {
+        result_count: Array.isArray(data.list) ? data.list.length : 0,
+        search_method: '목록',
+        has_filter: hasFilter,
+      });
       await registerRecentKeyword(searchKeyword);
     } catch (error) {
       console.error('검색 중 오류 발생:', error);
@@ -89,6 +106,9 @@ export function HospitalSearch() {
     JSON.stringify(filterState),
     userLocation.lat,
     userLocation.lng,
+    petTypeLabel,
+    regionLabel,
+    hasFilter,
   ]);
 
   useEffect(() => {
@@ -99,6 +119,26 @@ export function HospitalSearch() {
     setFilterState((prev) => ({ ...prev, isOpen: !prev.isOpen }));
 
   const handleApplyFilter = (newData) => {
+    if (newData?.animal) {
+      const selected = Array.isArray(newData.animal) ? newData.animal[0] : '';
+      pushDataLayer('apply_search_filter', {
+        filter_type: '동물종',
+        filter_value: selected ? ANIMAL_CATEGORY_KO[selected] || selected : '',
+        from_screen: '병원검색',
+      });
+    }
+
+    if (Object.prototype.hasOwnProperty.call(newData, 'city')) {
+      const nextRegion = Array.isArray(newData.region)
+        ? newData.region.join(', ')
+        : '';
+      pushDataLayer('apply_search_filter', {
+        filter_type: '지역',
+        filter_value: nextRegion || newData.city || '',
+        from_screen: '병원검색',
+      });
+    }
+
     setFilterState((prev) => ({ ...prev, ...newData }));
     setActiveSheet(null);
   };

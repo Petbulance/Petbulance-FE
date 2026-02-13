@@ -21,22 +21,36 @@ export default function SignupComplete() {
   };
 
   const pushSignupCompleteEvent = () => {
-    let signUpMethod = 'kakao';
+    let signUpMethod = '카카오';
+    const hasPetInfo = [
+      profile?.petType,
+      profile?.animalType,
+      profile?.petName,
+      Array.isArray(profile?.pets) && profile.pets.length > 0,
+      Array.isArray(profile?.petInfo) && profile.petInfo.length > 0,
+    ].some(Boolean);
 
     try {
       const recent = JSON.parse(localStorage.getItem('recent_login') || '{}');
       if (recent?.provider) {
-        signUpMethod = String(recent.provider).toLowerCase();
+        const provider = String(recent.provider).toUpperCase();
+        const methodMap = {
+          KAKAO: '카카오',
+          NAVER: '네이버',
+          GOOGLE: '구글',
+        };
+        signUpMethod = methodMap[provider] || recent.provider;
       }
     } catch {
-      signUpMethod = 'kakao';
+      signUpMethod = '카카오';
     }
 
     const debugMode = isDebugModeEnabled();
     window.dataLayer = window.dataLayer || [];
     const gaPayload = {
       event: 'sign_up_complete',
-      sign_up_method: signUpMethod,
+      signup_method: signUpMethod,
+      has_pet_info: hasPetInfo,
       ...(debugMode ? { debug_mode: true } : {}),
     };
     console.log('[GA] sign_up_complete payload', gaPayload);

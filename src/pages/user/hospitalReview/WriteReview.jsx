@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 
-import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 import { fetchHospitalDetail } from '@/apis/hospitals/hospitalDetail';
 import { postReview } from '@/apis/reviews/postReview';
+import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 import { ReceiptVerifiedModal } from '@/components/commons/layout/ReceiptVerifiedModal';
 
 import ReviewForm_1 from './form/ReviewForm_1';
@@ -100,7 +100,11 @@ export function WriteReview() {
             event: 'submit_review',
             hospital_id: String(formData.hospitalId),
             rating: Number(avgRating.toFixed(1)),
-            from_screen: 'review_form',
+            has_photo: Array.isArray(formData.images)
+              ? formData.images.length > 0
+              : false,
+            has_receipt: Boolean(receiptChecked),
+            review_length: String(formData.content || '').trim().length,
           };
           console.log('[GA] submit_review payload', gaPayload);
           window.dataLayer.push(gaPayload);

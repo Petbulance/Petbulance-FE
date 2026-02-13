@@ -8,6 +8,8 @@ import current_location_marker from '@/assets/images/icons/current_location_mark
 import marker_open from '@/assets/images/icons/open_hospital_marker.svg';
 import selected_close_marker from '@/assets/images/icons/selected_close_marker.svg';
 import selected_marker from '@/assets/images/icons/selected_marker.svg';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
+import { pushDataLayer } from '@/lib/gtm';
 import { loadNaverMap } from '@/lib/loadNaverMap';
 
 import { CurrentHospitalBtn } from './ui/CurrentHospitalBtn';
@@ -42,6 +44,21 @@ const NaverMap = React.memo(
 
     const handleSearchHospitals = useCallback(async () => {
       if (!mapInstance.current) return;
+
+      const petTypeLabel = filterState.animal?.[0]
+        ? ANIMAL_CATEGORY_KO[filterState.animal[0]] || filterState.animal[0]
+        : '';
+      const regionLabel =
+        Array.isArray(filterState.region) && filterState.region.length > 0
+          ? filterState.region.join(', ')
+          : filterState.city || '';
+
+      pushDataLayer('search_hospital_start', {
+        search_method: '지도',
+        pet_type: petTypeLabel,
+        region: regionLabel,
+        filter_operating: Boolean(filterState.isOpen),
+      });
 
       const bounds = mapInstance.current.getBounds();
       const sw = bounds.getSW();
@@ -260,13 +277,27 @@ const NaverMap = React.memo(
       }
     }, [hospitals, selectedHospital, clearMarkers, setSelectedHospital]);
 
+    const handleSearchCurrentLocationClick = useCallback(() => {
+      if (typeof window !== 'undefined') {
+        window.dataLayer = window.dataLayer || [];
+        const gaPayload = {
+          event: 'search_map_current_location',
+          is_first_search: false,
+        };
+        console.log('[GA] search_map_current_location payload', gaPayload);
+        window.dataLayer.push(gaPayload);
+      }
+
+      handleSearchHospitals();
+    }, [handleSearchHospitals]);
+
     return (
       <div className="relative h-full w-full">
         <div
           ref={mapElement}
           className="h-[calc(100dvh-63px-56px)] w-full bg-gray-100"
         />
-        <CurrentHospitalBtn onClick={handleSearchHospitals} />
+        <CurrentHospitalBtn onClick={handleSearchCurrentLocationClick} />
         <button
           onClick={handleCurrentLocation}
           className="absolute right-5 bottom-50 z-[1000] active:scale-95"

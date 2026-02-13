@@ -7,6 +7,8 @@ import {
 } from '@carbon/icons-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { pushDataLayer } from '@/lib/gtm';
+
 const MENUS = [
   { label: '홈', icon: Home, path: '/index/home' },
   { label: '병원검색', icon: HealthCross, path: '/index/hospitals' },
@@ -18,6 +20,16 @@ const MENUS = [
 export default function MainFooter() {
   const navigate = useNavigate();
   const location = useLocation();
+  const activeMenu =
+    MENUS.find((menu) => location.pathname.startsWith(menu.path))?.label || '';
+
+  const handleTabClick = (menuLabel, menuPath) => {
+    pushDataLayer('view_tab', {
+      tab_name: menuLabel,
+      previous_tab: activeMenu,
+    });
+    navigate(menuPath);
+  };
 
   return (
     <footer className="z-10 shrink-0 border-t bg-white pb-[env(safe-area-inset-bottom)]">
@@ -28,7 +40,7 @@ export default function MainFooter() {
           return (
             <li
               key={menu.label}
-              onClick={() => navigate(menu.path)}
+              onClick={() => handleTabClick(menu.label, menu.path)}
               className={`flex cursor-pointer flex-col items-center text-xs transition-colors ${isActive ? 'text-green-600' : 'text-gray-500'} `}
             >
               <menu.icon className="h-5 w-5" />
