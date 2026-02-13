@@ -1,12 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-
-// eslint-disable-next-line import/order
-import router from '@/router/index.jsx';
-
-import './index.css';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
+
+import router from '@/router/index.jsx';
+import { initGlobalDebugMode } from '@/utils/gtm';
+
+import './index.css';
+
+initGlobalDebugMode();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
