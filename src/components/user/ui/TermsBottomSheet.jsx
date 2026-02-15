@@ -12,7 +12,12 @@ import {
 
 import TermsAgreementItem from './TermsAgreementItem.jsx';
 
-export default function TermsBottomSheet({ open, onClose, onConsented }) {
+export default function TermsBottomSheet({
+  open,
+  onClose,
+  onConsented,
+  portalContainer,
+}) {
   /* ===============================
      state
   =============================== */
@@ -147,7 +152,12 @@ export default function TermsBottomSheet({ open, onClose, onConsented }) {
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="fixed top-1/2 left-1/2 h-[472px] max-h-[90vh] w-[calc(100vw-2rem)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-white p-0">
+        <DialogContent
+          disableDefaultPosition
+          portalContainer={portalContainer}
+          overlayClassName="!absolute !inset-0 bg-black/50"
+          className="!absolute right-0 bottom-0 left-0 h-[472px] max-h-[90vh] w-full max-w-none rounded-t-3xl rounded-b-none bg-white p-0"
+        >
           {/* 내부 레이아웃 */}
           <div className="flex max-h-[90vh] flex-col px-6 py-6">
             {/* 헤더 (고정) */}
@@ -196,7 +206,7 @@ export default function TermsBottomSheet({ open, onClose, onConsented }) {
               <button
                 onClick={handleSubmit}
                 className="mt-3 h-[68px] w-full rounded-2xl border border-[#2da969] text-[20px] text-[27px] text-[#2da969]"
-                disabled={loading}
+                disabled={loading || !isRequiredAgreed}
               >
                 동의하기
               </button>
@@ -207,7 +217,12 @@ export default function TermsBottomSheet({ open, onClose, onConsented }) {
 
       {/* 상세 약관 */}
       <Dialog open={!!selectedTerm} onOpenChange={() => setSelectedTerm(null)}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          disableDefaultPosition
+          portalContainer={portalContainer}
+          overlayClassName="!absolute !inset-0"
+          className="!absolute !top-auto !right-0 !bottom-0 !left-0 !h-[472px] max-h-[90vh] !w-full !max-w-none overflow-y-auto rounded-t-3xl rounded-b-none"
+        >
           <DialogHeader>
             <DialogTitle>{selectedTerm?.title}</DialogTitle>
           </DialogHeader>

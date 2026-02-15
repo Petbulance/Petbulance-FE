@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
@@ -10,6 +10,7 @@ import { isDebugModeEnabled } from '@/utils/gtm';
 export default function SignupComplete() {
   const [open, setOpen] = useState(false);
   const [hasRequiredAgree, setHasRequiredAgree] = useState(false);
+  const bottomSheetContainerRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -121,7 +122,10 @@ export default function SignupComplete() {
   }, [fetchMyProfile]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white px-6">
+    <div
+      ref={bottomSheetContainerRef}
+      className="relative flex min-h-screen flex-col bg-white px-6"
+    >
       {/* ================= 상단 ================= */}
       <div className="mt-48 flex flex-col items-center text-center">
         <img
@@ -182,6 +186,7 @@ export default function SignupComplete() {
       <TermsBottomSheet
         open={open}
         onClose={() => setOpen(false)}
+        portalContainer={bottomSheetContainerRef.current}
         onConsented={() => {
           setHasRequiredAgree(true);
           runPostLoginInit();
