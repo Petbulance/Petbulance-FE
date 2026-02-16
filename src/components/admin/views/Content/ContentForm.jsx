@@ -102,14 +102,18 @@ export default function ContentForm({
       return [];
     }
 
-    const presignRes = await api.post('/app/image/presign', {
-      files: imageFiles.map((file, index) => ({
-        usage,
-        filename: file.name,
-        contentType: file.type,
-        order: index + 1,
-      })),
-    });
+    const presignRes = await api.post(
+      '/app/image/presign',
+      {
+        files: imageFiles.map((file, index) => ({
+          usage,
+          filename: file.name,
+          contentType: file.type,
+          order: index + 1,
+        })),
+      },
+      { authType: 'admin' }
+    );
 
     const uploadedFiles = presignRes.data.data.uploadedFiles;
 

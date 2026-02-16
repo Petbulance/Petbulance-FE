@@ -21,6 +21,11 @@ let adminRefreshPromise = null;
 const isAdminRequest = (url = '') =>
   url.startsWith('/admin') || url.includes('/admin/');
 
+const shouldUseAdminAuth = (config = {}) => {
+  if (config.authType === 'admin') return true;
+  return isAdminRequest(config.url ?? '');
+};
+
 const getAccessTokenFromResponse = (response) => {
   const payload = response?.data?.data || response?.data || {};
   return (
@@ -139,10 +144,7 @@ const getAdminRefreshPromise = () => {
 
 api.interceptors.request.use(
   (config) => {
-    const requestUrl = config.url ?? '';
-    const tokenKey = isAdminRequest(requestUrl)
-      ? 'admin_token'
-      : 'access_token';
+    const tokenKey = shouldUseAdminAuth(config) ? 'admin_token' : 'access_token';
     const token = localStorage.getItem(tokenKey);
 
     if (!config.headers?.Authorization && token) {
@@ -167,7 +169,7 @@ api.interceptors.response.use(
     }
 
     const requestUrl = originalRequest.url ?? '';
-    if (isAdminRequest(requestUrl)) {
+    if (shouldUseAdminAuth(originalRequest)) {
       if (requestUrl.includes(ADMIN_REFRESH_ENDPOINT)) {
         handleAdminAuthFailure();
         return Promise.reject(error);
