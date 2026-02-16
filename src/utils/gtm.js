@@ -1,11 +1,21 @@
 export function pushDL(eventName, params = {}) {
+  const debugMode =
+    typeof localStorage !== 'undefined' &&
+    localStorage.getItem(DEBUG_MODE_KEY) === 'true';
   window.dataLayer = window.dataLayer || [];
   const payload = {
     event: eventName,
     ...params,
+    ...(debugMode ? { debug_mode: true } : {}),
   };
   console.log('[GA] pushDL payload', payload);
   window.dataLayer.push(payload);
+
+  if (typeof window.gtag === 'function') {
+    const gaParams = { ...payload };
+    delete gaParams.event;
+    window.gtag('event', eventName, gaParams);
+  }
 }
 
 const DEBUG_MODE_KEY = 'ga_debug_mode';

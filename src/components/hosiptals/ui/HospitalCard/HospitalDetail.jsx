@@ -7,6 +7,7 @@ import DotIcon from '@/assets/images/icons/DotIcon.svg';
 import hide_icon from '@/assets/images/icons/hide_icon.svg';
 import PhoneIcon from '@/assets/images/icons/PhoneIcon.svg';
 import Star from '@/assets/images/icons/Star.svg';
+import { pushDataLayer } from '@/lib/gtm';
 
 import { CategoryButton } from './CategoryButton';
 
@@ -81,17 +82,13 @@ export function HosipitalDetail({
   }, [lat, lng, userLat, userLng]);
 
   const handleCallClick = () => {
-    if (typeof window !== 'undefined') {
-      window.dataLayer = window.dataLayer || [];
-      const gaPayload = {
-        event: 'click_call_hospital',
-        hospital_id: String(id),
-        from_screen: 'detail_cta',
-        call_type: '직접전화',
-      };
-      console.log('[GA] click_call_hospital payload', gaPayload);
-      window.dataLayer.push(gaPayload);
-    }
+    const gaPayload = {
+      hospital_id: String(id),
+      from_screen: 'detail_cta',
+      call_type: '직접전화',
+    };
+    console.log('[GA] click_call_hospital payload', gaPayload);
+    pushDataLayer('click_call_hospital', gaPayload);
   };
 
   useEffect(() => {

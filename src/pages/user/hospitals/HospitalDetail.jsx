@@ -6,6 +6,7 @@ import { HosipitalDetail } from '@/components/hosiptals/ui/HospitalCard/Hospital
 import { DetailContent } from '@/components/hosiptals/ui/HospitalDetail/detailInfo';
 import { DetailTabMenu } from '@/components/hosiptals/ui/HospitalDetail/DetailTabMenu';
 import { ReviewContent } from '@/components/hosiptals/ui/HospitalDetail/review';
+import { pushDataLayer } from '@/lib/gtm';
 
 export function HospitalDetail() {
   const { id } = useParams();
@@ -35,20 +36,14 @@ export function HospitalDetail() {
         setHospital(data);
 
         // ✅ [GTM] 병원 상세 진입 이벤트
-        if (typeof window !== 'undefined') {
-          window.dataLayer = window.dataLayer || [];
-          const gaPayload = {
-            event: 'view_hospital_detail',
-            hospital_id: String(id),
-            from_screen: fromScreenLabelMap[fromScreen] || fromScreen,
-            has_review: Number(data?.reviewCount || 0) > 0,
-            is_operating_now: Boolean(
-              data?.isOpenNow ?? data?.openNow ?? false
-            ),
-          };
-          console.log('[GA] view_hospital_detail payload', gaPayload);
-          window.dataLayer.push(gaPayload);
-        }
+        const gaPayload = {
+          hospital_id: String(id),
+          from_screen: fromScreenLabelMap[fromScreen] || fromScreen,
+          has_review: Number(data?.reviewCount || 0) > 0,
+          is_operating_now: Boolean(data?.isOpenNow ?? data?.openNow ?? false),
+        };
+        console.log('[GA] view_hospital_detail payload', gaPayload);
+        pushDataLayer('view_hospital_detail', gaPayload);
       } catch (error) {
         console.error('상세 정보 조회 실패', error);
       } finally {

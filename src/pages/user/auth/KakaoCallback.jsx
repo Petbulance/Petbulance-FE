@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 import api from '@/apis/api.jsx';
 import Spinner from '@/components/commons/Spinner.jsx';
-import { isDebugModeEnabled, withDebugQuery } from '@/utils/gtm';
+import { pushDataLayer } from '@/lib/gtm';
+import { withDebugQuery } from '@/utils/gtm';
 
 export default function KakaoCallback() {
   const navigate = useNavigate();
@@ -62,15 +63,11 @@ export default function KakaoCallback() {
         });
         console.log('데이터', JWTres);
         const { accessToken, refreshToken, isNewUser } = JWTres.data.data;
-        const debugMode = isDebugModeEnabled();
-        window.dataLayer = window.dataLayer || [];
         const gaPayload = {
-          event: 'login_success',
           login_method: 'kakao',
-          ...(debugMode ? { debug_mode: true } : {}),
         };
         console.log('[GA] login_success payload', gaPayload);
-        window.dataLayer.push(gaPayload);
+        pushDataLayer('login_success', gaPayload);
 
         if (isNewUser) {
           localStorage.setItem('temp_access_token', accessToken);

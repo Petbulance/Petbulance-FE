@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '@/apis/api.jsx';
 import partyIcon from '@/assets/images/pageImages/partyImg.svg';
 import TermsBottomSheet from '@/components/user/ui/TermsBottomSheet.jsx';
+import { pushDataLayer } from '@/lib/gtm';
 import useUserStore from '@/stores/useUserStore';
-import { isDebugModeEnabled } from '@/utils/gtm';
 
 export default function SignupComplete() {
   const [open, setOpen] = useState(false);
@@ -46,16 +46,12 @@ export default function SignupComplete() {
       signUpMethod = '카카오';
     }
 
-    const debugMode = isDebugModeEnabled();
-    window.dataLayer = window.dataLayer || [];
     const gaPayload = {
-      event: 'sign_up_complete',
       signup_method: signUpMethod,
       has_pet_info: hasPetInfo,
-      ...(debugMode ? { debug_mode: true } : {}),
     };
     console.log('[GA] sign_up_complete payload', gaPayload);
-    window.dataLayer.push(gaPayload);
+    pushDataLayer('sign_up_complete', gaPayload);
   };
 
   /* ===============================

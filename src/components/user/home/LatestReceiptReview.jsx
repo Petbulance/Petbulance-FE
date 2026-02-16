@@ -65,7 +65,7 @@ export default function LatestReceiptReview() {
           receipt: true,
         },
       });
-
+      console.log(response);
       setReviews(response.data.data.list || []);
     } catch (e) {
       console.error('최신 영수증 후기 조회 실패', e);

@@ -5,6 +5,7 @@ import { fetchHospitalDetail } from '@/apis/hospitals/hospitalDetail';
 import { postReview } from '@/apis/reviews/postReview';
 import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
 import { ReceiptVerifiedModal } from '@/components/commons/layout/ReceiptVerifiedModal';
+import { pushDataLayer } from '@/lib/gtm';
 
 import ReviewForm_1 from './form/ReviewForm_1';
 import ReviewForm_2 from './form/ReviewForm_2';
@@ -90,25 +91,21 @@ export function WriteReview() {
         setReviewId(savedReviewId);
         setIsSuccessOpen(true);
 
-        if (typeof window !== 'undefined') {
-          const { expertise, kindness, facility } = formData.ratings;
-          const avgRating =
-            (Number(expertise) + Number(kindness) + Number(facility)) / 3;
+        const { expertise, kindness, facility } = formData.ratings;
+        const avgRating =
+          (Number(expertise) + Number(kindness) + Number(facility)) / 3;
 
-          window.dataLayer = window.dataLayer || [];
-          const gaPayload = {
-            event: 'submit_review',
-            hospital_id: String(formData.hospitalId),
-            rating: Number(avgRating.toFixed(1)),
-            has_photo: Array.isArray(formData.images)
-              ? formData.images.length > 0
-              : false,
-            has_receipt: Boolean(receiptChecked),
-            review_length: String(formData.content || '').trim().length,
-          };
-          console.log('[GA] submit_review payload', gaPayload);
-          window.dataLayer.push(gaPayload);
-        }
+        const gaPayload = {
+          hospital_id: String(formData.hospitalId),
+          rating: Number(avgRating.toFixed(1)),
+          has_photo: Array.isArray(formData.images)
+            ? formData.images.length > 0
+            : false,
+          has_receipt: Boolean(receiptChecked),
+          review_length: String(formData.content || '').trim().length,
+        };
+        console.log('[GA] submit_review payload', gaPayload);
+        pushDataLayer('submit_review', gaPayload);
       }
     } catch (error) {
       alert('후기 등록에 실패했습니다. 잠시 후 다시 시도해주세요.');

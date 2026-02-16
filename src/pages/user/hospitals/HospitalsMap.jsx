@@ -16,6 +16,7 @@ import { HospitalInfoSlide } from '@/components/hosiptals/ui/HospitalCard';
 import { NoHospitalResult } from '@/components/hosiptals/ui/HospitalCard/NoHospitalResult';
 import { HospitalCardList } from '@/components/hosiptals/ui/HospitalCardList';
 import { useHospitalFilter } from '@/hooks/useHospitalFilter';
+import { pushDataLayer } from '@/lib/gtm';
 
 export default function HospitalsMap() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,15 +47,11 @@ export default function HospitalsMap() {
   const isListOpen = searchParams.get('view') === 'list';
 
   const openList = () => {
-    if (typeof window !== 'undefined') {
-      window.dataLayer = window.dataLayer || [];
-      const gaPayload = {
-        event: 'switch_to_list_view',
-        from_view: '지도',
-      };
-      console.log('[GA] switch_to_list_view payload', gaPayload);
-      window.dataLayer.push(gaPayload);
-    }
+    const gaPayload = {
+      from_view: '지도',
+    };
+    console.log('[GA] switch_to_list_view payload', gaPayload);
+    pushDataLayer('switch_to_list_view', gaPayload);
 
     const newParams = new URLSearchParams(searchParams);
     newParams.set('view', 'list');
