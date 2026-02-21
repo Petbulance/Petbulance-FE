@@ -278,11 +278,11 @@ const NaverMap = React.memo(
     }, [hospitals, selectedHospital, clearMarkers, setSelectedHospital]);
 
     const handleSearchCurrentLocationClick = useCallback(() => {
-      const gaPayload = {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'search_map_current_location',
         is_first_search: false,
-      };
-      console.log('[GA] search_map_current_location payload', gaPayload);
-      pushDataLayer('search_map_current_location', gaPayload);
+      });
 
       handleSearchHospitals();
     }, [handleSearchHospitals]);
