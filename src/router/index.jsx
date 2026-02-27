@@ -69,6 +69,7 @@ import NotFoundPage from '@/pages/user/NotFoundPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
+import CommunityLayout from '@/components/community/layout';
 
 const router = createBrowserRouter([
   /* ================= 루트 ================= */
@@ -159,9 +160,9 @@ const router = createBrowserRouter([
         path: 'community',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
-            <MainLayout title="커뮤니티">
+            <CommunityLayout>
               <CommunityPage />
-            </MainLayout>
+            </CommunityLayout>
           </LayoutShell>
         ),
       },
