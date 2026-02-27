@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import arrow from '@/assets/images/icons/arrow_header.svg';
 import Bell from '@/assets/images/icons/bell.svg';
@@ -7,6 +7,7 @@ import Search from '@/assets/images/icons/community_search.svg';
 export function CommunityHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedType, setSelectedType] = useState('전체');
+  const dropdownRef = useRef(null);
   const animalTypes = [
     '전체',
     '소형포유류',
@@ -16,9 +17,22 @@ export function CommunityHeader() {
     '어류',
   ];
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!dropdownRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="relative flex items-center justify-between border-b-[1px] border-[#E0E0E0] px-1 pl-5">
-      <div className="relative">
+      <div ref={dropdownRef} className="relative">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
           className="flex items-center gap-1 text-[20px] font-semibold text-[#1E1E1E]"

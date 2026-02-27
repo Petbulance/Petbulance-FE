@@ -111,6 +111,7 @@ export default function CommunityPage() {
           selectedSort={selectedSort}
           isSortOpen={isSortOpen}
           onToggleSort={() => setIsSortOpen((prev) => !prev)}
+          onCloseSort={() => setIsSortOpen(false)}
           onSelectSort={(sort) => {
             setSelectedSort(sort);
             setIsSortOpen(false);
