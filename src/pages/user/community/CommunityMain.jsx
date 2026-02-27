@@ -94,7 +94,7 @@ const POSTS = [
   },
 ];
 
-export default function CommunityPage() {
+export default function CommunityMain() {
   const [selectedTopic, setSelectedTopic] = useState(TOPIC_FILTERS[0]);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState('최신순');
