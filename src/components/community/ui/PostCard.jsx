@@ -1,11 +1,19 @@
+import { useNavigate } from 'react-router-dom';
+
 import eye from '@/assets/images/icons/eye_icon.svg';
 import dot from '@/assets/images/icons/DotIcon.svg';
 import thumbs from '@/assets/images/icons/thumbs.svg';
 import message from '@/assets/images/icons/message.svg';
 
 export function PostCard({ post }) {
+  const navigate = useNavigate();
+
   return (
-    <article key={post.id} className="border-b border-[##EEEEEE] px-6 py-4">
+    <article
+      key={post.id}
+      className="cursor-pointer border-b border-[##EEEEEE] px-6 py-4"
+      onClick={() => navigate(`/index/community/${post.id}`)}
+    >
       <div className="flex gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex justify-between">
@@ -22,9 +30,7 @@ export function PostCard({ post }) {
               <h3 className="mb-2 text-[18px] font-medium text-[#1E1E1E]">
                 {post.title}
               </h3>
-              <p className="mb-[28px] text-[16px] text-[#424242]">
-                {post.content}
-              </p>
+              <p className="mb-[28px] text-[16px] text-[#424242]">{post.content}</p>
             </div>
 
             {post.hasImage && (
@@ -39,18 +45,18 @@ export function PostCard({ post }) {
           <div className="flex items-center justify-between">
             <div className="flex flex-row items-center gap-[2px] text-[14px] text-[#9E9E9E]">
               {post.nickname}
-              <img src={dot} />
+              <img src={dot} alt="구분점" />
               {post.time}
-              <img src={dot} />
-              <img src={eye} /> {post.views}
+              <img src={dot} alt="구분점" />
+              <img src={eye} alt="조회수" /> {post.views}
             </div>
 
             <div className="flex justify-end gap-3 text-sm text-[#A3A3A3]">
               <p className="flex items-center gap-1">
-                <img src={thumbs} /> {post.likes}
+                <img src={thumbs} alt="좋아요" /> {post.likes}
               </p>
               <p className="flex items-center gap-1">
-                <img src={message} /> {post.comments}
+                <img src={message} alt="댓글" /> {post.comments}
               </p>
             </div>
           </div>
