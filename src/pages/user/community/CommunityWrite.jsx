@@ -4,14 +4,14 @@ import { toast } from 'sonner';
 
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import downArrow from '@/assets/images/icons/gray_bottom_arrow.svg';
-import leftArrow from '@/assets/images/icons/left_arrow.svg';
 import reviewImage from '@/assets/images/icons/review_img_ex.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
+import xIconBlack from '@/assets/images/icons/x_icon_black.svg';
 
 const ANIMAL_CATEGORIES = ['소형포유류', '조류', '파충류', '양서류', '어류'];
 const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑', '중고거래'];
 const EDIT_POSTS = {
-  '1': {
+  1: {
     category: '소형포유류',
     topic: '일상/자랑',
     title: '울집 햄스터 자랑하는 글',
@@ -25,7 +25,9 @@ export default function CommunityWrite() {
   const navigate = useNavigate();
   const { postId } = useParams();
   const isEditMode = Boolean(postId);
-  const initialEditPost = isEditMode ? EDIT_POSTS[postId] ?? EDIT_POSTS['1'] : null;
+  const initialEditPost = isEditMode
+    ? (EDIT_POSTS[postId] ?? EDIT_POSTS['1'])
+    : null;
 
   const [category, setCategory] = useState(initialEditPost?.category ?? '');
   const [topic, setTopic] = useState(initialEditPost?.topic ?? '');
@@ -38,10 +40,11 @@ export default function CommunityWrite() {
           preview: src,
           isLocal: false,
         }))
-      : [],
+      : []
   );
   const [isCategoryOpen, setIsCategoryOpen] = useState(!isEditMode);
   const [isTopicOpen, setIsTopicOpen] = useState(false);
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
 
   const canSubmit = useMemo(
     () => Boolean(category && topic && title.trim() && content.trim()),
@@ -122,8 +125,8 @@ export default function CommunityWrite() {
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-white">
       <header className="relative flex h-[48px] items-center justify-between border-b border-[#E0E0E0] px-4">
-        <button onClick={() => navigate(-1)}>
-          <img src={leftArrow} alt="뒤로가기" />
+        <button onClick={() => setIsExitConfirmOpen(true)}>
+          <img src={xIconBlack} alt="닫기" className="h-[20px] w-[20px]" />
         </button>
 
         <button
@@ -303,6 +306,40 @@ export default function CommunityWrite() {
                   )}
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isExitConfirmOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsExitConfirmOpen(false)}
+            aria-label="수정중단 닫기"
+          />
+          <div className="relative mx-6 w-full max-w-[320px] rounded-[14px] bg-white px-5 py-5 text-center">
+            <h2 className="text-[20px] font-semibold text-[#1E1E1E]">
+              {isEditMode
+                ? '게시글 수정을 그만할까요?'
+                : '게시글 작성을 그만할까요?'}
+            </h2>
+            <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">
+              변경된 내용은 저장되지 않아요.
+            </p>
+            <div className="mt-5 flex gap-2">
+              <button
+                className="flex-1 rounded-[999px] border border-[#E3E3E3] py-2 text-[15px] text-[#8A8A8A]"
+                onClick={() => setIsExitConfirmOpen(false)}
+              >
+                취소
+              </button>
+              <button
+                className="flex-1 rounded-[999px] bg-[#FF2B2B] py-2 text-[15px] font-medium text-white"
+                onClick={() => navigate('/index/community', { replace: true })}
+              >
+                나가기
+              </button>
             </div>
           </div>
         </div>
