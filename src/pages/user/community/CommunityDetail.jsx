@@ -16,6 +16,7 @@ import xIcon from '@/assets/images/icons/x_icon.svg';
 const COMMUNITY_DETAIL_POSTS = [
   {
     id: 1,
+    isMine: true,
     nickname: '햄스터조련사',
     category: '소형포유류',
     topic: '일상/자랑',
@@ -31,6 +32,7 @@ const COMMUNITY_DETAIL_POSTS = [
   },
   {
     id: 2,
+    isMine: false,
     nickname: '햄스터조련사',
     category: '소형포유류',
     topic: '일상/자랑',
@@ -151,6 +153,17 @@ export default function CommunityDetail() {
   const { postId } = useParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isReportReasonOpen, setIsReportReasonOpen] = useState(false);
+  const [selectedReportReason, setSelectedReportReason] = useState('');
+  const reportReasons = [
+    '욕설/비방/선정적',
+    '도배/광고',
+    '허위/가짜 정보',
+    '저작권 침해',
+    '개인정보 노출',
+    '사기/금융 범죄',
+    '기타',
+  ];
 
   const post = useMemo(
     () => COMMUNITY_DETAIL_POSTS.find((item) => String(item.id) === postId),
@@ -166,6 +179,9 @@ export default function CommunityDetail() {
   }
 
   const hasComments = post.commentItems.length > 0;
+  const isMyPost = Boolean(post.isMine);
+  const reportStorageKey = `community-reported-${post.id}`;
+  const isAlreadyReported = localStorage.getItem(reportStorageKey) === '1';
   const handleDeleteClick = () => {
     setIsMenuOpen(false);
     setIsDeleteConfirmOpen(true);
@@ -195,6 +211,46 @@ export default function CommunityDetail() {
         color: '#ffffff',
         padding: 0,
         cursor: 'pointer',
+      },
+    });
+  };
+  const handleSubmitReport = () => {
+    if (!selectedReportReason) {
+      toast('신고 사유를 선택해주세요', { position: 'bottom-center' });
+      return;
+    }
+
+    setIsReportReasonOpen(false);
+    setIsMenuOpen(false);
+    setSelectedReportReason('');
+
+    if (isAlreadyReported) {
+      toast('이미 신고 접수된 게시글입니다', {
+        position: 'bottom-center',
+        duration: 2500,
+        style: {
+          width: '100%',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          background: '#222222E5',
+          color: '#ffffff',
+        },
+      });
+      return;
+    }
+
+    localStorage.setItem(reportStorageKey, '1');
+    toast('[게시글 신고 완료] 운영자 검토 후 조치 예정입니다', {
+      position: 'bottom-center',
+      duration: 2500,
+      style: {
+        width: '100%',
+        height: '44px',
+        display: 'flex',
+        alignItems: 'center',
+        background: '#222222E5',
+        color: '#ffffff',
       },
     });
   };
@@ -334,25 +390,48 @@ export default function CommunityDetail() {
             onClick={() => setIsMenuOpen(false)}
             aria-label="메뉴 닫기"
           />
-          <div className="absolute right-0 bottom-0 left-0 px-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
-            <div className="overflow-hidden rounded-[10px] bg-white">
+          {isMyPost ? (
+            <div className="absolute right-0 bottom-0 left-0 px-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+              <div className="overflow-hidden rounded-[10px] bg-white">
+                <button
+                  className="w-full border-b border-[#EDEDED] py-3 text-[18px] font-medium text-[#F04438]"
+                  onClick={handleDeleteClick}
+                >
+                  게시글 삭제
+                </button>
+                <button
+                  className="w-full py-3 text-[18px] text-[#1E1E1E]"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate('/index/community/write');
+                  }}
+                >
+                  수정
+                </button>
+              </div>
               <button
-                className="w-full border-b border-[#EDEDED] py-3 text-[18px] font-medium text-[#F04438]"
-                onClick={handleDeleteClick}
+                className="mt-3 w-full rounded-[10px] bg-white py-3 text-[18px] text-[#1E1E1E]"
+                onClick={() => setIsMenuOpen(false)}
               >
-                게시글 삭제
-              </button>
-              <button className="w-full py-3 text-[18px] text-[#1E1E1E]">
-                수정
+                취소
               </button>
             </div>
-            <button
-              className="mt-3 w-full rounded-[10px] bg-white py-3 text-[18px] text-[#1E1E1E]"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              취소
-            </button>
-          </div>
+          ) : (
+            <div className="absolute top-1/2 left-1/2 w-[168px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[10px] bg-white">
+              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[15px] font-medium text-[#1E1E1E]">
+                신고하기
+              </p>
+              <button
+                className="flex w-full items-center gap-2 px-4 py-3 text-[13px] text-[#616161]"
+                onClick={() => {
+                  setIsReportReasonOpen(true);
+                }}
+              >
+                <span className="text-[12px]">⚑</span>
+                게시글 신고
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -382,6 +461,59 @@ export default function CommunityDetail() {
                 onClick={handleDeleteConfirm}
               >
                 삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isReportReasonOpen && (
+        <div className="absolute inset-0 z-[70] flex items-center justify-center">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => {
+              setIsReportReasonOpen(false);
+              setIsMenuOpen(false);
+            }}
+            aria-label="신고 사유 닫기"
+          />
+          <div className="relative mx-6 w-full max-w-[320px] rounded-[12px] bg-white p-4">
+            <h3 className="mb-3 text-[14px] font-medium text-[#1E1E1E]">
+              게시글 신고 이유를 알려주세요.
+            </h3>
+            <div className="space-y-1.5">
+              {reportReasons.map((reason) => (
+                <label
+                  key={reason}
+                  className="flex cursor-pointer items-center gap-2 text-[12px] text-[#424242]"
+                >
+                  <input
+                    type="radio"
+                    name="reportReason"
+                    checked={selectedReportReason === reason}
+                    onChange={() => setSelectedReportReason(reason)}
+                    className="h-3.5 w-3.5 accent-[#27BE69]"
+                  />
+                  {reason}
+                </label>
+              ))}
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              <button
+                className="flex-1 rounded-[6px] border border-[#E0E0E0] py-2 text-[13px] text-[#757575]"
+                onClick={() => {
+                  setIsReportReasonOpen(false);
+                  setIsMenuOpen(false);
+                }}
+              >
+                취소
+              </button>
+              <button
+                className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white"
+                onClick={handleSubmitReport}
+              >
+                제출
               </button>
             </div>
           </div>
