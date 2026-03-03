@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import defaultProfile from '@/assets/images/icons/defaultImg.svg';
@@ -172,7 +173,30 @@ export default function CommunityDetail() {
 
   const handleDeleteConfirm = () => {
     setIsDeleteConfirmOpen(false);
-    alert('삭제');
+    navigate('/index/community', { replace: true });
+    toast('게시글을 삭제했어요', {
+      position: 'bottom-center',
+      duration: 3000,
+      style: {
+        width: '100%',
+        height: '44px',
+        display: 'flex',
+        alignItems: 'center',
+        background: '#222222E5',
+        color: '#ffffff',
+      },
+      action: {
+        label: '취소',
+        onClick: () => toast.dismiss(),
+      },
+      actionButtonStyle: {
+        background: 'transparent',
+        border: 'none',
+        color: '#ffffff',
+        padding: 0,
+        cursor: 'pointer',
+      },
+    });
   };
 
   return (
