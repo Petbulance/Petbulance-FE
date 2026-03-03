@@ -149,6 +149,7 @@ export default function CommunityDetail() {
   const navigate = useNavigate();
   const { postId } = useParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const post = useMemo(
     () => COMMUNITY_DETAIL_POSTS.find((item) => String(item.id) === postId),
@@ -164,9 +165,18 @@ export default function CommunityDetail() {
   }
 
   const hasComments = post.commentItems.length > 0;
+  const handleDeleteClick = () => {
+    setIsMenuOpen(false);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setIsDeleteConfirmOpen(false);
+    alert('삭제');
+  };
 
   return (
-    <div className="relative flex min-h-full flex-col bg-[#F2F4F6]">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#F2F4F6]">
       <header className="sticky top-0 z-10 flex h-[48px] items-center justify-between border-b border-[#E0E0E0] bg-white px-5">
         <button onClick={() => navigate(-1)}>
           <img src={leftArrow} alt="뒤로가기" />
@@ -181,78 +191,80 @@ export default function CommunityDetail() {
         </div>
       </header>
 
-      <section className="bg-white px-5 pt-4 pb-5">
-        <div className="mb-3 flex items-center gap-1 text-[12px]">
-          <span className="rounded-full bg-[#F1E89A] px-2 py-1 text-[#424242]">
-            {post.category}
-          </span>
-          <span className="rounded-full bg-[#F2F2F2] px-2 py-1 text-[#9E9E9E]">
-            {post.topic}
-          </span>
-        </div>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <section className="bg-white px-5 pt-4 pb-5">
+          <div className="mb-3 flex items-center gap-1 text-[12px]">
+            <span className="rounded-full bg-[#F1E89A] px-2 py-1 text-[#424242]">
+              {post.category}
+            </span>
+            <span className="rounded-full bg-[#F2F2F2] px-2 py-1 text-[#9E9E9E]">
+              {post.topic}
+            </span>
+          </div>
 
-        <div className="mb-3 flex items-center gap-2">
-          <img
-            src={defaultProfile}
-            alt="프로필"
-            className="h-8 w-8 shrink-0 rounded-full"
-          />
-          <div>
-            <p className="text-[14px] font-medium text-[#424242]">
-              {post.nickname}
+          <div className="mb-3 flex items-center gap-2">
+            <img
+              src={defaultProfile}
+              alt="프로필"
+              className="h-8 w-8 shrink-0 rounded-full"
+            />
+            <div>
+              <p className="text-[14px] font-medium text-[#424242]">
+                {post.nickname}
+              </p>
+              <p className="text-[12px] text-[#9E9E9E]">{post.time}</p>
+            </div>
+          </div>
+
+          <h1 className="mb-3 text-[26px] font-semibold text-[#1E1E1E]">
+            {post.title}
+          </h1>
+          <p className="text-[16px] leading-7 text-[#424242]">{post.content}</p>
+
+          {post.image && (
+            <img
+              src={post.image}
+              alt="게시글 첨부"
+              className="mt-4 h-[160px] w-[160px] rounded object-cover"
+            />
+          )}
+
+          <div className="mt-4 flex items-center gap-3 text-[15px] text-[#9E9E9E]">
+            <p className="flex items-center gap-1">
+              <img src={thumbs} alt="좋아요" /> {post.likes}
             </p>
-            <p className="text-[12px] text-[#9E9E9E]">{post.time}</p>
-          </div>
-        </div>
-
-        <h1 className="mb-3 text-[26px] font-semibold text-[#1E1E1E]">
-          {post.title}
-        </h1>
-        <p className="text-[16px] leading-7 text-[#424242]">{post.content}</p>
-
-        {post.image && (
-          <img
-            src={post.image}
-            alt="게시글 첨부"
-            className="mt-4 h-[160px] w-[160px] rounded object-cover"
-          />
-        )}
-
-        <div className="mt-4 flex items-center gap-3 text-[15px] text-[#9E9E9E]">
-          <p className="flex items-center gap-1">
-            <img src={thumbs} alt="좋아요" /> {post.likes}
-          </p>
-          <p className="flex items-center gap-1">
-            <img src={eye} alt="조회수" /> {post.views}
-          </p>
-          <p className="flex items-center gap-1">
-            <img src={message} alt="댓글" /> {post.comments}
-          </p>
-        </div>
-      </section>
-
-      <section className="mt-2 flex-1 bg-white">
-        <div className="border-b border-[#EFEFEF] px-5 py-3 text-[15px] text-[#616161]">
-          댓글 {post.comments}
-        </div>
-
-        {hasComments ? (
-          <div>
-            {post.commentItems.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center py-8">
-            <p className="mb-4 text-[22px] font-semibold text-[#B0B0B0]">
-              첫 댓글을 남겨보세요.
+            <p className="flex items-center gap-1">
+              <img src={eye} alt="조회수" /> {post.views}
             </p>
-            <button className="rounded-[10px] border border-[#CFCFCF] px-5 py-2 text-[26px] font-medium text-[#616161]">
-              댓글 쓰기
-            </button>
+            <p className="flex items-center gap-1">
+              <img src={message} alt="댓글" /> {post.comments}
+            </p>
           </div>
-        )}
-      </section>
+        </section>
+
+        <section className="mt-2 bg-white">
+          <div className="border-b border-[#EFEFEF] px-5 py-3 text-[15px] text-[#616161]">
+            댓글 {post.comments}
+          </div>
+
+          {hasComments ? (
+            <div>
+              {post.commentItems.map((comment) => (
+                <CommentItem key={comment.id} comment={comment} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center py-8">
+              <p className="mb-4 text-[22px] font-semibold text-[#B0B0B0]">
+                첫 댓글을 남겨보세요.
+              </p>
+              <button className="rounded-[10px] border border-[#CFCFCF] px-5 py-2 text-[26px] font-medium text-[#616161]">
+                댓글 쓰기
+              </button>
+            </div>
+          )}
+        </section>
+      </div>
 
       {hasComments && (
         <footer className="sticky bottom-0 border-t border-[#DCDCDC] bg-white pb-[calc(8px+env(safe-area-inset-bottom))]">
@@ -300,7 +312,10 @@ export default function CommunityDetail() {
           />
           <div className="absolute right-0 bottom-0 left-0 px-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
             <div className="overflow-hidden rounded-[10px] bg-white">
-              <button className="w-full border-b border-[#EDEDED] py-3 text-[18px] font-medium text-[#F04438]">
+              <button
+                className="w-full border-b border-[#EDEDED] py-3 text-[18px] font-medium text-[#F04438]"
+                onClick={handleDeleteClick}
+              >
                 게시글 삭제
               </button>
               <button className="w-full py-3 text-[18px] text-[#1E1E1E]">
@@ -313,6 +328,38 @@ export default function CommunityDetail() {
             >
               취소
             </button>
+          </div>
+        </div>
+      )}
+
+      {isDeleteConfirmOpen && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsDeleteConfirmOpen(false)}
+            aria-label="삭제 확인 닫기"
+          />
+          <div className="relative mx-6 w-full max-w-[320px] rounded-[14px] bg-white px-5 py-5 text-center">
+            <h2 className="text-[20px] font-semibold text-[#1E1E1E]">
+              게시글을 삭제할까요?
+            </h2>
+            <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">
+              게시글을 삭제하면 모든 데이터가 삭제되고 다시 볼 수 없어요.
+            </p>
+            <div className="mt-5 flex gap-2">
+              <button
+                className="flex-1 rounded-[999px] border border-[#E3E3E3] py-2 text-[15px] text-[#8A8A8A]"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+              >
+                취소
+              </button>
+              <button
+                className="flex-1 rounded-[999px] bg-[#FF2B2B] py-2 text-[15px] font-medium text-white"
+                onClick={handleDeleteConfirm}
+              >
+                삭제
+              </button>
+            </div>
           </div>
         </div>
       )}
