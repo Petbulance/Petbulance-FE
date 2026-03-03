@@ -144,7 +144,9 @@ const getAdminRefreshPromise = () => {
 
 api.interceptors.request.use(
   (config) => {
-    const tokenKey = shouldUseAdminAuth(config) ? 'admin_token' : 'access_token';
+    const tokenKey = shouldUseAdminAuth(config)
+      ? 'admin_token'
+      : 'access_token';
     const token = localStorage.getItem(tokenKey);
 
     if (!config.headers?.Authorization && token) {

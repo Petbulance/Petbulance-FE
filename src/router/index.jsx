@@ -40,7 +40,6 @@ import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
 import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
 import SignupComplete from '@/pages/user/auth/SignupComplete.jsx';
 import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
-import CommunityPage from '@/pages/user/community/CommunityPage.jsx';
 import Home from '@/pages/user/Home.jsx';
 import { EditReview } from '@/pages/user/hospitalReview/EditReview';
 import HosptialsReviews from '@/pages/user/hospitalReview/HosptialsReviews.jsx';
@@ -69,6 +68,9 @@ import NotFoundPage from '@/pages/user/NotFoundPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
+import CommunityLayout from '@/components/community/layout';
+import { Community } from '@/pages/user/community';
+import CommunityMain from '@/pages/user/community/CommunityMain.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 ================= */
@@ -157,13 +159,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'community',
-        element: (
-          <LayoutShell banner={<ServiceBanner />}>
-            <MainLayout title="커뮤니티">
-              <CommunityPage />
-            </MainLayout>
-          </LayoutShell>
-        ),
+        element: <Community />,
+        children: [
+          { index: true, element: <CommunityMain /> },
+          // { path: 'search', element: <CommmunitySearch /> },
+        ],
       },
       // 마이페이지
       {
