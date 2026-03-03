@@ -44,6 +44,7 @@ import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import { Community } from '@/pages/user/community';
 import CommunityDetail from '@/pages/user/community/CommunityDetail.jsx';
 import CommunityMain from '@/pages/user/community/CommunityMain.jsx';
+import CommunityWrite from '@/pages/user/community/CommunityWrite.jsx';
 import Home from '@/pages/user/Home.jsx';
 import { EditReview } from '@/pages/user/hospitalReview/EditReview';
 import HosptialsReviews from '@/pages/user/hospitalReview/HosptialsReviews.jsx';
@@ -163,6 +164,7 @@ const router = createBrowserRouter([
         element: <Community />,
         children: [
           { index: true, element: <CommunityMain /> },
+          { path: 'write', element: <CommunityWrite /> },
           { path: ':postId', element: <CommunityDetail /> },
           // { path: 'search', element: <CommmunitySearch /> },
         ],
