@@ -403,7 +403,7 @@ export default function CommunityDetail() {
                   className="w-full py-3 text-[18px] text-[#1E1E1E]"
                   onClick={() => {
                     setIsMenuOpen(false);
-                    navigate('/index/community/write');
+                    navigate(`/index/community/${post.id}/edit`);
                   }}
                 >
                   수정

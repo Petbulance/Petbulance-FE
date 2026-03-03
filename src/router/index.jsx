@@ -165,6 +165,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <CommunityMain /> },
           { path: 'write', element: <CommunityWrite /> },
+          { path: ':postId/edit', element: <CommunityWrite /> },
           { path: ':postId', element: <CommunityDetail /> },
           // { path: 'search', element: <CommmunitySearch /> },
         ],

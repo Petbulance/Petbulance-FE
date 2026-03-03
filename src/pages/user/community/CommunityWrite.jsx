@@ -1,24 +1,46 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import downArrow from '@/assets/images/icons/gray_bottom_arrow.svg';
 import leftArrow from '@/assets/images/icons/left_arrow.svg';
+import reviewImage from '@/assets/images/icons/review_img_ex.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 
 const ANIMAL_CATEGORIES = ['소형포유류', '조류', '파충류', '양서류', '어류'];
 const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑', '중고거래'];
+const EDIT_POSTS = {
+  '1': {
+    category: '소형포유류',
+    topic: '일상/자랑',
+    title: '울집 햄스터 자랑하는 글',
+    content:
+      '진짜 귀엽죠? 어제는 해바라기씨 몇개 뺏었더니 삐져서 뒤돌아있었어요ㅋㅋㅋ 털이 얼마나 볼슬볼슬 하고 윤기가 나는지.. 이번에 받은 먹이가 잘 맞나봐요! 여기서 추천받았는데 역시 펫뷸런스 고수님들 고견이 최고입니다. 늘 감사합니다 선생님들ㅎ',
+    images: [reviewImage, reviewImage],
+  },
+};
 
 export default function CommunityWrite() {
   const navigate = useNavigate();
+  const { postId } = useParams();
+  const isEditMode = Boolean(postId);
+  const initialEditPost = isEditMode ? EDIT_POSTS[postId] ?? EDIT_POSTS['1'] : null;
 
-  const [category, setCategory] = useState('');
-  const [topic, setTopic] = useState('');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [images, setImages] = useState([]);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(true);
+  const [category, setCategory] = useState(initialEditPost?.category ?? '');
+  const [topic, setTopic] = useState(initialEditPost?.topic ?? '');
+  const [title, setTitle] = useState(initialEditPost?.title ?? '');
+  const [content, setContent] = useState(initialEditPost?.content ?? '');
+  const [images, setImages] = useState(
+    initialEditPost
+      ? initialEditPost.images.map((src, index) => ({
+          id: `initial-${index}`,
+          preview: src,
+          isLocal: false,
+        }))
+      : [],
+  );
+  const [isCategoryOpen, setIsCategoryOpen] = useState(!isEditMode);
   const [isTopicOpen, setIsTopicOpen] = useState(false);
 
   const canSubmit = useMemo(
@@ -28,7 +50,9 @@ export default function CommunityWrite() {
 
   useEffect(() => {
     return () => {
-      images.forEach((image) => URL.revokeObjectURL(image.preview));
+      images.forEach((image) => {
+        if (image.isLocal) URL.revokeObjectURL(image.preview);
+      });
     };
   }, [images]);
 
@@ -39,8 +63,8 @@ export default function CommunityWrite() {
     const remainCount = 10 - images.length;
     const selected = files.slice(0, remainCount).map((file) => ({
       id: `${file.name}-${file.size}-${Date.now()}`,
-      file,
       preview: URL.createObjectURL(file),
+      isLocal: true,
     }));
 
     if (files.length > remainCount) {
@@ -56,7 +80,7 @@ export default function CommunityWrite() {
   const handleRemoveImage = (id) => {
     setImages((prev) => {
       const target = prev.find((item) => item.id === id);
-      if (target) URL.revokeObjectURL(target.preview);
+      if (target?.isLocal) URL.revokeObjectURL(target.preview);
       return prev.filter((item) => item.id !== id);
     });
   };
@@ -64,7 +88,7 @@ export default function CommunityWrite() {
   const handleSubmit = () => {
     if (!canSubmit) return;
 
-    toast('게시글 등록을 완료했어요', {
+    toast(isEditMode ? '게시글을 수정했어요' : '게시글 등록을 완료했어요', {
       position: 'bottom-center',
       duration: 3000,
       style: {
@@ -88,6 +112,10 @@ export default function CommunityWrite() {
       },
     });
 
+    if (isEditMode) {
+      navigate(`/index/community/${postId}`, { replace: true });
+      return;
+    }
     navigate('/index/community/1');
   };
 
