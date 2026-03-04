@@ -71,6 +71,7 @@ import NotificationSetting from '@/pages/user/notification/NotificationSetting.j
 import CommunityLayout from '@/components/community/layout';
 import { Community } from '@/pages/user/community';
 import CommunityMain from '@/pages/user/community/CommunityMain.jsx';
+import { CommunityTabTemporary } from '@/pages/user/community/CommunityTabTemporary.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 ================= */
@@ -164,6 +165,11 @@ const router = createBrowserRouter([
           { index: true, element: <CommunityMain /> },
           // { path: 'search', element: <CommmunitySearch /> },
         ],
+      },
+      {
+        path: 'community-tab',
+        element: <Community />,
+        children: [{ index: true, element: <CommunityTabTemporary /> }],
       },
       // 마이페이지
       {
