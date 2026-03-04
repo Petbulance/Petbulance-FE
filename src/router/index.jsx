@@ -29,7 +29,6 @@ import UserManagementDetail from '@/components/admin/views/usermanagement/UserMa
 import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
-import CommunityLayout from '@/components/community/layout';
 import { HospitalDetailLayout } from '@/components/hosiptals/layout/hospitalDetailLayout';
 import MainLayout from '@/components/user/layout/MainLayout.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
@@ -73,6 +72,8 @@ import NotFoundPage from '@/pages/user/NotFoundPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
+import CommunityLayout from '@/components/community/layout';
+import { CommunityTabTemporary } from '@/pages/user/community/CommunityTabTemporary.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 ================= */
@@ -169,6 +170,11 @@ const router = createBrowserRouter([
           { path: ':postId', element: <CommunityDetail /> },
           // { path: 'search', element: <CommmunitySearch /> },
         ],
+      },
+      {
+        path: 'community-tab',
+        element: <Community />,
+        children: [{ index: true, element: <CommunityTabTemporary /> }],
       },
       // 마이페이지
       {

@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import arrow from '@/assets/images/icons/arrow_header.svg';
 import Bell from '@/assets/images/icons/bell.svg';
 import Search from '@/assets/images/icons/community_search.svg';
 
 export function CommunityHeader() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedType, setSelectedType] = useState('전체');
   const dropdownRef = useRef(null);
@@ -61,7 +63,7 @@ export function CommunityHeader() {
         )}
       </div>
       <div className="flex items-center text-[#525252]">
-        <img src={Search} />
+        <img src={Search} onClick={() => navigate('/index/community/search')} />
         <img src={Bell} />
       </div>
     </div>
