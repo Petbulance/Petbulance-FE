@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { SearchHeader } from '@/components/hosiptals/layout/SearchHeader';
+import MainFooter from '@/components/user/layout/MainFooter.jsx';
 
 export function CommunitySearchLayout() {
   const navigate = useNavigate();
@@ -36,7 +37,10 @@ export function CommunitySearchLayout() {
           onConfirm={handleConfirm}
         />
       )}
-      <Outlet context={{ searchKeyword, setIsSearchHeaderHidden }} />
+      <div className="min-h-0 flex-1">
+        <Outlet context={{ searchKeyword, setIsSearchHeaderHidden }} />
+      </div>
+      {!isSearchHeaderHidden && <MainFooter />}
     </div>
   );
 }

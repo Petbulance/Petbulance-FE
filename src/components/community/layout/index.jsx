@@ -6,6 +6,7 @@ export default function CommunityLayout({ children }) {
   const isDetailPage = /^\/index\/community\/[^/]+$/.test(pathname);
   const isWritePage = pathname === '/index/community/write';
   const isEditPage = /^\/index\/community\/[^/]+\/edit$/.test(pathname);
+  const isSearchPage = pathname === '/index/community/search';
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
@@ -13,7 +14,9 @@ export default function CommunityLayout({ children }) {
       <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
 
       {/* Footer */}
-      {!isDetailPage && !isWritePage && !isEditPage && <MainFooter />}
+      {!isDetailPage && !isWritePage && !isEditPage && !isSearchPage && (
+        <MainFooter />
+      )}
     </div>
   );
 }

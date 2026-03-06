@@ -6,6 +6,7 @@ import { CommunityRecentKeywordsSection } from '@/components/community/ui/Commun
 import { CommunitySearchEmptyState } from '@/components/community/ui/CommunitySearchEmptyState';
 import { CommunitySearchHeader } from '@/components/community/ui/CommunitySearchHeader';
 import { PostCard } from '@/components/community/ui/PostCard';
+import { WriteButton } from '@/components/community/ui/WriteButton';
 import { ANIMAL_FILTER_OPTIONS, TOPIC_FILTERS } from '@/data/community';
 import { useCommunitySearch } from '@/hooks/useCommunitySearch';
 
@@ -94,6 +95,8 @@ export function CommunitySearch() {
               />
             )}
           </div>
+
+          {activeTab === 'post' && <WriteButton />}
         </>
       ) : (
         <CommunityRecentKeywordsSection
