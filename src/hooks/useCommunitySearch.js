@@ -8,7 +8,7 @@ import {
   INITIAL_RECENT_KEYWORDS,
   MOCK_COMMENT_RESULTS,
   MOCK_POST_RESULTS,
-} from '@/pages/user/community/communitySearch.constants';
+} from '@/data/communitySearch.constants';
 
 function filterMatches(
   { animal, category },

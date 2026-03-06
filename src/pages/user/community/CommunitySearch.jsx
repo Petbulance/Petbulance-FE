@@ -7,7 +7,7 @@ import { CommunitySearchEmptyState } from '@/components/community/ui/CommunitySe
 import { CommunitySearchHeader } from '@/components/community/ui/CommunitySearchHeader';
 import { PostCard } from '@/components/community/ui/PostCard';
 import { ANIMAL_FILTER_OPTIONS, TOPIC_FILTERS } from '@/data/community';
-import { useCommunitySearch } from '@/pages/user/community/hooks/useCommunitySearch';
+import { useCommunitySearch } from '@/hooks/useCommunitySearch';
 
 export function CommunitySearch() {
   const navigate = useNavigate();
