@@ -49,7 +49,7 @@ import { EditReview } from '@/pages/user/hospitalReview/EditReview';
 import HosptialsReviews from '@/pages/user/hospitalReview/HosptialsReviews.jsx';
 import ReviewDetailPage from '@/pages/user/hospitalReview/ReviewDetailPage';
 import { ReviewMain } from '@/pages/user/hospitalReview/ReviewMain';
-import { ReviewSerch } from '@/pages/user/hospitalReview/ReviewSearch';
+// import { ReviewSerch } from '@/pages/user/hospitalReview/ReviewSearch';
 import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
 import { HospitalDetail } from '@/pages/user/hospitals/HospitalDetail.jsx';
 import Hospitals from '@/pages/user/hospitals/Hospitals';
@@ -72,8 +72,9 @@ import NotFoundPage from '@/pages/user/NotFoundPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
-import CommunityLayout from '@/components/community/layout';
 import { CommunityTabTemporary } from '@/pages/user/community/CommunityTabTemporary.jsx';
+import { CommunitySearch } from '@/pages/user/community/CommunitySearch';
+import { CommunitySearchLayout } from '@/components/community/layout/CommunitySearchLayout.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 ================= */
@@ -168,7 +169,11 @@ const router = createBrowserRouter([
           { path: 'write', element: <CommunityWrite /> },
           { path: ':postId/edit', element: <CommunityWrite /> },
           { path: ':postId', element: <CommunityDetail /> },
-          // { path: 'search', element: <CommmunitySearch /> },
+          {
+            path: 'search',
+            element: <CommunitySearchLayout />,
+            children: [{ index: true, element: <CommunitySearch /> }],
+          },
         ],
       },
       {
