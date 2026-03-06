@@ -8,6 +8,7 @@ import { ProgressBar } from '@/components/reviews/ui/ProgressBar';
 import { NextBtn } from '@/components/reviews/ui/NextBtn';
 
 export default function ReviewForm_3({ data, setData, onNext }) {
+  const MAX_IMAGE_COUNT = 5;
   const fileInputRef = useRef(null);
 
   const handleContentChange = (e) => {
@@ -15,8 +16,8 @@ export default function ReviewForm_3({ data, setData, onNext }) {
   };
 
   const handleImageUpload = () => {
-    if ((data.images?.length || 0) >= 10) {
-      alert('사진은 최대 10장까지 첨부할 수 있어요.');
+    if ((data.images?.length || 0) >= MAX_IMAGE_COUNT) {
+      alert(`사진은 최대 ${MAX_IMAGE_COUNT}장까지 첨부할 수 있어요.`);
       return;
     }
     fileInputRef.current?.click();
@@ -28,8 +29,8 @@ export default function ReviewForm_3({ data, setData, onNext }) {
 
     const currentImages = data.images || [];
 
-    if (currentImages.length + files.length > 10) {
-      alert('사진은 최대 10장까지 첨부할 수 있어요.');
+    if (currentImages.length + files.length > MAX_IMAGE_COUNT) {
+      alert(`사진은 최대 ${MAX_IMAGE_COUNT}장까지 첨부할 수 있어요.`);
       return;
     }
 
@@ -67,7 +68,9 @@ export default function ReviewForm_3({ data, setData, onNext }) {
               className="flex h-[96px] w-[96px] flex-col items-center justify-center rounded-[12px] border-[1.72px] border-[#EEEEEE] bg-white text-[#9E9E9E]"
             >
               <img src={camera_icon} alt="camera" />
-              <span className="text-[20.67px] font-medium">0/10</span>
+              <span className="text-[20.67px] font-medium">
+                0/{MAX_IMAGE_COUNT}
+              </span>
             </button>
           )}
 
@@ -93,7 +96,7 @@ export default function ReviewForm_3({ data, setData, onNext }) {
                 </div>
               ))}
 
-              {data.images.length < 10 && (
+              {data.images.length < MAX_IMAGE_COUNT && (
                 <button
                   type="button"
                   onClick={handleImageUpload}
