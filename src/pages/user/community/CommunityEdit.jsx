@@ -11,7 +11,7 @@ const ANIMAL_CATEGORIES = ['소형포유류', '조류', '파충류', '양서류'
 const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑', '중고거래'];
 
 const EDIT_POSTS = {
-  '1': {
+  1: {
     category: '소형포유류',
     topic: '일상/자랑',
     title: '울집 햄스터 자랑하는 글',
@@ -19,7 +19,7 @@ const EDIT_POSTS = {
       '진짜 귀엽죠? 어제는 해바라기씨 몇개 뺏었더니 삐져서 뒤돌아있었어요ㅋㅋㅋ 털이 얼마나 볼슬볼슬 하고 윤기가 나는지.. 이번에 받은 먹이가 잘 맞나봐요! 여기서 추천받았는데 역시 펫뷸런스 고수님들 고견이 최고입니다. 늘 감사합니다 선생님들ㅎ',
     images: [reviewImage, reviewImage],
   },
-  '2': {
+  2: {
     category: '소형포유류',
     topic: '일상/자랑',
     title: '울집 햄스터 자랑하는 글',
@@ -43,7 +43,7 @@ export default function CommunityEdit() {
       id: `initial-${index}`,
       preview: src,
       isLocal: false,
-    })),
+    }))
   );
 
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -53,7 +53,7 @@ export default function CommunityEdit() {
 
   const canSubmit = useMemo(
     () => Boolean(category && topic && title.trim() && content.trim()),
-    [category, topic, title, content],
+    [category, topic, title, content]
   );
 
   useEffect(() => {

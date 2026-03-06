@@ -30,7 +30,9 @@ export function PostCard({ post }) {
               <h3 className="mb-2 text-[18px] font-medium text-[#1E1E1E]">
                 {post.title}
               </h3>
-              <p className="mb-[28px] text-[16px] text-[#424242]">{post.content}</p>
+              <p className="mb-[28px] text-[16px] text-[#424242]">
+                {post.content}
+              </p>
             </div>
 
             {post.hasImage && (
