@@ -4,9 +4,9 @@ export default function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-[#F2F2F2]">
+    <div className="flex min-h-full w-full items-center justify-center bg-[#F2F2F2] p-4">
       {/* 중앙 카드 */}
-      <div className="flex h-[90%] w-[90%] max-w-[420px] flex-col items-center justify-center rounded-lg bg-white px-[24px] text-center">
+      <div className="flex w-full max-w-[420px] flex-col items-center justify-center rounded-lg bg-white px-[24px] py-12 text-center">
         <p className="mb-2 text-[18px] font-semibold text-[#424242]">
           존재하지 않는 페이지에요.
         </p>
