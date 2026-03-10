@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import {
+  COMMUNITY_TOPIC_TO_API,
+  COMMUNITY_TYPE_TO_API,
+  createCommunityPost,
+  uploadPostImages,
+} from '@/apis/community/posts';
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import downArrow from '@/assets/images/icons/gray_bottom_arrow.svg';
 import reviewImage from '@/assets/images/icons/review_img_ex.svg';
@@ -39,12 +45,14 @@ export default function CommunityWrite() {
           id: `initial-${index}`,
           preview: src,
           isLocal: false,
+          file: null,
         }))
       : []
   );
   const [isCategoryOpen, setIsCategoryOpen] = useState(!isEditMode);
   const [isTopicOpen, setIsTopicOpen] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const canSubmit = useMemo(
     () => Boolean(category && topic && title.trim() && content.trim()),
@@ -68,6 +76,7 @@ export default function CommunityWrite() {
       id: `${file.name}-${file.size}-${Date.now()}`,
       preview: URL.createObjectURL(file),
       isLocal: true,
+      file,
     }));
 
     if (files.length > remainCount) {
@@ -88,38 +97,95 @@ export default function CommunityWrite() {
     });
   };
 
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-
-    toast(isEditMode ? '게시글을 수정했어요' : '게시글 등록을 완료했어요', {
-      position: 'bottom-center',
-      duration: 3000,
-      style: {
-        width: '100%',
-        height: '44px',
-        display: 'flex',
-        alignItems: 'center',
-        background: '#222222E5',
-        color: '#ffffff',
-      },
-      action: {
-        label: '✕',
-        onClick: () => toast.dismiss(),
-      },
-      actionButtonStyle: {
-        background: 'transparent',
-        border: 'none',
-        color: '#ffffff',
-        padding: 0,
-        cursor: 'pointer',
-      },
-    });
+  const handleSubmit = async () => {
+    if (!canSubmit || isSubmitting) return;
 
     if (isEditMode) {
+      toast('게시글을 수정했어요', {
+        position: 'bottom-center',
+        duration: 3000,
+      });
       navigate(`/index/community/${postId}`, { replace: true });
       return;
     }
-    navigate('/index/community/1');
+
+    const type = COMMUNITY_TYPE_TO_API[category];
+    const topicValue = COMMUNITY_TOPIC_TO_API[topic];
+    if (!type || !topicValue) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const imageFiles = images
+        .map((image) => image.file)
+        .filter((file) => file instanceof File);
+      const imageUrls = await uploadPostImages(imageFiles);
+
+      const data = await createCommunityPost({
+        type,
+        topic: topicValue,
+        title: title.trim(),
+        content: content.trim(),
+        imageUrls,
+      });
+
+      toast('게시글 등록을 완료했어요', {
+        position: 'bottom-center',
+        duration: 3000,
+        style: {
+          width: '100%',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          background: '#222222E5',
+          color: '#ffffff',
+        },
+        action: {
+          label: '✕',
+          onClick: () => toast.dismiss(),
+        },
+        actionButtonStyle: {
+          background: 'transparent',
+          border: 'none',
+          color: '#ffffff',
+          padding: 0,
+          cursor: 'pointer',
+        },
+      });
+
+      navigate(`/index/community/${data.postId}`, { replace: true });
+    } catch (error) {
+      console.error('게시글 등록 실패', {
+        status: error?.response?.status,
+        data: error?.response?.data,
+      });
+      const errorClass = error?.response?.data?.data?.errorClassName;
+      const message = error?.response?.data?.data?.message;
+
+      if (errorClass === 'VALIDATION_ERROR') {
+        toast(message || '제목과 내용을 확인해 주세요.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'EXCEEDED_MAX_IMAGE_COUNT') {
+        toast('이미지는 최대 10장까지만 첨부할 수 있습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'FAIL_IMAGE_UPLOAD') {
+        toast('이미지 업로드에 실패하였습니다.', {
+          position: 'bottom-center',
+        });
+      } else {
+        toast(
+          message ||
+            '게시글 등록에 실패했습니다. 잠시 후 다시 시도해 주세요. (서버 오류)',
+          {
+            position: 'bottom-center',
+          }
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -272,10 +338,10 @@ export default function CommunityWrite() {
       <footer className="border-t border-[#F0F0F0] bg-white px-4 py-3">
         <button
           onClick={handleSubmit}
-          disabled={!canSubmit}
-          className={`h-10 w-full rounded-[8px] text-[14px] font-medium text-white ${canSubmit ? 'bg-[#2DA969]' : 'bg-[#DCDCDC]'}`}
+          disabled={!canSubmit || isSubmitting}
+          className={`h-10 w-full rounded-[8px] text-[14px] font-medium text-white ${canSubmit && !isSubmitting ? 'bg-[#2DA969]' : 'bg-[#DCDCDC]'}`}
         >
-          작성 완료
+          {isSubmitting ? '등록 중...' : '작성 완료'}
         </button>
       </footer>
 
