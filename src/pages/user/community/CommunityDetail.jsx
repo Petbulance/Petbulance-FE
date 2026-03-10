@@ -1,7 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import {
+  deleteCommunityPosts,
+  fetchCommunityPostDetail,
+} from '@/apis/community/posts';
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import defaultProfile from '@/assets/images/icons/defaultImg.svg';
 import eye from '@/assets/images/icons/eye_icon.svg';
@@ -151,10 +155,14 @@ function CommentItem({ comment }) {
 export default function CommunityDetail() {
   const navigate = useNavigate();
   const { postId } = useParams();
+  const [post, setPost] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [detailError, setDetailError] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isReportReasonOpen, setIsReportReasonOpen] = useState(false);
   const [selectedReportReason, setSelectedReportReason] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const reportReasons = [
     '욕설/비방/선정적',
     '도배/광고',
@@ -165,54 +173,114 @@ export default function CommunityDetail() {
     '기타',
   ];
 
-  const post = useMemo(
-    () => COMMUNITY_DETAIL_POSTS.find((item) => String(item.id) === postId),
-    [postId]
-  );
+  useEffect(() => {
+    let mounted = true;
 
-  if (!post) {
+    const loadDetail = async () => {
+      setIsLoading(true);
+      setDetailError('');
+
+      try {
+        const data = await fetchCommunityPostDetail(postId);
+        if (!mounted) return;
+        setPost(data);
+      } catch (error) {
+        if (!mounted) return;
+        const errorClass = error?.response?.data?.data?.errorClassName;
+        const message = error?.response?.data?.data?.message;
+
+        if (errorClass === 'POST_NOT_FOUND') {
+          setDetailError('요청하신 게시글을 찾을 수 없습니다.');
+        } else if (errorClass === 'POST_HIDDEN') {
+          setDetailError('숨겨진 게시글입니다.');
+        } else if (errorClass === 'POST_DELETED') {
+          setDetailError('삭제된 게시글입니다.');
+        } else {
+          setDetailError(
+            message || '게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+          );
+        }
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    loadDetail();
+
+    return () => {
+      mounted = false;
+    };
+  }, [postId]);
+
+  if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center bg-white text-sm text-[#757575]">
-        게시글을 찾을 수 없습니다.
+        게시글을 불러오는 중이에요.
       </div>
     );
   }
 
-  const hasComments = post.commentItems.length > 0;
-  const isMyPost = Boolean(post.isMine);
-  const reportStorageKey = `community-reported-${post.id}`;
+  if (!post || detailError) {
+    return (
+      <div className="flex h-full items-center justify-center bg-white text-sm text-[#757575]">
+        {detailError || '게시글을 찾을 수 없습니다.'}
+      </div>
+    );
+  }
+
+  const commentItems = [];
+  const hasComments = commentItems.length > 0;
+  const isMyPost = Boolean(post.isCurrentUserPost);
+  const reportStorageKey = `community-reported-${post.postId}`;
+  const postImages = Array.isArray(post.images)
+    ? [...post.images].sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0))
+    : [];
   const isAlreadyReported = localStorage.getItem(reportStorageKey) === '1';
   const handleDeleteClick = () => {
     setIsMenuOpen(false);
     setIsDeleteConfirmOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    setIsDeleteConfirmOpen(false);
-    navigate('/index/community', { replace: true });
-    toast('게시글을 삭제했어요', {
-      position: 'bottom-center',
-      duration: 3000,
-      style: {
-        width: '100%',
-        height: '44px',
-        display: 'flex',
-        alignItems: 'center',
-        background: '#222222E5',
-        color: '#ffffff',
-      },
-      action: {
-        label: '취소',
-        onClick: () => toast.dismiss(),
-      },
-      actionButtonStyle: {
-        background: 'transparent',
-        border: 'none',
-        color: '#ffffff',
-        padding: 0,
-        cursor: 'pointer',
-      },
-    });
+  const handleDeleteConfirm = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+
+    try {
+      await deleteCommunityPosts([post.postId]);
+      setIsDeleteConfirmOpen(false);
+      navigate('/index/community', { replace: true });
+      toast('게시글을 삭제했어요', {
+        position: 'bottom-center',
+        duration: 3000,
+        style: {
+          width: '100%',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          background: '#222222E5',
+          color: '#ffffff',
+        },
+      });
+    } catch (error) {
+      const errorClass = error?.response?.data?.data?.errorClassName;
+      const message = error?.response?.data?.data?.message;
+
+      if (errorClass === 'FORBIDDEN_POST_ACCESS') {
+        toast('본인이 작성한 글이 아니거나 관리자 권한이 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'POST_NOT_FOUND') {
+        toast('요청하신 게시글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else {
+        toast(message || '게시글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.', {
+          position: 'bottom-center',
+        });
+      }
+    } finally {
+      setIsDeleting(false);
+    }
   };
   const handleSubmitReport = () => {
     if (!selectedReportReason) {
@@ -275,7 +343,7 @@ export default function CommunityDetail() {
         <section className="bg-white px-5 pt-4 pb-5">
           <div className="mb-3 flex items-center gap-1 text-[12px]">
             <span className="rounded-full bg-[#F1E89A] px-2 py-1 text-[#424242]">
-              {post.category}
+              {post.type}
             </span>
             <span className="rounded-full bg-[#F2F2F2] px-2 py-1 text-[#9E9E9E]">
               {post.topic}
@@ -284,15 +352,15 @@ export default function CommunityDetail() {
 
           <div className="mb-3 flex items-center gap-2">
             <img
-              src={defaultProfile}
+              src={post.writerProfileUrl || defaultProfile}
               alt="프로필"
               className="h-8 w-8 shrink-0 rounded-full"
             />
             <div>
               <p className="text-[14px] font-medium text-[#424242]">
-                {post.nickname}
+                {post.writerNickname}
               </p>
-              <p className="text-[12px] text-[#9E9E9E]">{post.time}</p>
+              <p className="text-[12px] text-[#9E9E9E]">{post.createdAt}</p>
             </div>
           </div>
 
@@ -301,35 +369,40 @@ export default function CommunityDetail() {
           </h1>
           <p className="text-[16px] leading-7 text-[#424242]">{post.content}</p>
 
-          {post.image && (
-            <img
-              src={post.image}
-              alt="게시글 첨부"
-              className="mt-4 h-[160px] w-[160px] rounded object-cover"
-            />
+          {postImages.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {postImages.map((image) => (
+                <img
+                  key={image.imageId}
+                  src={image.imageUrl}
+                  alt="게시글 첨부"
+                  className="w-full rounded"
+                />
+              ))}
+            </div>
           )}
 
           <div className="mt-4 flex items-center gap-3 text-[15px] text-[#9E9E9E]">
             <p className="flex items-center gap-1">
-              <img src={thumbs} alt="좋아요" /> {post.likes}
+              <img src={thumbs} alt="좋아요" /> {post.likeCount}
             </p>
             <p className="flex items-center gap-1">
-              <img src={eye} alt="조회수" /> {post.views}
+              <img src={eye} alt="조회수" /> {post.viewCount}
             </p>
             <p className="flex items-center gap-1">
-              <img src={message} alt="댓글" /> {post.comments}
+              <img src={message} alt="댓글" /> {post.commentCount}
             </p>
           </div>
         </section>
 
         <section className="mt-2 bg-white">
           <div className="border-b border-[#EFEFEF] px-5 py-3 text-[15px] text-[#616161]">
-            댓글 {post.comments}
+            댓글 {post.commentCount}
           </div>
 
           {hasComments ? (
             <div>
-              {post.commentItems.map((comment) => (
+              {commentItems.map((comment) => (
                 <CommentItem key={comment.id} comment={comment} />
               ))}
             </div>
@@ -403,7 +476,7 @@ export default function CommunityDetail() {
                   className="w-full py-3 text-[18px] text-[#1E1E1E]"
                   onClick={() => {
                     setIsMenuOpen(false);
-                    navigate(`/index/community/${post.id}/edit`);
+                    navigate(`/index/community/${post.postId}/edit`);
                   }}
                 >
                   수정
@@ -458,9 +531,10 @@ export default function CommunityDetail() {
               </button>
               <button
                 className="flex-1 rounded-[999px] bg-[#FF2B2B] py-2 text-[15px] font-medium text-white"
+                disabled={isDeleting}
                 onClick={handleDeleteConfirm}
               >
-                삭제
+                {isDeleting ? '삭제 중...' : '삭제'}
               </button>
             </div>
           </div>

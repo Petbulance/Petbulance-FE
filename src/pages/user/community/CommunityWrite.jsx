@@ -6,53 +6,61 @@ import {
   COMMUNITY_TOPIC_TO_API,
   COMMUNITY_TYPE_TO_API,
   createCommunityPost,
+  fetchCommunityPostDetail,
+  updateCommunityPost,
   uploadPostImages,
 } from '@/apis/community/posts';
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import downArrow from '@/assets/images/icons/gray_bottom_arrow.svg';
-import reviewImage from '@/assets/images/icons/review_img_ex.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 import xIconBlack from '@/assets/images/icons/x_icon_black.svg';
 
 const ANIMAL_CATEGORIES = ['소형포유류', '조류', '파충류', '양서류', '어류'];
 const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑', '중고거래'];
-const EDIT_POSTS = {
-  1: {
-    category: '소형포유류',
-    topic: '일상/자랑',
-    title: '울집 햄스터 자랑하는 글',
-    content:
-      '진짜 귀엽죠? 어제는 해바라기씨 몇개 뺏었더니 삐져서 뒤돌아있었어요ㅋㅋㅋ 털이 얼마나 볼슬볼슬 하고 윤기가 나는지.. 이번에 받은 먹이가 잘 맞나봐요! 여기서 추천받았는데 역시 펫뷸런스 고수님들 고견이 최고입니다. 늘 감사합니다 선생님들ㅎ',
-    images: [reviewImage, reviewImage],
-  },
+
+const mapApiEnumToLabel = (apiValue, mapTable, fallback = '') => {
+  if (!apiValue) return fallback;
+  if (Object.prototype.hasOwnProperty.call(mapTable, apiValue)) return apiValue;
+
+  const entry = Object.entries(mapTable).find(([, value]) => value === apiValue);
+  return entry?.[0] ?? fallback;
 };
+
+const makeLocalImage = (file) => ({
+  id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
+  preview: URL.createObjectURL(file),
+  isLocal: true,
+  file,
+  existing: false,
+  imageUrl: null,
+});
+
+const makeServerImage = (image, index) => ({
+  id: `server-${image.imageId ?? index}-${index}`,
+  preview: image.imageUrl,
+  isLocal: false,
+  file: null,
+  existing: true,
+  imageUrl: image.imageUrl,
+});
 
 export default function CommunityWrite() {
   const navigate = useNavigate();
   const { postId } = useParams();
   const isEditMode = Boolean(postId);
-  const initialEditPost = isEditMode
-    ? (EDIT_POSTS[postId] ?? EDIT_POSTS['1'])
-    : null;
 
-  const [category, setCategory] = useState(initialEditPost?.category ?? '');
-  const [topic, setTopic] = useState(initialEditPost?.topic ?? '');
-  const [title, setTitle] = useState(initialEditPost?.title ?? '');
-  const [content, setContent] = useState(initialEditPost?.content ?? '');
-  const [images, setImages] = useState(
-    initialEditPost
-      ? initialEditPost.images.map((src, index) => ({
-          id: `initial-${index}`,
-          preview: src,
-          isLocal: false,
-          file: null,
-        }))
-      : []
-  );
+  const [category, setCategory] = useState('');
+  const [topic, setTopic] = useState('');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [images, setImages] = useState([]);
+  const [imageUrlsToDelete, setImageUrlsToDelete] = useState([]);
+
   const [isCategoryOpen, setIsCategoryOpen] = useState(!isEditMode);
   const [isTopicOpen, setIsTopicOpen] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetchingPost, setIsFetchingPost] = useState(isEditMode);
 
   const canSubmit = useMemo(
     () => Boolean(category && topic && title.trim() && content.trim()),
@@ -67,19 +75,62 @@ export default function CommunityWrite() {
     };
   }, [images]);
 
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    let mounted = true;
+
+    const loadPost = async () => {
+      setIsFetchingPost(true);
+      try {
+        const data = await fetchCommunityPostDetail(postId);
+        if (!mounted) return;
+
+        setCategory(mapApiEnumToLabel(data.type, COMMUNITY_TYPE_TO_API, data.type));
+        setTopic(mapApiEnumToLabel(data.topic, COMMUNITY_TOPIC_TO_API, data.topic));
+        setTitle(data.title ?? '');
+        setContent(data.content ?? '');
+
+        const normalizedImages = Array.isArray(data.images)
+          ? [...data.images]
+              .sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0))
+              .map(makeServerImage)
+          : [];
+        setImages(normalizedImages);
+        setImageUrlsToDelete([]);
+      } catch (error) {
+        const message =
+          error?.response?.data?.data?.message ||
+          '게시글 정보를 불러오지 못했습니다.';
+        toast(message, { position: 'bottom-center' });
+        navigate('/index/community', { replace: true });
+      } finally {
+        if (mounted) setIsFetchingPost(false);
+      }
+    };
+
+    loadPost();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isEditMode, navigate, postId]);
+
   const handleAddImages = (event) => {
     const files = Array.from(event.target.files || []);
     if (files.length === 0) return;
 
-    const remainCount = 10 - images.length;
-    const selected = files.slice(0, remainCount).map((file) => ({
-      id: `${file.name}-${file.size}-${Date.now()}`,
-      preview: URL.createObjectURL(file),
-      isLocal: true,
-      file,
-    }));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      toast('이미지 파일만 첨부할 수 있어요.', { position: 'bottom-center' });
+      event.target.value = '';
+      return;
+    }
 
-    if (files.length > remainCount) {
+    const remainCount = 10 - images.length;
+    const selected = imageFiles.slice(0, remainCount).map(makeLocalImage);
+
+    if (imageFiles.length > remainCount) {
       toast('사진은 최대 10장까지 첨부할 수 있어요', {
         position: 'bottom-center',
       });
@@ -92,22 +143,51 @@ export default function CommunityWrite() {
   const handleRemoveImage = (id) => {
     setImages((prev) => {
       const target = prev.find((item) => item.id === id);
-      if (target?.isLocal) URL.revokeObjectURL(target.preview);
+      if (!target) return prev;
+
+      if (target.isLocal) {
+        URL.revokeObjectURL(target.preview);
+      }
+
+      if (target.existing && target.imageUrl) {
+        setImageUrlsToDelete((deleted) => {
+          if (deleted.includes(target.imageUrl)) return deleted;
+          return [...deleted, target.imageUrl];
+        });
+      }
+
       return prev.filter((item) => item.id !== id);
     });
   };
 
-  const handleSubmit = async () => {
-    if (!canSubmit || isSubmitting) return;
+  const showSubmitToast = (message) => {
+    toast(message, {
+      position: 'bottom-center',
+      duration: 3000,
+      style: {
+        width: '100%',
+        height: '44px',
+        display: 'flex',
+        alignItems: 'center',
+        background: '#222222E5',
+        color: '#ffffff',
+      },
+      action: {
+        label: '✕',
+        onClick: () => toast.dismiss(),
+      },
+      actionButtonStyle: {
+        background: 'transparent',
+        border: 'none',
+        color: '#ffffff',
+        padding: 0,
+        cursor: 'pointer',
+      },
+    });
+  };
 
-    if (isEditMode) {
-      toast('게시글을 수정했어요', {
-        position: 'bottom-center',
-        duration: 3000,
-      });
-      navigate(`/index/community/${postId}`, { replace: true });
-      return;
-    }
+  const handleSubmit = async () => {
+    if (!canSubmit || isSubmitting || isFetchingPost) return;
 
     const type = COMMUNITY_TYPE_TO_API[category];
     const topicValue = COMMUNITY_TOPIC_TO_API[topic];
@@ -116,56 +196,74 @@ export default function CommunityWrite() {
     setIsSubmitting(true);
 
     try {
-      const imageFiles = images
-        .map((image) => image.file)
-        .filter((file) => file instanceof File);
-      const imageUrls = await uploadPostImages(imageFiles);
+      const localImages = images.filter((image) => image.isLocal && image.file);
+      const uploadedImageUrls = await uploadPostImages(
+        localImages.map((image) => image.file)
+      );
 
-      const data = await createCommunityPost({
+      if (!isEditMode) {
+        const data = await createCommunityPost({
+          type,
+          topic: topicValue,
+          title: title.trim(),
+          content: content.trim(),
+          imageUrls: uploadedImageUrls,
+        });
+
+        showSubmitToast('게시글 등록을 완료했어요');
+        navigate(`/index/community/${data.postId}`, { replace: true });
+        return;
+      }
+
+      let uploadCursor = 0;
+      const imagesToKeepOrAdd = images
+        .map((image, index) => {
+          const imageUrl = image.existing
+            ? image.imageUrl
+            : uploadedImageUrls[uploadCursor++];
+
+          if (!imageUrl) return null;
+
+          return {
+            imageUrl,
+            imageOrder: index + 1,
+            thumbnail: index === 0,
+          };
+        })
+        .filter(Boolean);
+
+      await updateCommunityPost(postId, {
         type,
         topic: topicValue,
         title: title.trim(),
         content: content.trim(),
-        imageUrls,
+        imagesToKeepOrAdd,
+        imageUrlsToDelete,
       });
 
-      toast('게시글 등록을 완료했어요', {
-        position: 'bottom-center',
-        duration: 3000,
-        style: {
-          width: '100%',
-          height: '44px',
-          display: 'flex',
-          alignItems: 'center',
-          background: '#222222E5',
-          color: '#ffffff',
-        },
-        action: {
-          label: '✕',
-          onClick: () => toast.dismiss(),
-        },
-        actionButtonStyle: {
-          background: 'transparent',
-          border: 'none',
-          color: '#ffffff',
-          padding: 0,
-          cursor: 'pointer',
-        },
-      });
-
-      navigate(`/index/community/${data.postId}`, { replace: true });
+      showSubmitToast('게시글을 수정했어요');
+      navigate(`/index/community/${postId}`, { replace: true });
     } catch (error) {
-      console.error('게시글 등록 실패', {
+      console.error('게시글 저장 실패', {
         status: error?.response?.status,
         data: error?.response?.data,
       });
+
       const errorClass = error?.response?.data?.data?.errorClassName;
       const message = error?.response?.data?.data?.message;
 
-      if (errorClass === 'VALIDATION_ERROR') {
-        toast(message || '제목과 내용을 확인해 주세요.', {
+      if (errorClass === 'FORBIDDEN_POST_ACCESS') {
+        toast('게시글에 대한 권한이 존재하지 않습니다.', {
           position: 'bottom-center',
         });
+      } else if (errorClass === 'POST_NOT_FOUND') {
+        toast('요청하신 게시글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'POST_HIDDEN') {
+        toast('숨겨진 게시글입니다.', { position: 'bottom-center' });
+      } else if (errorClass === 'POST_DELETED') {
+        toast('삭제된 게시글입니다.', { position: 'bottom-center' });
       } else if (errorClass === 'EXCEEDED_MAX_IMAGE_COUNT') {
         toast('이미지는 최대 10장까지만 첨부할 수 있습니다.', {
           position: 'bottom-center',
@@ -175,18 +273,22 @@ export default function CommunityWrite() {
           position: 'bottom-center',
         });
       } else {
-        toast(
-          message ||
-            '게시글 등록에 실패했습니다. 잠시 후 다시 시도해 주세요. (서버 오류)',
-          {
-            position: 'bottom-center',
-          }
-        );
+        toast(message || '게시글 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.', {
+          position: 'bottom-center',
+        });
       }
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isFetchingPost) {
+    return (
+      <div className="flex h-full items-center justify-center bg-white text-sm text-[#757575]">
+        게시글 정보를 불러오는 중이에요.
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-white">
@@ -341,7 +443,7 @@ export default function CommunityWrite() {
           disabled={!canSubmit || isSubmitting}
           className={`h-10 w-full rounded-[8px] text-[14px] font-medium text-white ${canSubmit && !isSubmitting ? 'bg-[#2DA969]' : 'bg-[#DCDCDC]'}`}
         >
-          {isSubmitting ? '등록 중...' : '작성 완료'}
+          {isSubmitting ? (isEditMode ? '수정 중...' : '등록 중...') : '작성 완료'}
         </button>
       </footer>
 
@@ -367,9 +469,7 @@ export default function CommunityWrite() {
                   }}
                 >
                   {item}
-                  {category === item && (
-                    <span className="text-[#2DA969]">✓</span>
-                  )}
+                  {category === item && <span className="text-[#2DA969]">✓</span>}
                 </button>
               ))}
             </div>
@@ -386,9 +486,7 @@ export default function CommunityWrite() {
           />
           <div className="relative mx-6 w-full max-w-[320px] rounded-[14px] bg-white px-5 py-5 text-center">
             <h2 className="text-[20px] font-semibold text-[#1E1E1E]">
-              {isEditMode
-                ? '게시글 수정을 그만할까요?'
-                : '게시글 작성을 그만할까요?'}
+              {isEditMode ? '게시글 수정을 그만할까요?' : '게시글 작성을 그만할까요?'}
             </h2>
             <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">
               변경된 내용은 저장되지 않아요.

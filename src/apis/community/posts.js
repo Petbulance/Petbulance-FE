@@ -45,6 +45,22 @@ export async function fetchCommunityPosts({
   return response.data?.data ?? {};
 }
 
+export async function fetchCommunityPostDetail(postId) {
+  const response = await api.get(`/posts/${postId}`);
+  const data = response.data?.data ?? {};
+  return data.post ?? data;
+}
+
+export async function deleteCommunityPosts(postIds = []) {
+  const response = await api.delete('/posts', {
+    data: {
+      postIds,
+    },
+  });
+
+  return response.data?.data ?? {};
+}
+
 export async function createCommunityPost({
   type,
   topic,
@@ -62,6 +78,11 @@ export async function createCommunityPost({
 
   const response = await api.post('/posts', payload);
 
+  return response.data?.data ?? {};
+}
+
+export async function updateCommunityPost(postId, payload) {
+  const response = await api.put(`/posts/${postId}`, payload);
   return response.data?.data ?? {};
 }
 
