@@ -22,6 +22,7 @@ const NaverMap = React.memo(
     setSelectedHospital,
     filterState,
     setFilterState,
+    searchTrigger,
   }) => {
     const mapInstance = useRef(null);
     const mapElement = useRef(null);
@@ -185,12 +186,18 @@ const NaverMap = React.memo(
           setTimeout(() => handleSearchHospitals(), 500);
         }
       });
-    }, [
-      filterState.city,
-      filterState.region,
-      isMapLoaded,
-      handleSearchHospitals,
-    ]);
+    }, [filterState.city, JSON.stringify(filterState.region), isMapLoaded]);
+
+    useEffect(() => {
+      if (!isMapLoaded || !mapInstance.current) return;
+      handleSearchHospitals();
+    }, [filterState.sort, JSON.stringify(filterState.animal), isMapLoaded]);
+
+    useEffect(() => {
+      if (!isMapLoaded || !mapInstance.current) return;
+      if (!searchTrigger) return;
+      handleSearchHospitals();
+    }, [searchTrigger, isMapLoaded]);
 
     // 지도 초기화
     useEffect(() => {
@@ -306,7 +313,14 @@ const NaverMap = React.memo(
   (prev, next) =>
     prev.hospitals === next.hospitals &&
     prev.selectedHospital === next.selectedHospital &&
-    prev.filterState === next.filterState
+    prev.filterState.city === next.filterState.city &&
+    JSON.stringify(prev.filterState.region) ===
+      JSON.stringify(next.filterState.region) &&
+    JSON.stringify(prev.filterState.animal) ===
+      JSON.stringify(next.filterState.animal) &&
+    prev.filterState.isOpen === next.filterState.isOpen &&
+    prev.filterState.sort === next.filterState.sort &&
+    prev.searchTrigger === next.searchTrigger
 );
 
 export { NaverMap };
