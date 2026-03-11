@@ -3,7 +3,7 @@ name: React CI/CD to AWS S3 (Develop)
 # develop 브랜치에 push가 발생했을 때만 실행
 on:
   push:
-    branches: [ "develop" ]
+    branches: ['develop']
 
 jobs:
   build-and-deploy:
@@ -41,4 +41,3 @@ jobs:
       - name: Deploy to S3
         run: |
           aws s3 sync ./dist s3://${{ secrets.AWS_S3_BUCKET_NAME }} --delete
-          
