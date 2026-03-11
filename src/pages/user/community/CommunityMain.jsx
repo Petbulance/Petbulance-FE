@@ -7,12 +7,11 @@ import {
   fetchCommunityPosts,
 } from '@/apis/community/posts';
 import { CommunityHeader } from '@/components/community/layout/CommunityHeader';
-import { TOPIC_FILTERS } from '@/data/community';
-import { TopicFilterChips } from '@/components/community/ui/TopicFilterChips';
-import { SortDropdown } from '@/components/community/ui/SortDropdown';
 import { NoticeBanner } from '@/components/community/ui/NoticeBanner';
 import { PostCard } from '@/components/community/ui/PostCard';
-import { WriteButton } from '@/components/community/ui/WriteButton';
+import { SortDropdown } from '@/components/community/ui/SortDropdown';
+import { TopicFilterChips } from '@/components/community/ui/TopicFilterChips';
+import { TOPIC_FILTERS } from '@/data/community';
 
 export default function CommunityMain() {
   const sentinelRef = useRef(null);
@@ -83,7 +82,8 @@ export default function CommunityMain() {
       } catch (error) {
         const serverMessage = error?.response?.data?.data?.message;
         setErrorMessage(
-          serverMessage || '게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+          serverMessage ||
+            '게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
         );
       } finally {
         isLoadingRef.current = false;
@@ -126,7 +126,7 @@ export default function CommunityMain() {
   }, [loadPosts]);
 
   return (
-    <div className="relative min-h-full bg-[#F2F4F6]">
+    <div className="relative flex min-h-full flex-col bg-[#F2F4F6]">
       <section className="border-b border-gray-200 bg-white">
         <CommunityHeader
           selectedType={selectedType}
@@ -150,7 +150,7 @@ export default function CommunityMain() {
 
       <NoticeBanner notice={noticeBanner} />
 
-      <section className="bg-white">
+      <section className="flex-1 bg-white">
         {errorMessage && (
           <p className="px-6 py-10 text-center text-sm text-[#616161]">
             {errorMessage}
@@ -182,7 +182,6 @@ export default function CommunityMain() {
         )}
       </section>
 
-      <WriteButton />
     </div>
   );
 }
