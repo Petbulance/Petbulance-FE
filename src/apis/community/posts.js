@@ -89,3 +89,25 @@ export async function updateCommunityPost(postId, payload) {
 export async function uploadPostImages(imageFiles = []) {
   return uploadImagesWithPresign(imageFiles, { usage: POST_IMAGE_USAGE });
 }
+
+export async function fetchPostComments(postId) {
+  const response = await api.get(`/posts/${postId}/comments`);
+  const data = response.data?.data ?? {};
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.comments)) return data.comments;
+  if (Array.isArray(data.content)) return data.content;
+  if (Array.isArray(data.list)) return data.list;
+
+  return [];
+}
+
+export async function createPostComment(postId, payload) {
+  const response = await api.post(`/posts/${postId}/comments`, payload);
+  return response.data?.data ?? {};
+}
+
+export async function uploadCommentImages(imageFiles = []) {
+  const urls = await uploadImagesWithPresign(imageFiles, { usage: 'COMMENT' });
+  return urls;
+}
