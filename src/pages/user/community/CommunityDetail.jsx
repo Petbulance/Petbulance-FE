@@ -17,78 +17,6 @@ import shareIcon from '@/assets/images/icons/share_icon.svg';
 import thumbs from '@/assets/images/icons/thumbs.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 
-const COMMUNITY_DETAIL_POSTS = [
-  {
-    id: 1,
-    isMine: true,
-    nickname: '햄스터조련사',
-    category: '소형포유류',
-    topic: '일상/자랑',
-    title: '울집 햄스터 자랑하는 글',
-    content:
-      '진짜 귀엽죠? 어제는 해바라기씨 몇개 뺏었더니 삐져서 뒤돌아있었어요ㅋㅋㅋ 털이 얼마나 볼슬볼슬 하고 윤기가 나는지.. 이번에 받은 먹이가 잘 맞나봐요! 여기서 추천받았는데 역시 펫뷸런스 고수님들 고견이 최고입니다. 늘 감사합니다 선생님들ㅎ',
-    time: '38초 전',
-    views: 55,
-    likes: 24,
-    comments: 0,
-    image: reviewImage,
-    commentItems: [],
-  },
-  {
-    id: 2,
-    isMine: false,
-    nickname: '햄스터조련사',
-    category: '소형포유류',
-    topic: '일상/자랑',
-    title: '울집 햄스터 자랑하는 글',
-    content:
-      '진짜 귀엽죠? 어제는 해바라기씨 몇개 뺏었더니 삐져서 뒤돌아있었어요ㅋㅋㅋ 털이 얼마나 볼슬볼슬 하고 윤기가 나는지.. 이번에 받은 먹이가 잘 맞나봐요! 여기서 추천받았는데 역시 펫뷸런스 고수님들 고견이 최고입니다. 늘 감사합니다 선생님들ㅎ',
-    time: '38초 전',
-    views: 55,
-    likes: 24,
-    comments: 5,
-    image: reviewImage,
-    commentItems: [
-      {
-        id: 1,
-        nickname: '알많은앵무새',
-        time: '18분 전',
-        depth: 0,
-        text: '와 천사가 따로없네요. 넘 귀엽다..',
-      },
-      {
-        id: 2,
-        nickname: '죽순이도련님',
-        time: '2분 전',
-        depth: 1,
-        text: '@알많은앵무새 진짜 꼭 껴안고 싶죠',
-      },
-      {
-        id: 3,
-        nickname: '알많은앵무새',
-        time: '45초 전',
-        depth: 1,
-        text: '@죽순이도련님 네. 넉넉히 다줘야죠 주변시선 받으니까 세상에서 제일 귀여운 햄스터같아요',
-      },
-      {
-        id: 4,
-        nickname: '용감한코끼리',
-        time: '4분 전',
-        depth: 0,
-        text: '와 근데 햄스터 폴문인가요? 엄청 건강해보이네요! 사진 딱 먹이시간 같네용 급여 어케하나요?',
-      },
-      {
-        id: 5,
-        nickname: '복부팡기니피그',
-        time: '2분 전',
-        depth: 1,
-        text: '@용감한코끼리 지나가다 남겨요.. 영양제만 매니큐어 끝에다만 참치캔줘요. 울집 기니도 보내기시켜주듯 귀여워요',
-        image: reviewImage,
-      },
-    ],
-  },
-];
-
 function CommentText({ text }) {
   const tokens = text.split(/(@[^\s]+)/g);
 
@@ -197,7 +125,8 @@ export default function CommunityDetail() {
           setDetailError('삭제된 게시글입니다.');
         } else {
           setDetailError(
-            message || '게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+            message ||
+              '게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
           );
         }
       } finally {
@@ -274,9 +203,12 @@ export default function CommunityDetail() {
           position: 'bottom-center',
         });
       } else {
-        toast(message || '게시글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.', {
-          position: 'bottom-center',
-        });
+        toast(
+          message || '게시글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+          {
+            position: 'bottom-center',
+          }
+        );
       }
     } finally {
       setIsDeleting(false);
