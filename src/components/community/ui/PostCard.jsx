@@ -63,12 +63,12 @@ export function PostCard({ post }) {
 
           <div className="flex items-center justify-between">
             <div className="flex flex-row items-center gap-[2px] text-[14px] text-[#9E9E9E]">
-              {nickname && (
+              {
                 <>
                   {nickname}
                   <img src={dot} alt="구분점" />
                 </>
-              )}
+              }
               {createdAt}
               <img src={dot} alt="구분점" />
               <img src={eye} alt="조회수" /> {viewCount}
