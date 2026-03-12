@@ -181,7 +181,6 @@ export default function CommunityMain() {
           </p>
         )}
       </section>
-
     </div>
   );
 }

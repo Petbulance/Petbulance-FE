@@ -49,4 +49,3 @@ export async function uploadImagesWithPresign(
 
   return uploadedFiles.map((file) => file.imageUrl).filter(Boolean);
 }
-

@@ -22,7 +22,9 @@ const mapApiEnumToLabel = (apiValue, mapTable, fallback = '') => {
   if (!apiValue) return fallback;
   if (Object.prototype.hasOwnProperty.call(mapTable, apiValue)) return apiValue;
 
-  const entry = Object.entries(mapTable).find(([, value]) => value === apiValue);
+  const entry = Object.entries(mapTable).find(
+    ([, value]) => value === apiValue
+  );
   return entry?.[0] ?? fallback;
 };
 
@@ -86,8 +88,12 @@ export default function CommunityWrite() {
         const data = await fetchCommunityPostDetail(postId);
         if (!mounted) return;
 
-        setCategory(mapApiEnumToLabel(data.type, COMMUNITY_TYPE_TO_API, data.type));
-        setTopic(mapApiEnumToLabel(data.topic, COMMUNITY_TOPIC_TO_API, data.topic));
+        setCategory(
+          mapApiEnumToLabel(data.type, COMMUNITY_TYPE_TO_API, data.type)
+        );
+        setTopic(
+          mapApiEnumToLabel(data.topic, COMMUNITY_TOPIC_TO_API, data.topic)
+        );
         setTitle(data.title ?? '');
         setContent(data.content ?? '');
 
@@ -273,9 +279,12 @@ export default function CommunityWrite() {
           position: 'bottom-center',
         });
       } else {
-        toast(message || '게시글 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.', {
-          position: 'bottom-center',
-        });
+        toast(
+          message || '게시글 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+          {
+            position: 'bottom-center',
+          }
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -443,7 +452,11 @@ export default function CommunityWrite() {
           disabled={!canSubmit || isSubmitting}
           className={`h-10 w-full rounded-[8px] text-[14px] font-medium text-white ${canSubmit && !isSubmitting ? 'bg-[#2DA969]' : 'bg-[#DCDCDC]'}`}
         >
-          {isSubmitting ? (isEditMode ? '수정 중...' : '등록 중...') : '작성 완료'}
+          {isSubmitting
+            ? isEditMode
+              ? '수정 중...'
+              : '등록 중...'
+            : '작성 완료'}
         </button>
       </footer>
 
@@ -469,7 +482,9 @@ export default function CommunityWrite() {
                   }}
                 >
                   {item}
-                  {category === item && <span className="text-[#2DA969]">✓</span>}
+                  {category === item && (
+                    <span className="text-[#2DA969]">✓</span>
+                  )}
                 </button>
               ))}
             </div>
@@ -486,7 +501,9 @@ export default function CommunityWrite() {
           />
           <div className="relative mx-6 w-full max-w-[320px] rounded-[14px] bg-white px-5 py-5 text-center">
             <h2 className="text-[20px] font-semibold text-[#1E1E1E]">
-              {isEditMode ? '게시글 수정을 그만할까요?' : '게시글 작성을 그만할까요?'}
+              {isEditMode
+                ? '게시글 수정을 그만할까요?'
+                : '게시글 작성을 그만할까요?'}
             </h2>
             <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">
               변경된 내용은 저장되지 않아요.
