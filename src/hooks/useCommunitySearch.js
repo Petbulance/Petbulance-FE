@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 import {
   COMMENT_SEARCH_TYPE_OPTIONS,
@@ -33,6 +34,8 @@ function getFilterLabel(selectedAnimalFilter, selectedCategoryFilter) {
 export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
   const normalizedKeyword = searchKeyword?.trim() ?? '';
   const [recentKeywords, setRecentKeywords] = useState([]);
+  const pendingDeleteTimerRef = useRef(null);
+  const pendingDeleteSnapshotRef = useRef(null);
   const [activeTab, setActiveTab] = useState('post');
   const [selectedSort, setSelectedSort] = useState('최신순');
   const [selectedType, setSelectedType] = useState('글제목+내용');
@@ -105,39 +108,25 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
     if (!Array.isArray(items)) return [];
     return items
       .map((item) => ({
-        id:
-          item?.keywordId ??
-          item?.keywordID ??
-          item?.id ??
-          item?.keyword_id ??
-          '',
-        text: item?.keyword ?? item?.text ?? '',
-        createdAt: item?.createdAt ?? item?.created_at ?? null,
+        id: item?.keywordId,
+        keyword: item.keyword,
       }))
-      .filter((item) => item.id && item.text);
+      .filter((item) => item.id && item.keyword);
   };
 
   const normalizeCommentResults = (items = []) => {
     if (!Array.isArray(items)) return [];
     return items.map((item) => ({
-      id:
-        item?.commentId ??
-        item?.commentID ??
-        item?.id ??
-        item?.comment_id ??
-        '',
-      content: item?.content ?? item?.comment ?? '',
-      nickname: item?.nickname ?? item?.writer ?? item?.author ?? '',
-      date: item?.date ?? item?.createdAt ?? item?.created_at ?? '',
-      postTitle: item?.postTitle ?? item?.title ?? '',
-      hasImage: Boolean(
-        item?.hasImage ??
-          item?.has_image ??
-          item?.imageCount ??
-          item?.image_count ??
-          item?.imageUrl ??
-          item?.image_url
-      ),
+      id: item.commentId,
+      content: item.commentContent,
+      nickname: item.writerNickname,
+      date: item.createdAt,
+      type: item.type,
+      topic: item.topic,
+      postTitle: item.postTitle,
+      img: item.commentImageUrl,
+      createdAt: item.createdAt,
+      postId: item.postId,
     }));
   };
 
@@ -152,10 +141,54 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
     setRecentKeywords((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleDeleteAll = async () => {
-    const result = await deleteAllRecentCommunityKeywords();
-    if (!result) return;
+  const handleDeleteAll = () => {
+    if (pendingDeleteTimerRef.current) {
+      clearTimeout(pendingDeleteTimerRef.current);
+      pendingDeleteTimerRef.current = null;
+      pendingDeleteSnapshotRef.current = null;
+    }
+
+    const snapshot = [...recentKeywords];
+    pendingDeleteSnapshotRef.current = snapshot;
     setRecentKeywords([]);
+
+    toast('최근 검색어를 전부 삭제했어요', {
+      position: 'bottom-center',
+      duration: 3000,
+      style: {
+        width: '100%',
+        height: '44px',
+        background: '#222222E5',
+        color: '#ffffff',
+      },
+      action: {
+        label: '취소',
+        onClick: () => {
+          toast.dismiss();
+          if (pendingDeleteTimerRef.current) {
+            clearTimeout(pendingDeleteTimerRef.current);
+            pendingDeleteTimerRef.current = null;
+          }
+          if (pendingDeleteSnapshotRef.current) {
+            setRecentKeywords(pendingDeleteSnapshotRef.current);
+            pendingDeleteSnapshotRef.current = null;
+          }
+        },
+      },
+    });
+
+    pendingDeleteTimerRef.current = setTimeout(async () => {
+      pendingDeleteTimerRef.current = null;
+      try {
+        await deleteAllRecentCommunityKeywords();
+        pendingDeleteSnapshotRef.current = null;
+      } catch (error) {
+        if (pendingDeleteSnapshotRef.current) {
+          setRecentKeywords(pendingDeleteSnapshotRef.current);
+        }
+        pendingDeleteSnapshotRef.current = null;
+      }
+    }, 3000);
   };
 
   const openFilterSheet = () => {
@@ -242,11 +275,11 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
       try {
         const typeParam =
           selectedAnimalFilter && selectedAnimalFilter !== '전체'
-            ? animalTypeByLabel[selectedAnimalFilter] ?? selectedAnimalFilter
+            ? (animalTypeByLabel[selectedAnimalFilter] ?? selectedAnimalFilter)
             : undefined;
         const topicParam =
           selectedCategoryFilter && selectedCategoryFilter !== '전체'
-            ? topicByLabel[selectedCategoryFilter] ?? selectedCategoryFilter
+            ? (topicByLabel[selectedCategoryFilter] ?? selectedCategoryFilter)
             : undefined;
 
         const data = await searchCommunityPosts({
@@ -260,14 +293,7 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
 
         if (isCancelled) return;
 
-        const list =
-          data?.content ??
-          data?.posts ??
-          data?.list ??
-          data?.items ??
-          data?.results ??
-          [];
-        setPostResults(Array.isArray(list) ? list : []);
+        setPostResults(data);
       } catch (error) {
         if (isCancelled) return;
         setPostResults([]);
@@ -306,33 +332,24 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
       try {
         const typeParam =
           selectedAnimalFilter && selectedAnimalFilter !== '전체'
-            ? animalTypeByLabel[selectedAnimalFilter] ?? selectedAnimalFilter
+            ? (animalTypeByLabel[selectedAnimalFilter] ?? selectedAnimalFilter)
             : undefined;
         const topicParam =
           selectedCategoryFilter && selectedCategoryFilter !== '전체'
-            ? topicByLabel[selectedCategoryFilter] ?? selectedCategoryFilter
+            ? (topicByLabel[selectedCategoryFilter] ?? selectedCategoryFilter)
             : undefined;
 
         const data = await searchCommunityComments({
           type: typeParam,
           topic: topicParam,
-          sort: getSortParam(selectedSort),
           pageSize: 20,
           searchKeyword: normalizedKeyword,
-          searcgScope: getCommentSearchScopeParam(selectedType),
+          searchScope: getCommentSearchScopeParam(selectedType),
         });
 
         if (isCancelled) return;
 
-        const list =
-          data?.comments ??
-          data?.list ??
-          data?.items ??
-          data?.results ??
-          [];
-        setCommentResults(
-          Array.isArray(list) ? normalizeCommentResults(list) : []
-        );
+        setCommentResults(normalizeCommentResults(data));
       } catch (error) {
         if (isCancelled) return;
         setCommentResults([]);
