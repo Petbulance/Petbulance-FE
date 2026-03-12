@@ -9,7 +9,7 @@ export function RecentSearchList({ keywords, onDelete }) {
           <button className="flex items-center gap-2">
             <img src={clock_icon} alt="clock_icon" />
             <span className="cursor-pointer text-[19px] text-[#424242] hover:underline">
-              {item.text}
+              {item.keyword}
             </span>
           </button>
 
