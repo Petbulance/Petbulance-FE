@@ -16,12 +16,12 @@ export function PostCard({ post }) {
   const viewCount = post.viewCount ?? post.views ?? 0;
   const hasImage = (post.imageCount ?? 0) > 0 || post.hasImage;
   const imageCount = post.imageCount ?? (post.hasImage ? 1 : 0);
-  const nickname = post.nickname;
+  const nickname = post.writerNickname;
 
   return (
     <article
       key={postId}
-      className="cursor-pointer border-b border-[#EEEEEE] px-6 py-4"
+      className="cursor-pointer border-b border-[##EEEEEE] px-6 py-4"
       onClick={() => navigate(`/index/community/${postId}`)}
     >
       <div className="flex gap-3">

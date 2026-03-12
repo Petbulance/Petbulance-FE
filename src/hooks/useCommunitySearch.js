@@ -5,27 +5,13 @@ import {
   POST_SEARCH_TYPE_OPTIONS,
 } from '@/data/community';
 import {
-  INITIAL_RECENT_KEYWORDS,
-  MOCK_COMMENT_RESULTS,
-  MOCK_POST_RESULTS,
-} from '@/data/communitySearch.constants';
-
-function filterMatches(
-  { animal, category },
-  selectedAnimalFilter,
-  selectedCategoryFilter
-) {
-  const animalMatched =
-    !selectedAnimalFilter ||
-    selectedAnimalFilter === '전체' ||
-    animal === selectedAnimalFilter;
-  const categoryMatched =
-    !selectedCategoryFilter ||
-    selectedCategoryFilter === '전체' ||
-    category === selectedCategoryFilter;
-
-  return animalMatched && categoryMatched;
-}
+  deleteAllRecentCommunityKeywords,
+  deleteRecentCommunityKeyword,
+  fetchRecentCommunityKeywords,
+  searchCommunityComments,
+  searchCommunityPosts,
+} from '@/apis/community/search';
+import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
 
 function getFilterLabel(selectedAnimalFilter, selectedCategoryFilter) {
   const animalLabel =
@@ -45,7 +31,8 @@ function getFilterLabel(selectedAnimalFilter, selectedCategoryFilter) {
 }
 
 export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
-  const [recentKeywords, setRecentKeywords] = useState(INITIAL_RECENT_KEYWORDS);
+  const normalizedKeyword = searchKeyword?.trim() ?? '';
+  const [recentKeywords, setRecentKeywords] = useState([]);
   const [activeTab, setActiveTab] = useState('post');
   const [selectedSort, setSelectedSort] = useState('최신순');
   const [selectedType, setSelectedType] = useState('글제목+내용');
@@ -57,6 +44,10 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('');
   const [draftAnimalFilter, setDraftAnimalFilter] = useState('');
   const [draftCategoryFilter, setDraftCategoryFilter] = useState('');
+  const [postResults, setPostResults] = useState([]);
+  const [commentResults, setCommentResults] = useState([]);
+  const [isPostLoading, setIsPostLoading] = useState(false);
+  const [isCommentLoading, setIsCommentLoading] = useState(false);
 
   const dropdownGroupRef = useRef(null);
   const searchTypeOptions =
@@ -64,53 +55,106 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
       ? POST_SEARCH_TYPE_OPTIONS
       : COMMENT_SEARCH_TYPE_OPTIONS;
 
-  const filteredPosts = useMemo(() => {
-    if (!searchKeyword) {
-      return [];
-    }
+  const filteredPosts = useMemo(() => postResults, [postResults]);
 
-    const keyword = searchKeyword.toLowerCase();
-    return MOCK_POST_RESULTS.filter((post) => {
-      if (!filterMatches(post, selectedAnimalFilter, selectedCategoryFilter)) {
-        return false;
-      }
-
-      const merged = `${post.title} ${post.content}`.toLowerCase();
-      return merged.includes(keyword);
-    });
-  }, [searchKeyword, selectedAnimalFilter, selectedCategoryFilter]);
-
-  const filteredComments = useMemo(() => {
-    if (!searchKeyword) {
-      return [];
-    }
-
-    const keyword = searchKeyword.toLowerCase();
-    return MOCK_COMMENT_RESULTS.filter((comment) => {
-      if (
-        !filterMatches(comment, selectedAnimalFilter, selectedCategoryFilter)
-      ) {
-        return false;
-      }
-
-      const merged =
-        `${comment.content} ${comment.postTitle} ${comment.nickname}`.toLowerCase();
-      return merged.includes(keyword);
-    });
-  }, [searchKeyword, selectedAnimalFilter, selectedCategoryFilter]);
+  const filteredComments = useMemo(() => commentResults, [commentResults]);
 
   const currentResults =
     activeTab === 'post' ? filteredPosts : filteredComments;
+  const isSearchLoading =
+    activeTab === 'post' ? isPostLoading : isCommentLoading;
   const filterLabel = getFilterLabel(
     selectedAnimalFilter,
     selectedCategoryFilter
   );
 
-  const handleDelete = (id) => {
+  const getSortParam = (sortLabel) => {
+    if (sortLabel === '최신순') return 'latest';
+    if (sortLabel === '인기순') return 'popular';
+    if (sortLabel === '댓글순') return 'comment';
+    return 'latest';
+  };
+
+  const getPostSearchScopeParam = (typeLabel) => {
+    if (typeLabel === '글제목+내용') return 'title_content';
+    if (typeLabel === '글제목') return 'title';
+    if (typeLabel === '글작성자') return 'writer';
+    return 'title_content';
+  };
+
+  const getCommentSearchScopeParam = (typeLabel) => {
+    if (typeLabel === '댓글작성자') return 'writer';
+    return 'content';
+  };
+
+  const animalTypeByLabel = Object.entries(ANIMAL_CATEGORY_KO).reduce(
+    (acc, [key, label]) => {
+      acc[label] = key;
+      return acc;
+    },
+    {}
+  );
+  const topicByLabel = {
+    '건강/질병': 'HEALTH',
+    '용품/사료': 'SUPPLIES',
+    '일상/자랑': 'DAILY',
+    중고거래: 'TRADE',
+  };
+
+  const normalizeRecentKeywords = (items = []) => {
+    if (!Array.isArray(items)) return [];
+    return items
+      .map((item) => ({
+        id:
+          item?.keywordId ??
+          item?.keywordID ??
+          item?.id ??
+          item?.keyword_id ??
+          '',
+        text: item?.keyword ?? item?.text ?? '',
+        createdAt: item?.createdAt ?? item?.created_at ?? null,
+      }))
+      .filter((item) => item.id && item.text);
+  };
+
+  const normalizeCommentResults = (items = []) => {
+    if (!Array.isArray(items)) return [];
+    return items.map((item) => ({
+      id:
+        item?.commentId ??
+        item?.commentID ??
+        item?.id ??
+        item?.comment_id ??
+        '',
+      content: item?.content ?? item?.comment ?? '',
+      nickname: item?.nickname ?? item?.writer ?? item?.author ?? '',
+      date: item?.date ?? item?.createdAt ?? item?.created_at ?? '',
+      postTitle: item?.postTitle ?? item?.title ?? '',
+      hasImage: Boolean(
+        item?.hasImage ??
+          item?.has_image ??
+          item?.imageCount ??
+          item?.image_count ??
+          item?.imageUrl ??
+          item?.image_url
+      ),
+    }));
+  };
+
+  const loadRecentKeywords = async () => {
+    const items = await fetchRecentCommunityKeywords();
+    setRecentKeywords(normalizeRecentKeywords(items));
+  };
+
+  const handleDelete = async (id) => {
+    const result = await deleteRecentCommunityKeyword(id);
+    if (!result) return;
     setRecentKeywords((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = async () => {
+    const result = await deleteAllRecentCommunityKeywords();
+    if (!result) return;
     setRecentKeywords([]);
   };
 
@@ -178,8 +222,144 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
     }
   }, [activeTab, searchTypeOptions, selectedType]);
 
+  useEffect(() => {
+    if (!normalizedKeyword) {
+      loadRecentKeywords();
+    }
+  }, [normalizedKeyword]);
+
+  useEffect(() => {
+    if (!normalizedKeyword || activeTab !== 'post') {
+      setPostResults([]);
+      setIsPostLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const runSearch = async () => {
+      setIsPostLoading(true);
+      try {
+        const typeParam =
+          selectedAnimalFilter && selectedAnimalFilter !== '전체'
+            ? animalTypeByLabel[selectedAnimalFilter] ?? selectedAnimalFilter
+            : undefined;
+        const topicParam =
+          selectedCategoryFilter && selectedCategoryFilter !== '전체'
+            ? topicByLabel[selectedCategoryFilter] ?? selectedCategoryFilter
+            : undefined;
+
+        const data = await searchCommunityPosts({
+          type: typeParam,
+          topic: topicParam,
+          sort: getSortParam(selectedSort),
+          pageSize: 20,
+          searchKeyword: normalizedKeyword,
+          searchScope: getPostSearchScopeParam(selectedType),
+        });
+
+        if (isCancelled) return;
+
+        const list =
+          data?.content ??
+          data?.posts ??
+          data?.list ??
+          data?.items ??
+          data?.results ??
+          [];
+        setPostResults(Array.isArray(list) ? list : []);
+      } catch (error) {
+        if (isCancelled) return;
+        setPostResults([]);
+      } finally {
+        if (!isCancelled) {
+          setIsPostLoading(false);
+        }
+      }
+    };
+
+    runSearch();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    normalizedKeyword,
+    activeTab,
+    selectedAnimalFilter,
+    selectedCategoryFilter,
+    selectedSort,
+    selectedType,
+  ]);
+
+  useEffect(() => {
+    if (!normalizedKeyword || activeTab !== 'comment') {
+      setCommentResults([]);
+      setIsCommentLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const runSearch = async () => {
+      setIsCommentLoading(true);
+      try {
+        const typeParam =
+          selectedAnimalFilter && selectedAnimalFilter !== '전체'
+            ? animalTypeByLabel[selectedAnimalFilter] ?? selectedAnimalFilter
+            : undefined;
+        const topicParam =
+          selectedCategoryFilter && selectedCategoryFilter !== '전체'
+            ? topicByLabel[selectedCategoryFilter] ?? selectedCategoryFilter
+            : undefined;
+
+        const data = await searchCommunityComments({
+          type: typeParam,
+          topic: topicParam,
+          sort: getSortParam(selectedSort),
+          pageSize: 20,
+          searchKeyword: normalizedKeyword,
+          searcgScope: getCommentSearchScopeParam(selectedType),
+        });
+
+        if (isCancelled) return;
+
+        const list =
+          data?.comments ??
+          data?.list ??
+          data?.items ??
+          data?.results ??
+          [];
+        setCommentResults(
+          Array.isArray(list) ? normalizeCommentResults(list) : []
+        );
+      } catch (error) {
+        if (isCancelled) return;
+        setCommentResults([]);
+      } finally {
+        if (!isCancelled) {
+          setIsCommentLoading(false);
+        }
+      }
+    };
+
+    runSearch();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    normalizedKeyword,
+    activeTab,
+    selectedAnimalFilter,
+    selectedCategoryFilter,
+    selectedSort,
+    selectedType,
+  ]);
+
   return {
     recentKeywords,
+    isSearchLoading,
     activeTab,
     selectedSort,
     selectedType,

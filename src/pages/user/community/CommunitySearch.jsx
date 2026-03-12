@@ -15,9 +15,9 @@ export function CommunitySearch() {
   const outletContext = useOutletContext() || {};
   const { searchKeyword, setIsSearchHeaderHidden } = outletContext;
 
-  const isLoading = false;
   const {
     recentKeywords,
+    isSearchLoading,
     activeTab,
     selectedSort,
     selectedType,
@@ -71,7 +71,7 @@ export function CommunitySearch() {
           />
 
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {isLoading ? (
+            {isSearchLoading ? (
               <div className="py-10 text-center text-gray-400">검색 중...</div>
             ) : currentResults.length > 0 ? (
               <section className="bg-white">
