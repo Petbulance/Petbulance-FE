@@ -92,18 +92,36 @@ export async function uploadPostImages(imageFiles = []) {
 
 export async function fetchPostComments(postId) {
   const response = await api.get(`/posts/${postId}/comments`);
-  const data = response.data?.data ?? {};
+  console.log('poset/id/comm', response);
+  const root = response.data ?? {};
+  const data = root.data ?? {};
 
   if (Array.isArray(data)) return data;
   if (Array.isArray(data.comments)) return data.comments;
   if (Array.isArray(data.content)) return data.content;
   if (Array.isArray(data.list)) return data.list;
+  if (Array.isArray(data.commentList)) return data.commentList;
+  if (Array.isArray(data.items)) return data.items;
+
+  // 일부 응답은 data 안에 다시 data를 감싸서 내려줄 수 있음
+  const nested = data.data ?? {};
+  if (Array.isArray(nested)) return nested;
+  if (Array.isArray(nested.comments)) return nested.comments;
+  if (Array.isArray(nested.content)) return nested.content;
+  if (Array.isArray(nested.list)) return nested.list;
+  if (Array.isArray(nested.commentList)) return nested.commentList;
+  if (Array.isArray(nested.items)) return nested.items;
 
   return [];
 }
 
 export async function createPostComment(postId, payload) {
   const response = await api.post(`/posts/${postId}/comments`, payload);
+  return response.data?.data ?? {};
+}
+
+export async function deletePostComment(commentId) {
+  const response = await api.delete(`/comments/${commentId}`);
   return response.data?.data ?? {};
 }
 

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import {
   createPostComment,
+  deletePostComment,
   deleteCommunityPosts,
   fetchCommunityPostDetail,
   fetchPostComments,
@@ -26,7 +27,10 @@ function CommentText({ text }) {
     <p className="mt-1 text-[14px] leading-5 text-[#1E1E1E]">
       {tokens.map((token, index) =>
         token.startsWith('@') ? (
-          <span key={`${token}-${index}`} className="font-medium text-[#27BE69]">
+          <span
+            key={`${token}-${index}`}
+            className="font-medium text-[#27BE69]"
+          >
             {token}
           </span>
         ) : (
@@ -37,7 +41,7 @@ function CommentText({ text }) {
   );
 }
 
-function CommentItem({ comment, onReply }) {
+function CommentItem({ comment, onReply, onMore }) {
   const depth = comment.depth ?? 0;
   const isReply = depth > 0;
 
@@ -57,10 +61,17 @@ function CommentItem({ comment, onReply }) {
         >
           <div className="flex items-center justify-between">
             <p className="text-[12px] text-[#9E9E9E]">
-              <span className="font-medium text-[#424242]">{comment.nickname}</span>{' '}
+              <span className="font-medium text-[#424242]">
+                {comment.nickname}
+              </span>{' '}
               {comment.time}
             </p>
-            <button className="text-[14px] leading-none text-[#B8B8B8]">⋮</button>
+            <button
+              className="text-[14px] leading-none text-[#B8B8B8]"
+              onClick={() => onMore(comment)}
+            >
+              ⋮
+            </button>
           </div>
           <CommentText text={comment.text} />
           {comment.image && (
@@ -85,15 +96,20 @@ function CommentItem({ comment, onReply }) {
 const normalizeComment = (comment = {}) => {
   const commentId = comment.commentId ?? comment.id;
   const parentId = comment.parentId ?? null;
+  const writerNickname = comment.writerNickname || comment.nickname || '익명';
+  const rawIsMine = comment.isCommentAuthor;
+  const isMineByFlag =
+    rawIsMine === true || rawIsMine === 'true' || rawIsMine === 1;
 
   return {
     id: commentId,
     parentId,
-    nickname: comment.writerNickname || comment.nickname || '익명',
+    nickname: writerNickname,
     profileUrl: comment.writerProfileUrl || comment.profileUrl || null,
     time: comment.createdAt || '',
     text: comment.content || '',
     image: comment.imageUrl || null,
+    isMine: isMineByFlag,
     depth:
       typeof comment.depth === 'number'
         ? comment.depth
@@ -120,6 +136,14 @@ export default function CommunityDetail() {
   const [isReportReasonOpen, setIsReportReasonOpen] = useState(false);
   const [selectedReportReason, setSelectedReportReason] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedComment, setSelectedComment] = useState(null);
+  const [isCommentMenuOpen, setIsCommentMenuOpen] = useState(false);
+  const [isCommentDeleteConfirmOpen, setIsCommentDeleteConfirmOpen] =
+    useState(false);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
+  const [isCommentReportOpen, setIsCommentReportOpen] = useState(false);
+  const [selectedCommentReportReason, setSelectedCommentReportReason] =
+    useState('');
 
   const [commentInput, setCommentInput] = useState('');
   const [isSecretComment, setIsSecretComment] = useState(false);
@@ -229,7 +253,8 @@ export default function CommunityDetail() {
       : `/${String(post.writerProfileUrl).replace(/^\/+/, '')}`
     : defaultProfile;
   const isAlreadyReported = localStorage.getItem(reportStorageKey) === '1';
-  const commentCount = comments.length > 0 ? comments.length : (post.commentCount ?? 0);
+  const commentCount =
+    comments.length > 0 ? comments.length : (post.commentCount ?? 0);
 
   const handleDeleteClick = () => {
     setIsMenuOpen(false);
@@ -244,7 +269,10 @@ export default function CommunityDetail() {
       await deleteCommunityPosts([post.postId]);
       setIsDeleteConfirmOpen(false);
       navigate('/index/community', { replace: true });
-      toast('게시글을 삭제했어요', { position: 'bottom-center', duration: 3000 });
+      toast('게시글을 삭제했어요', {
+        position: 'bottom-center',
+        duration: 3000,
+      });
     } catch (error) {
       const errorClass = error?.response?.data?.data?.errorClassName;
       const message = error?.response?.data?.data?.message;
@@ -290,6 +318,11 @@ export default function CommunityDetail() {
 
   const handlePickCommentImage = () => {
     fileInputRef.current?.click();
+  };
+
+  const openCommentMenu = (comment) => {
+    setSelectedComment(comment);
+    setIsCommentMenuOpen(true);
   };
 
   const handleCommentImageChange = (e) => {
@@ -349,21 +382,64 @@ export default function CommunityDetail() {
       if (errorClass === 'EMPTY_COMMENT_CONTENT') {
         toast('댓글 내용을 입력해주세요.', { position: 'bottom-center' });
       } else if (errorClass === 'INVALID_PARENT_COMMENT') {
-        toast('상위 댓글 정보를 찾을 수 없습니다.', { position: 'bottom-center' });
+        toast('상위 댓글 정보를 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
       } else if (errorClass === 'INVALID_MENTION_USER') {
-        toast('멘션된 사용자 정보를 찾을 수 없습니다.', { position: 'bottom-center' });
+        toast('멘션된 사용자 정보를 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
       } else if (errorClass === 'INVALID_INPUT_RELATION') {
         toast('입력 관계가 잘못되었습니다.', { position: 'bottom-center' });
       } else if (errorClass === 'POST_NOT_FOUND') {
-        toast('요청하신 게시글을 찾을 수 없습니다.', { position: 'bottom-center' });
+        toast('요청하신 게시글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
       } else {
-        toast(message || '댓글 등록에 실패했습니다.', { position: 'bottom-center' });
+        toast(message || '댓글 등록에 실패했습니다.', {
+          position: 'bottom-center',
+        });
       }
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
+  const handleDeleteComment = async () => {
+    if (!selectedComment?.id || isDeletingComment) return;
+
+    setIsDeletingComment(true);
+    try {
+      await deletePostComment(selectedComment.id);
+      setIsCommentDeleteConfirmOpen(false);
+      setIsCommentMenuOpen(false);
+      setSelectedComment(null);
+      await loadComments(post.postId);
+      toast('댓글이 성공적으로 삭제되었습니다.', {
+        position: 'bottom-center',
+      });
+    } catch (error) {
+      const errorClass = error?.response?.data?.data?.errorClassName;
+      const message = error?.response?.data?.data?.message;
+
+      if (errorClass === 'COMMENT_NOT_FOUND') {
+        toast('요청하신 댓글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'FORBIDDEN_COMMENT_ACCESS') {
+        toast('댓글에 대한 권한이 존재하지 않습니다.', {
+          position: 'bottom-center',
+        });
+      } else {
+        toast(message || '댓글 삭제에 실패했습니다.', {
+          position: 'bottom-center',
+        });
+      }
+    } finally {
+      setIsDeletingComment(false);
+    }
+  };
+  console.log('셀렉트 댓글', selectedComment);
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#F2F4F6]">
       <header className="sticky top-0 z-10 flex h-[48px] items-center justify-between border-b border-[#E0E0E0] bg-white px-5">
@@ -383,33 +459,56 @@ export default function CommunityDetail() {
       <div className="min-h-0 flex-1 overflow-y-auto">
         <section className="bg-white px-5 pt-4 pb-5">
           <div className="mb-3 flex items-center gap-1 text-[12px]">
-            <span className="rounded-full bg-[#F1E89A] px-2 py-1 text-[#424242]">{post.type}</span>
-            <span className="rounded-full bg-[#F2F2F2] px-2 py-1 text-[#9E9E9E]">{post.topic}</span>
+            <span className="rounded-full bg-[#F1E89A] px-2 py-1 text-[#424242]">
+              {post.type}
+            </span>
+            <span className="rounded-full bg-[#F2F2F2] px-2 py-1 text-[#9E9E9E]">
+              {post.topic}
+            </span>
           </div>
 
           <div className="mb-3 flex items-center gap-2">
-            <img src={writerProfileSrc} alt="프로필" className="h-8 w-8 rounded-full" />
+            <img
+              src={writerProfileSrc}
+              alt="프로필"
+              className="h-8 w-8 rounded-full"
+            />
             <div>
-              <p className="text-[14px] font-medium text-[#424242]">{post.writerNickname}</p>
+              <p className="text-[14px] font-medium text-[#424242]">
+                {post.writerNickname}
+              </p>
               <p className="text-[12px] text-[#9E9E9E]">{post.createdAt}</p>
             </div>
           </div>
 
-          <h1 className="mb-3 text-[26px] font-semibold text-[#1E1E1E]">{post.title}</h1>
+          <h1 className="mb-3 text-[26px] font-semibold text-[#1E1E1E]">
+            {post.title}
+          </h1>
           <p className="text-[16px] leading-7 text-[#424242]">{post.content}</p>
 
           {postImages.length > 0 && (
             <div className="mt-4 space-y-2">
               {postImages.map((image) => (
-                <img key={image.imageId} src={image.imageUrl} alt="게시글 첨부" className="w-full rounded" />
+                <img
+                  key={image.imageId}
+                  src={image.imageUrl}
+                  alt="게시글 첨부"
+                  className="w-full rounded"
+                />
               ))}
             </div>
           )}
 
           <div className="mt-4 flex items-center gap-3 text-[15px] text-[#9E9E9E]">
-            <p className="flex items-center gap-1"><img src={thumbs} alt="좋아요" /> {post.likeCount}</p>
-            <p className="flex items-center gap-1"><img src={eye} alt="조회수" /> {post.viewCount}</p>
-            <p className="flex items-center gap-1"><img src={message} alt="댓글" /> {commentCount}</p>
+            <p className="flex items-center gap-1">
+              <img src={thumbs} alt="좋아요" /> {post.likeCount}
+            </p>
+            <p className="flex items-center gap-1">
+              <img src={eye} alt="조회수" /> {post.viewCount}
+            </p>
+            <p className="flex items-center gap-1">
+              <img src={message} alt="댓글" /> {commentCount}
+            </p>
           </div>
         </section>
 
@@ -418,13 +517,28 @@ export default function CommunityDetail() {
             <input
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
-              placeholder={replyTarget ? `@${replyTarget.nickname} 님에게 답글 남기기` : '댓글 남기기'}
-              className="w-full text-[14px] text-[#424242] placeholder:text-[#B8B8B8] outline-none"
+              placeholder={
+                replyTarget
+                  ? `@${replyTarget.nickname} 님에게 답글 남기기`
+                  : '댓글 남기기'
+              }
+              className="w-full text-[14px] text-[#424242] outline-none placeholder:text-[#B8B8B8]"
             />
             {commentImagePreview && (
               <div className="mt-2 inline-flex items-center gap-2 rounded border border-[#E5E5E5] px-2 py-1">
-                <img src={commentImagePreview} alt="댓글 첨부" className="h-8 w-8 rounded object-cover" />
-                <button onClick={() => { if (commentImagePreview) URL.revokeObjectURL(commentImagePreview); setCommentImagePreview(''); setCommentImageFile(null); }}>
+                <img
+                  src={commentImagePreview}
+                  alt="댓글 첨부"
+                  className="h-8 w-8 rounded object-cover"
+                />
+                <button
+                  onClick={() => {
+                    if (commentImagePreview)
+                      URL.revokeObjectURL(commentImagePreview);
+                    setCommentImagePreview('');
+                    setCommentImageFile(null);
+                  }}
+                >
                   <img src={xIcon} alt="이미지 제거" className="h-3 w-3" />
                 </button>
               </div>
@@ -443,7 +557,11 @@ export default function CommunityDetail() {
                 <span className="text-[13px]">@</span>
               </button>
               <button onClick={handlePickCommentImage}>
-                <img src={cameraIcon} alt="사진" className="h-3.5 w-3.5 opacity-60" />
+                <img
+                  src={cameraIcon}
+                  alt="사진"
+                  className="h-3.5 w-3.5 opacity-60"
+                />
               </button>
               {replyTarget && (
                 <button
@@ -471,33 +589,228 @@ export default function CommunityDetail() {
             onChange={handleCommentImageChange}
           />
 
-          <div className="border-b border-[#EFEFEF] px-4 py-2 text-[13px] text-[#616161]">댓글 {commentCount}</div>
+          <div className="border-b border-[#EFEFEF] px-4 py-2 text-[13px] text-[#616161]">
+            댓글 {commentCount}
+          </div>
 
           {isLoadingComments ? (
-            <div className="px-4 py-5 text-[13px] text-[#B0B0B0]">댓글을 불러오는 중...</div>
+            <div className="px-4 py-5 text-[13px] text-[#B0B0B0]">
+              댓글을 불러오는 중...
+            </div>
           ) : comments.length > 0 ? (
-            <div>{comments.map((comment) => <CommentItem key={comment.id} comment={comment} onReply={setReplyTarget} />)}</div>
+            <div>
+              {comments.map((comment) => (
+                <CommentItem
+                  key={comment.id}
+                  comment={comment}
+                  onReply={setReplyTarget}
+                  onMore={openCommentMenu}
+                />
+              ))}
+            </div>
           ) : (
-            <div className="px-4 py-5 text-[13px] text-[#B0B0B0]">작성된 댓글이 없습니다.</div>
+            <div className="px-4 py-5 text-[13px] text-[#B0B0B0]">
+              작성된 댓글이 없습니다.
+            </div>
           )}
         </section>
       </div>
 
-      {isMenuOpen && (
-        <div className="absolute inset-0 z-50">
-          <button className="absolute inset-0 bg-black/50" onClick={() => setIsMenuOpen(false)} aria-label="메뉴 닫기" />
-          {isMyPost ? (
+      {isCommentMenuOpen && selectedComment && (
+        <div className="absolute inset-0 z-[80]">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => {
+              setIsCommentMenuOpen(false);
+              setSelectedComment(null);
+            }}
+            aria-label="댓글 메뉴 닫기"
+          />
+          {selectedComment.isMine ? (
             <div className="absolute right-0 bottom-0 left-0 px-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
               <div className="overflow-hidden rounded-[10px] bg-white">
-                <button className="w-full border-b border-[#EDEDED] py-3 text-[18px] font-medium text-[#F04438]" onClick={handleDeleteClick}>게시글 삭제</button>
-                <button className="w-full py-3 text-[18px] text-[#1E1E1E]" onClick={() => { setIsMenuOpen(false); navigate(`/index/community/${post.postId}/edit`); }}>수정</button>
+                <button
+                  className="w-full border-b border-[#EDEDED] py-3 text-[18px] font-medium text-[#F04438]"
+                  onClick={() => {
+                    setIsCommentMenuOpen(false);
+                    setIsCommentDeleteConfirmOpen(true);
+                  }}
+                >
+                  댓글 삭제
+                </button>
+                <button className="w-full py-3 text-[18px] text-[#1E1E1E]">
+                  댓글 수정
+                </button>
               </div>
-              <button className="mt-3 w-full rounded-[10px] bg-white py-3 text-[18px] text-[#1E1E1E]" onClick={() => setIsMenuOpen(false)}>취소</button>
+              <button
+                className="mt-3 w-full rounded-[10px] bg-white py-3 text-[18px] text-[#1E1E1E]"
+                onClick={() => {
+                  setIsCommentMenuOpen(false);
+                  setSelectedComment(null);
+                }}
+              >
+                취소
+              </button>
             </div>
           ) : (
             <div className="absolute top-1/2 left-1/2 w-[168px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[10px] bg-white">
-              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[15px] font-medium text-[#1E1E1E]">신고하기</p>
-              <button className="flex w-full items-center gap-2 px-4 py-3 text-[13px] text-[#616161]" onClick={() => setIsReportReasonOpen(true)}>
+              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[15px] font-medium text-[#1E1E1E]">
+                신고하기
+              </p>
+              <button
+                className="flex w-full items-center gap-2 px-4 py-3 text-[13px] text-[#616161]"
+                onClick={() => {
+                  setIsCommentMenuOpen(false);
+                  setIsCommentReportOpen(true);
+                }}
+              >
+                <span className="text-[12px]">⚑</span>
+                댓글 신고
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {isCommentDeleteConfirmOpen && (
+        <div className="absolute inset-0 z-[90] flex items-center justify-center">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsCommentDeleteConfirmOpen(false)}
+            aria-label="댓글 삭제 확인 닫기"
+          />
+          <div className="relative mx-6 w-full max-w-[320px] rounded-[14px] bg-white px-5 py-5 text-center">
+            <h2 className="text-[20px] font-semibold text-[#1E1E1E]">
+              댓글을 삭제할까요?
+            </h2>
+            <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">
+              삭제하면 다시 복구할 수 없어요.
+            </p>
+            <div className="mt-5 flex gap-2">
+              <button
+                className="flex-1 rounded-[999px] border border-[#E3E3E3] py-2 text-[15px] text-[#8A8A8A]"
+                onClick={() => setIsCommentDeleteConfirmOpen(false)}
+              >
+                취소
+              </button>
+              <button
+                className="flex-1 rounded-[999px] bg-[#FF2B2B] py-2 text-[15px] font-medium text-white"
+                disabled={isDeletingComment}
+                onClick={handleDeleteComment}
+              >
+                {isDeletingComment ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isCommentReportOpen && (
+        <div className="absolute inset-0 z-[95] flex items-center justify-center">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => {
+              setIsCommentReportOpen(false);
+              setSelectedCommentReportReason('');
+            }}
+            aria-label="댓글 신고 닫기"
+          />
+          <div className="relative mx-6 w-full max-w-[320px] rounded-[12px] bg-white p-4">
+            <h3 className="mb-3 text-[14px] font-medium text-[#1E1E1E]">
+              댓글 신고 이유를 알려주세요.
+            </h3>
+            <div className="space-y-1.5">
+              {reportReasons.map((reason) => (
+                <label
+                  key={reason}
+                  className="flex cursor-pointer items-center gap-2 text-[12px] text-[#424242]"
+                >
+                  <input
+                    type="radio"
+                    name="commentReportReason"
+                    checked={selectedCommentReportReason === reason}
+                    onChange={() => setSelectedCommentReportReason(reason)}
+                    className="h-3.5 w-3.5 accent-[#27BE69]"
+                  />
+                  {reason}
+                </label>
+              ))}
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button
+                className="flex-1 rounded-[6px] border border-[#E0E0E0] py-2 text-[13px] text-[#757575]"
+                onClick={() => {
+                  setIsCommentReportOpen(false);
+                  setSelectedCommentReportReason('');
+                }}
+              >
+                취소
+              </button>
+              <button
+                className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white"
+                onClick={() => {
+                  if (!selectedCommentReportReason) {
+                    toast('신고 사유를 선택해주세요', {
+                      position: 'bottom-center',
+                    });
+                    return;
+                  }
+                  setIsCommentReportOpen(false);
+                  setSelectedCommentReportReason('');
+                  toast('댓글 신고가 접수되었습니다.', {
+                    position: 'bottom-center',
+                  });
+                }}
+              >
+                제출
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isMenuOpen && (
+        <div className="absolute inset-0 z-50">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsMenuOpen(false)}
+            aria-label="메뉴 닫기"
+          />
+          {isMyPost ? (
+            <div className="absolute right-0 bottom-0 left-0 px-3 pb-[calc(12px+env(safe-area-inset-bottom))]">
+              <div className="overflow-hidden rounded-[10px] bg-white">
+                <button
+                  className="w-full border-b border-[#EDEDED] py-3 text-[18px] font-medium text-[#F04438]"
+                  onClick={handleDeleteClick}
+                >
+                  게시글 삭제
+                </button>
+                <button
+                  className="w-full py-3 text-[18px] text-[#1E1E1E]"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate(`/index/community/${post.postId}/edit`);
+                  }}
+                >
+                  수정
+                </button>
+              </div>
+              <button
+                className="mt-3 w-full rounded-[10px] bg-white py-3 text-[18px] text-[#1E1E1E]"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                취소
+              </button>
+            </div>
+          ) : (
+            <div className="absolute top-1/2 left-1/2 w-[168px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[10px] bg-white">
+              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[15px] font-medium text-[#1E1E1E]">
+                신고하기
+              </p>
+              <button
+                className="flex w-full items-center gap-2 px-4 py-3 text-[13px] text-[#616161]"
+                onClick={() => setIsReportReasonOpen(true)}
+              >
                 <span className="text-[12px]">⚑</span>
                 게시글 신고
               </button>
@@ -508,13 +821,32 @@ export default function CommunityDetail() {
 
       {isDeleteConfirmOpen && (
         <div className="absolute inset-0 z-[60] flex items-center justify-center">
-          <button className="absolute inset-0 bg-black/50" onClick={() => setIsDeleteConfirmOpen(false)} aria-label="삭제 확인 닫기" />
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsDeleteConfirmOpen(false)}
+            aria-label="삭제 확인 닫기"
+          />
           <div className="relative mx-6 w-full max-w-[320px] rounded-[14px] bg-white px-5 py-5 text-center">
-            <h2 className="text-[20px] font-semibold text-[#1E1E1E]">게시글을 삭제할까요?</h2>
-            <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">게시글을 삭제하면 모든 데이터가 삭제되고 다시 볼 수 없어요.</p>
+            <h2 className="text-[20px] font-semibold text-[#1E1E1E]">
+              게시글을 삭제할까요?
+            </h2>
+            <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">
+              게시글을 삭제하면 모든 데이터가 삭제되고 다시 볼 수 없어요.
+            </p>
             <div className="mt-5 flex gap-2">
-              <button className="flex-1 rounded-[999px] border border-[#E3E3E3] py-2 text-[15px] text-[#8A8A8A]" onClick={() => setIsDeleteConfirmOpen(false)}>취소</button>
-              <button className="flex-1 rounded-[999px] bg-[#FF2B2B] py-2 text-[15px] font-medium text-white" disabled={isDeleting} onClick={handleDeleteConfirm}>{isDeleting ? '삭제 중...' : '삭제'}</button>
+              <button
+                className="flex-1 rounded-[999px] border border-[#E3E3E3] py-2 text-[15px] text-[#8A8A8A]"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+              >
+                취소
+              </button>
+              <button
+                className="flex-1 rounded-[999px] bg-[#FF2B2B] py-2 text-[15px] font-medium text-white"
+                disabled={isDeleting}
+                onClick={handleDeleteConfirm}
+              >
+                {isDeleting ? '삭제 중...' : '삭제'}
+              </button>
             </div>
           </div>
         </div>
@@ -522,20 +854,51 @@ export default function CommunityDetail() {
 
       {isReportReasonOpen && (
         <div className="absolute inset-0 z-[70] flex items-center justify-center">
-          <button className="absolute inset-0 bg-black/50" onClick={() => { setIsReportReasonOpen(false); setIsMenuOpen(false); }} aria-label="신고 사유 닫기" />
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => {
+              setIsReportReasonOpen(false);
+              setIsMenuOpen(false);
+            }}
+            aria-label="신고 사유 닫기"
+          />
           <div className="relative mx-6 w-full max-w-[320px] rounded-[12px] bg-white p-4">
-            <h3 className="mb-3 text-[14px] font-medium text-[#1E1E1E]">게시글 신고 이유를 알려주세요.</h3>
+            <h3 className="mb-3 text-[14px] font-medium text-[#1E1E1E]">
+              게시글 신고 이유를 알려주세요.
+            </h3>
             <div className="space-y-1.5">
               {reportReasons.map((reason) => (
-                <label key={reason} className="flex cursor-pointer items-center gap-2 text-[12px] text-[#424242]">
-                  <input type="radio" name="reportReason" checked={selectedReportReason === reason} onChange={() => setSelectedReportReason(reason)} className="h-3.5 w-3.5 accent-[#27BE69]" />
+                <label
+                  key={reason}
+                  className="flex cursor-pointer items-center gap-2 text-[12px] text-[#424242]"
+                >
+                  <input
+                    type="radio"
+                    name="reportReason"
+                    checked={selectedReportReason === reason}
+                    onChange={() => setSelectedReportReason(reason)}
+                    className="h-3.5 w-3.5 accent-[#27BE69]"
+                  />
                   {reason}
                 </label>
               ))}
             </div>
             <div className="mt-4 flex gap-2">
-              <button className="flex-1 rounded-[6px] border border-[#E0E0E0] py-2 text-[13px] text-[#757575]" onClick={() => { setIsReportReasonOpen(false); setIsMenuOpen(false); }}>취소</button>
-              <button className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white" onClick={handleSubmitReport}>제출</button>
+              <button
+                className="flex-1 rounded-[6px] border border-[#E0E0E0] py-2 text-[13px] text-[#757575]"
+                onClick={() => {
+                  setIsReportReasonOpen(false);
+                  setIsMenuOpen(false);
+                }}
+              >
+                취소
+              </button>
+              <button
+                className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white"
+                onClick={handleSubmitReport}
+              >
+                제출
+              </button>
             </div>
           </div>
         </div>
