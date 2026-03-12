@@ -92,7 +92,11 @@ export default function GoogleCallback() {
             at: Date.now(),
           })
         );
-        navigate(withDebugQuery('/index/auth/signupcomplete'));
+        navigate(
+          withDebugQuery(
+            isNewUser ? '/index/auth/signupcomplete' : '/index/home'
+          )
+        );
       } catch (e) {
         console.error('구글 로그인 실패', e);
         if (isConnectMode) {

@@ -4,6 +4,7 @@ import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
 import api from '@/apis/api.jsx';
+import { uploadImagesWithPresign } from '@/apis/files/presignedUpload.js';
 
 export default function ContentForm({
   mode = 'create',
@@ -94,40 +95,19 @@ export default function ContentForm({
      presigned URL 발급 + S3 업로드
   ========================= */
   const uploadFilesWithPresign = async (files, usage = 'NOTICE_FILE') => {
-    if (!files.length) return [];
-
-    const imageFiles = files.filter((f) => f.type.startsWith('image/'));
-    if (!imageFiles.length) {
+    if (!Array.isArray(files) || files.length === 0) return [];
+    if (!files.some((file) => file?.type?.startsWith('image/'))) {
       alert('이미지 파일만 업로드할 수 있습니다.');
       return [];
     }
 
-    const presignRes = await api.post(
-      '/app/image/presign',
-      {
-        files: imageFiles.map((file, index) => ({
-          usage,
-          filename: file.name,
-          contentType: file.type,
-          order: index + 1,
-        })),
-      },
-      { authType: 'admin' }
-    );
-
-    const uploadedFiles = presignRes.data.data.uploadedFiles;
-
-    await Promise.all(
-      uploadedFiles.map((fileInfo, index) =>
-        fetch(fileInfo.preSignedUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': imageFiles[index].type },
-          body: imageFiles[index],
-        })
-      )
-    );
-
-    return uploadedFiles.map((f) => f.imageUrl);
+    try {
+      return await uploadImagesWithPresign(files, { usage, authType: 'admin' });
+    } catch (error) {
+      console.error('이미지 업로드 실패', error);
+      alert('이미지 업로드에 실패했습니다.');
+      return [];
+    }
   };
 
   /* =========================

@@ -396,7 +396,13 @@ const router = createBrowserRouter([
   { path: '/auth/naver/callback', element: <NaverCallback /> },
   {
     path: '*',
-    element: <NotFoundPage />,
+    element: (
+      <LayoutShell banner={<ServiceBanner />}>
+        <MainLayout title="펫뷸런스">
+          <NotFoundPage />
+        </MainLayout>
+      </LayoutShell>
+    ),
   },
 ]);
 

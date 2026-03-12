@@ -5,10 +5,9 @@ import arrow from '@/assets/images/icons/arrow_header.svg';
 import Bell from '@/assets/images/icons/bell.svg';
 import Search from '@/assets/images/icons/community_search.svg';
 
-export function CommunityHeader() {
+export function CommunityHeader({ selectedType, onSelectType }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState('전체');
   const dropdownRef = useRef(null);
   const animalTypes = [
     '전체',
@@ -49,7 +48,7 @@ export function CommunityHeader() {
               <button
                 key={type}
                 onClick={() => {
-                  setSelectedType(type);
+                  onSelectType(type);
                   setIsOpen(false);
                 }}
                 className={`block w-full rounded-[6px] px-2 py-2 text-left text-[19px] text-[#424242] ${

@@ -85,7 +85,11 @@ export default function KakaoCallback() {
             at: Date.now(),
           })
         );
-        navigate(withDebugQuery('/index/auth/signupcomplete'));
+        navigate(
+          withDebugQuery(
+            isNewUser ? '/index/auth/signupcomplete' : '/index/home'
+          )
+        );
       } catch (e) {
         console.error('카카오 로그인 실패', e);
         if (isConnectMode) {

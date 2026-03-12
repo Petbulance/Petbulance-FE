@@ -95,7 +95,11 @@ export default function NaverCallback() {
         );
         localStorage.removeItem('com.naver.nid.access_token');
         localStorage.removeItem('com.naver.nid.oauth.state_token');
-        navigate(withDebugQuery('/index/auth/signupcomplete'));
+        navigate(
+          withDebugQuery(
+            isNewUser ? '/index/auth/signupcomplete' : '/index/home'
+          )
+        );
       } catch (e) {
         console.error('서버 로그인 실패', e);
         if (isConnectMode) {
