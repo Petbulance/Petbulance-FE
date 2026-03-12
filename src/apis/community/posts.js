@@ -125,7 +125,30 @@ export async function deletePostComment(commentId) {
   return response.data?.data ?? {};
 }
 
+export async function updatePostComment(commentId, payload) {
+  const response = await api.patch(`/comments/${commentId}`, payload);
+  return response.data?.data ?? {};
+}
+
 export async function uploadCommentImages(imageFiles = []) {
   const urls = await uploadImagesWithPresign(imageFiles, { usage: 'COMMENT' });
   return urls;
+}
+
+export async function createContentReport({
+  reportType,
+  reportReason,
+  postId = null,
+  commentId = null,
+  reviewId = null,
+}) {
+  const response = await api.post('/reports', {
+    reportType,
+    reportReason,
+    postId,
+    commentId,
+    reviewId,
+  });
+
+  return response.data?.data ?? {};
 }

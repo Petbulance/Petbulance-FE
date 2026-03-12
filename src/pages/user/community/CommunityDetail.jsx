@@ -3,11 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import {
+  createContentReport,
   createPostComment,
   deletePostComment,
   deleteCommunityPosts,
   fetchCommunityPostDetail,
   fetchPostComments,
+  updatePostComment,
   uploadCommentImages,
 } from '@/apis/community/posts';
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
@@ -109,6 +111,7 @@ const normalizeComment = (comment = {}) => {
     time: comment.createdAt || '',
     text: comment.content || '',
     image: comment.imageUrl || null,
+    isSecret: Boolean(comment.secret ?? comment.isSecret),
     isMine: isMineByFlag,
     depth:
       typeof comment.depth === 'number'
@@ -118,6 +121,9 @@ const normalizeComment = (comment = {}) => {
           : 0,
   };
 };
+
+const isBlobUrl = (value) =>
+  typeof value === 'string' && value.startsWith('blob:');
 
 export default function CommunityDetail() {
   const navigate = useNavigate();
@@ -144,6 +150,9 @@ export default function CommunityDetail() {
   const [isCommentReportOpen, setIsCommentReportOpen] = useState(false);
   const [selectedCommentReportReason, setSelectedCommentReportReason] =
     useState('');
+  const [isSubmittingPostReport, setIsSubmittingPostReport] = useState(false);
+  const [isSubmittingCommentReport, setIsSubmittingCommentReport] =
+    useState(false);
 
   const [commentInput, setCommentInput] = useState('');
   const [isSecretComment, setIsSecretComment] = useState(false);
@@ -151,6 +160,7 @@ export default function CommunityDetail() {
   const [commentImageFile, setCommentImageFile] = useState(null);
   const [commentImagePreview, setCommentImagePreview] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [editingComment, setEditingComment] = useState(null);
 
   const reportReasons = [
     '욕설/비방/선정적',
@@ -222,7 +232,9 @@ export default function CommunityDetail() {
 
   useEffect(() => {
     return () => {
-      if (commentImagePreview) URL.revokeObjectURL(commentImagePreview);
+      if (isBlobUrl(commentImagePreview)) {
+        URL.revokeObjectURL(commentImagePreview);
+      }
     };
   }, [commentImagePreview]);
 
@@ -243,7 +255,6 @@ export default function CommunityDetail() {
   }
 
   const isMyPost = Boolean(post.isCurrentUserPost);
-  const reportStorageKey = `community-reported-${post.postId}`;
   const postImages = Array.isArray(post.images)
     ? [...post.images].sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0))
     : [];
@@ -252,7 +263,6 @@ export default function CommunityDetail() {
       ? post.writerProfileUrl
       : `/${String(post.writerProfileUrl).replace(/^\/+/, '')}`
     : defaultProfile;
-  const isAlreadyReported = localStorage.getItem(reportStorageKey) === '1';
   const commentCount =
     comments.length > 0 ? comments.length : (post.commentCount ?? 0);
 
@@ -295,25 +305,52 @@ export default function CommunityDetail() {
     }
   };
 
-  const handleSubmitReport = () => {
+  const handleSubmitReport = async () => {
     if (!selectedReportReason) {
       toast('신고 사유를 선택해주세요', { position: 'bottom-center' });
       return;
     }
 
-    setIsReportReasonOpen(false);
-    setIsMenuOpen(false);
-    setSelectedReportReason('');
-
-    if (isAlreadyReported) {
-      toast('이미 신고 접수된 게시글입니다', { position: 'bottom-center' });
+    if (isSubmittingPostReport) {
       return;
     }
 
-    localStorage.setItem(reportStorageKey, '1');
-    toast('[게시글 신고 완료] 운영자 검토 후 조치 예정입니다', {
-      position: 'bottom-center',
-    });
+    setIsSubmittingPostReport(true);
+    try {
+      await createContentReport({
+        reportType: 'POST',
+        reportReason: selectedReportReason,
+        postId: post.postId,
+        commentId: null,
+        reviewId: null,
+      });
+
+      setIsReportReasonOpen(false);
+      setIsMenuOpen(false);
+      setSelectedReportReason('');
+      toast('신고가 정상적으로 접수되었습니다.', {
+        position: 'bottom-center',
+      });
+    } catch (error) {
+      const errorClass = error?.response?.data?.data?.errorClassName;
+      const message = error?.response?.data?.data?.message;
+
+      if (errorClass === 'POST_NOT_FOUND') {
+        toast('요청하신 게시글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'ALREADY_REPORTED') {
+        toast('이미 접수된 신고입니다.', { position: 'bottom-center' });
+      } else if (errorClass === 'ALREADY_COMPLETED') {
+        toast('이미 처리 완료된 신고입니다.', { position: 'bottom-center' });
+      } else {
+        toast(message || '신고 접수에 실패했습니다.', {
+          position: 'bottom-center',
+        });
+      }
+    } finally {
+      setIsSubmittingPostReport(false);
+    }
   };
 
   const handlePickCommentImage = () => {
@@ -335,7 +372,9 @@ export default function CommunityDetail() {
       return;
     }
 
-    if (commentImagePreview) URL.revokeObjectURL(commentImagePreview);
+    if (isBlobUrl(commentImagePreview)) {
+      URL.revokeObjectURL(commentImagePreview);
+    }
     setCommentImageFile(file);
     setCommentImagePreview(URL.createObjectURL(file));
   };
@@ -345,10 +384,16 @@ export default function CommunityDetail() {
     setReplyTarget(null);
     setIsSecretComment(false);
     setCommentImageFile(null);
-    if (commentImagePreview) {
+    setEditingComment(null);
+    if (isBlobUrl(commentImagePreview)) {
       URL.revokeObjectURL(commentImagePreview);
-      setCommentImagePreview('');
     }
+    setCommentImagePreview('');
+  };
+
+  const handleReplyClick = (targetComment) => {
+    clearCommentInput();
+    setReplyTarget(targetComment);
   };
 
   const handleSubmitComment = async () => {
@@ -357,24 +402,35 @@ export default function CommunityDetail() {
 
     setIsSubmittingComment(true);
     try {
-      let imageUrl = null;
+      let imageUrl = commentImagePreview || null;
       if (commentImageFile) {
         const uploadedUrls = await uploadCommentImages([commentImageFile]);
         imageUrl = uploadedUrls[0] ?? null;
       }
 
-      const payload = {
-        content,
-        parentId: replyTarget?.id ?? null,
-        mentionUserNickname: replyTarget?.nickname ?? null,
-        imageUrl,
-        isSecret: isSecretComment,
-      };
+      if (editingComment?.id) {
+        await updatePostComment(editingComment.id, {
+          content,
+          imageUrl: imageUrl,
+          isSecret: isSecretComment,
+        });
+      } else {
+        const payload = {
+          content,
+          parentId: replyTarget?.id ?? null,
+          mentionUserNickname: replyTarget?.nickname ?? null,
+          imageUrl,
+          isSecret: isSecretComment,
+        };
 
-      await createPostComment(post.postId, payload);
+        await createPostComment(post.postId, payload);
+      }
+
       clearCommentInput();
       await loadComments(post.postId);
-      toast('댓글을 등록했어요.', { position: 'bottom-center' });
+      toast(editingComment?.id ? '댓글을 수정했어요.' : '댓글을 등록했어요.', {
+        position: 'bottom-center',
+      });
     } catch (error) {
       const errorClass = error?.response?.data?.data?.errorClassName;
       const message = error?.response?.data?.data?.message;
@@ -395,28 +451,119 @@ export default function CommunityDetail() {
         toast('요청하신 게시글을 찾을 수 없습니다.', {
           position: 'bottom-center',
         });
-      } else {
-        toast(message || '댓글 등록에 실패했습니다.', {
+      } else if (errorClass === 'COMMENT_NOT_FOUND') {
+        toast('요청하신 댓글을 찾을 수 없습니다.', {
           position: 'bottom-center',
         });
+      } else if (errorClass === 'FORBIDDEN_COMMENT_ACCESS') {
+        toast('댓글에 대한 권한이 존재하지 않습니다.', {
+          position: 'bottom-center',
+        });
+      } else {
+        toast(
+          message ||
+            (editingComment?.id
+              ? '댓글 수정에 실패했습니다.'
+              : '댓글 등록에 실패했습니다.'),
+          {
+            position: 'bottom-center',
+          }
+        );
       }
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
+  const startEditComment = (comment) => {
+    if (!comment?.id) return;
+
+    if (isBlobUrl(commentImagePreview)) {
+      URL.revokeObjectURL(commentImagePreview);
+    }
+
+    setIsCommentMenuOpen(false);
+    setSelectedComment(null);
+    setReplyTarget(null);
+    setEditingComment(comment);
+    setCommentInput(comment.text || '');
+    setIsSecretComment(Boolean(comment.isSecret));
+    setCommentImageFile(null);
+    setCommentImagePreview(comment.image || '');
+  };
+
   const handleDeleteComment = async () => {
     if (!selectedComment?.id || isDeletingComment) return;
 
+    const deletedComment = selectedComment;
     setIsDeletingComment(true);
     try {
-      await deletePostComment(selectedComment.id);
+      await deletePostComment(deletedComment.id);
       setIsCommentDeleteConfirmOpen(false);
       setIsCommentMenuOpen(false);
       setSelectedComment(null);
       await loadComments(post.postId);
-      toast('댓글이 성공적으로 삭제되었습니다.', {
+      toast('댓글을 삭제했어요', {
         position: 'bottom-center',
+        duration: 4000,
+        style: {
+          width: '100%',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          background: '#222222E5',
+          color: '#ffffff',
+        },
+        action: {
+          label: '취소',
+          onClick: async () => {
+            try {
+              const basePayload = {
+                content: deletedComment.text || '',
+                imageUrl: deletedComment.image ?? null,
+                isSecret: false,
+              };
+
+              try {
+                await createPostComment(post.postId, {
+                  ...basePayload,
+                  parentId: deletedComment.parentId ?? null,
+                  mentionUserNickname: null,
+                });
+              } catch (firstRestoreError) {
+                const firstErrorClass =
+                  firstRestoreError?.response?.data?.data?.errorClassName;
+
+                if (firstErrorClass !== 'INVALID_INPUT_RELATION') {
+                  throw firstRestoreError;
+                }
+
+                // 답글 관계 복구가 불가능한 경우 일반 댓글로 복구
+                await createPostComment(post.postId, {
+                  ...basePayload,
+                  parentId: null,
+                  mentionUserNickname: null,
+                });
+              }
+              await loadComments(post.postId);
+              toast('댓글을 복구했어요.', {
+                position: 'bottom-center',
+              });
+            } catch (restoreError) {
+              const restoreMessage =
+                restoreError?.response?.data?.data?.message ||
+                '댓글 복구에 실패했습니다.';
+              toast(restoreMessage, { position: 'bottom-center' });
+            }
+          },
+        },
+        actionButtonStyle: {
+          background: 'transparent',
+          border: 'none',
+          color: '#ffffff',
+          padding: 0,
+          cursor: 'pointer',
+        },
       });
     } catch (error) {
       const errorClass = error?.response?.data?.data?.errorClassName;
@@ -439,7 +586,54 @@ export default function CommunityDetail() {
       setIsDeletingComment(false);
     }
   };
-  console.log('셀렉트 댓글', selectedComment);
+
+  const handleSubmitCommentReport = async () => {
+    if (!selectedCommentReportReason) {
+      toast('신고 사유를 선택해주세요', {
+        position: 'bottom-center',
+      });
+      return;
+    }
+
+    if (!selectedComment?.id || isSubmittingCommentReport) return;
+
+    setIsSubmittingCommentReport(true);
+    try {
+      await createContentReport({
+        reportType: 'COMMENT',
+        reportReason: selectedCommentReportReason,
+        postId: null,
+        commentId: selectedComment.id,
+        reviewId: null,
+      });
+
+      setIsCommentReportOpen(false);
+      setSelectedCommentReportReason('');
+      setSelectedComment(null);
+      toast('신고가 정상적으로 접수되었습니다.', {
+        position: 'bottom-center',
+      });
+    } catch (error) {
+      const errorClass = error?.response?.data?.data?.errorClassName;
+      const message = error?.response?.data?.data?.message;
+
+      if (errorClass === 'COMMENT_NOT_FOUND') {
+        toast('요청하신 댓글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'ALREADY_REPORTED') {
+        toast('이미 접수된 신고입니다.', { position: 'bottom-center' });
+      } else if (errorClass === 'ALREADY_COMPLETED') {
+        toast('이미 처리 완료된 신고입니다.', { position: 'bottom-center' });
+      } else {
+        toast(message || '신고 접수에 실패했습니다.', {
+          position: 'bottom-center',
+        });
+      }
+    } finally {
+      setIsSubmittingCommentReport(false);
+    }
+  };
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#F2F4F6]">
       <header className="sticky top-0 z-10 flex h-[48px] items-center justify-between border-b border-[#E0E0E0] bg-white px-5">
@@ -518,9 +712,11 @@ export default function CommunityDetail() {
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
               placeholder={
-                replyTarget
-                  ? `@${replyTarget.nickname} 님에게 답글 남기기`
-                  : '댓글 남기기'
+                editingComment
+                  ? '댓글 수정하기'
+                  : replyTarget
+                    ? `@${replyTarget.nickname} 님에게 답글 남기기`
+                    : '댓글 남기기'
               }
               className="w-full text-[14px] text-[#424242] outline-none placeholder:text-[#B8B8B8]"
             />
@@ -533,7 +729,7 @@ export default function CommunityDetail() {
                 />
                 <button
                   onClick={() => {
-                    if (commentImagePreview)
+                    if (isBlobUrl(commentImagePreview))
                       URL.revokeObjectURL(commentImagePreview);
                     setCommentImagePreview('');
                     setCommentImageFile(null);
@@ -571,13 +767,27 @@ export default function CommunityDetail() {
                   답글취소
                 </button>
               )}
+              {editingComment && (
+                <button
+                  className="text-[11px] text-[#27BE69]"
+                  onClick={clearCommentInput}
+                >
+                  수정취소
+                </button>
+              )}
             </div>
             <button
               className="rounded bg-[#EFEFEF] px-3 py-1 text-[12px] text-[#8F8F8F] disabled:opacity-60"
               disabled={!commentInput.trim() || isSubmittingComment}
               onClick={handleSubmitComment}
             >
-              {isSubmittingComment ? '등록중' : '등록'}
+              {isSubmittingComment
+                ? editingComment
+                  ? '수정중'
+                  : '등록중'
+                : editingComment
+                  ? '수정'
+                  : '등록'}
             </button>
           </div>
 
@@ -603,7 +813,7 @@ export default function CommunityDetail() {
                 <CommentItem
                   key={comment.id}
                   comment={comment}
-                  onReply={setReplyTarget}
+                  onReply={handleReplyClick}
                   onMore={openCommentMenu}
                 />
               ))}
@@ -638,7 +848,10 @@ export default function CommunityDetail() {
                 >
                   댓글 삭제
                 </button>
-                <button className="w-full py-3 text-[18px] text-[#1E1E1E]">
+                <button
+                  className="w-full py-3 text-[18px] text-[#1E1E1E]"
+                  onClick={() => startEditComment(selectedComment)}
+                >
                   댓글 수정
                 </button>
               </div>
@@ -684,7 +897,7 @@ export default function CommunityDetail() {
               댓글을 삭제할까요?
             </h2>
             <p className="mt-3 text-[14px] leading-5 text-[#8A8A8A]">
-              삭제하면 다시 복구할 수 없어요.
+              삭제 후 하단 알림에서 취소를 누르면 복구할 수 있어요.
             </p>
             <div className="mt-5 flex gap-2">
               <button
@@ -748,21 +961,10 @@ export default function CommunityDetail() {
               </button>
               <button
                 className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white"
-                onClick={() => {
-                  if (!selectedCommentReportReason) {
-                    toast('신고 사유를 선택해주세요', {
-                      position: 'bottom-center',
-                    });
-                    return;
-                  }
-                  setIsCommentReportOpen(false);
-                  setSelectedCommentReportReason('');
-                  toast('댓글 신고가 접수되었습니다.', {
-                    position: 'bottom-center',
-                  });
-                }}
+                disabled={isSubmittingCommentReport}
+                onClick={handleSubmitCommentReport}
               >
-                제출
+                {isSubmittingCommentReport ? '제출 중...' : '제출'}
               </button>
             </div>
           </div>
@@ -895,9 +1097,10 @@ export default function CommunityDetail() {
               </button>
               <button
                 className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white"
+                disabled={isSubmittingPostReport}
                 onClick={handleSubmitReport}
               >
-                제출
+                {isSubmittingPostReport ? '제출 중...' : '제출'}
               </button>
             </div>
           </div>
