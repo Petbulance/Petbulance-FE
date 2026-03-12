@@ -43,11 +43,10 @@ jobs:
 
       # 6. EC2 배포 후 명령 실행
       - name: Run Remote Deploy Command
-        if: ${{ secrets.EC2_DEPLOY_CMD }}
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT || 22 }}
+          port: 22
           script: ${{ secrets.EC2_DEPLOY_CMD }}
