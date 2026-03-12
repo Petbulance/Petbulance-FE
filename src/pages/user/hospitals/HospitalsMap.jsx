@@ -30,12 +30,12 @@ export default function HospitalsMap() {
     isSortOpen,
     setIsSortOpen,
     handleSortChange,
-    handleToggleOpen,
     handleApplyFilter,
     closeSheet,
   } = useHospitalFilter();
 
   const [selectedHospital, setSelectedHospital] = useState(null);
+  const [searchTrigger, setSearchTrigger] = useState(0);
 
   const [myLocation, setMyLocation] = useState({
     lat: null,
@@ -44,6 +44,11 @@ export default function HospitalsMap() {
   });
 
   const isListOpen = searchParams.get('view') === 'list';
+
+  const handleToggleOpen = () => {
+    setFilterState((prev) => ({ ...prev, isOpen: !prev.isOpen }));
+    setSearchTrigger((prev) => prev + 1);
+  };
 
   const openList = () => {
     window.dataLayer = window.dataLayer || [];
@@ -116,6 +121,7 @@ export default function HospitalsMap() {
         setSelectedHospital={setSelectedHospital}
         filterState={filterState}
         setFilterState={setFilterState}
+        searchTrigger={searchTrigger}
       />
 
       {!isListOpen && (
