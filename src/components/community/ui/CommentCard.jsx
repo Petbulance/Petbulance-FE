@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 function renderHighlightedText(text, keyword) {
   const normalizedKeyword = keyword?.trim();
   if (!normalizedKeyword) {
@@ -23,10 +25,15 @@ function renderHighlightedText(text, keyword) {
 }
 
 export function CommentCard({ comment, keyword }) {
+  const navigate = useNavigate();
+
   return (
-    <article className="border-b border-[#EEEEEE] px-6 py-3">
+    <article
+      className="border-b border-[#EEEEEE] px-6 py-3"
+      onClick={() => navigate(`/index/community/${comment.postId}`)}
+    >
       <div className="flex gap-2">
-        {comment.hasImage && (
+        {comment.img && (
           <div className="h-10 w-10 shrink-0 rounded-[3.59px] bg-[#F0F0F0]" />
         )}
 
