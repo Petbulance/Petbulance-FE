@@ -16,8 +16,8 @@ const MENUS = [
   {
     label: '커뮤니티',
     icon: Group,
-    path: '/index/community-tab',
-    activePaths: ['/index/community', '/index/community-tab'],
+    path: '/index/community',
+    activePaths: ['/index/community', '/index/community'],
   },
   { label: 'My', icon: OverflowMenuHorizontal, path: '/index/mypage' },
 ];
