@@ -34,7 +34,8 @@ export default function PopularPostList() {
         if (!mounted) return;
         const serverMessage = error?.response?.data?.data?.message;
         setErrorMessage(
-          serverMessage || '인기 게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+          serverMessage ||
+            '인기 게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
         );
       } finally {
         if (mounted) setLoading(false);
