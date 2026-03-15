@@ -427,7 +427,10 @@ export default function CommunityDetail() {
 
   const handleSubmitReport = async () => {
     if (!selectedReportReason) {
-      toast('신고 사유를 선택해주세요', { position: 'bottom-center' });
+      toast('신고 사유를 선택해주세요', {
+        position: 'bottom-center',
+        style: blackToastStyle,
+      });
       return;
     }
 
@@ -450,6 +453,7 @@ export default function CommunityDetail() {
       setSelectedReportReason('');
       toast('[게시글 신고 완료] 운영자 검토 후 조치 예정입니다.', {
         position: 'bottom-center',
+        style: blackToastStyle,
       });
     } catch (error) {
       const errorClass = error?.response?.data?.data?.errorClassName;
@@ -458,14 +462,22 @@ export default function CommunityDetail() {
       if (errorClass === 'POST_NOT_FOUND') {
         toast('요청하신 게시글을 찾을 수 없습니다.', {
           position: 'bottom-center',
+          style: blackToastStyle,
         });
       } else if (errorClass === 'ALREADY_REPORTED') {
-        toast('이미 신고한 게시글입니다.', { position: 'bottom-center' });
+        toast('이미 신고한 게시글입니다.', {
+          position: 'bottom-center',
+          style: blackToastStyle,
+        });
       } else if (errorClass === 'ALREADY_COMPLETED') {
-        toast('이미 처리 완료된 신고입니다.', { position: 'bottom-center' });
+        toast('이미 처리 완료된 신고입니다.', {
+          position: 'bottom-center',
+          style: blackToastStyle,
+        });
       } else {
         toast(message || '신고 접수에 실패했습니다.', {
           position: 'bottom-center',
+          style: blackToastStyle,
         });
       }
     } finally {
