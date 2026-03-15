@@ -1,89 +1,109 @@
-import { ChevronRight, Star } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import soon from '@/assets/images/pageImages/soon.png';
+import { fetchCommunityPosts } from '@/apis/community/posts';
+import Spinner from '@/components/commons/Spinner.jsx';
+
 export default function PopularPostList() {
-  /* =============================
-     🔽 기존 인기 게시글 리스트 (보존)
-  ============================== */
-  /*
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadPopularPosts = async () => {
+      setLoading(true);
+      setErrorMessage('');
+
+      try {
+        const data = await fetchCommunityPosts({
+          type: null,
+          topic: null,
+          sort: 'popular',
+          lastPostId: null,
+          pageSize: 4,
+        });
+
+        if (!mounted) return;
+        const list = Array.isArray(data.content) ? data.content : [];
+        setPosts(list.slice(0, 4));
+      } catch (error) {
+        if (!mounted) return;
+        const serverMessage = error?.response?.data?.data?.message;
+        setErrorMessage(
+          serverMessage || '인기 게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+        );
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    loadPopularPosts();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <section>
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-[19px] font-semibold">인기 게시글</h2>
-         <button className="">
-          <ChevronRight size={20} />{' '}
-        </button>
-      </div>
-
-      <div className="space-y-3">
-        {POPULAR_POSTS.slice(0, 5).map((post) => (
-          <div
-            key={post.id}
-            className="flex items-center justify-between rounded-xl bg-gray-100 px-4 py-3"
-          >
-            <div className="flex flex-col gap-1">
-              <p className="line-clamp-1 text-[15px] font-medium">
-                {post.title}
-              </p>
-
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span>{post.animalCategory}</span>
-                <span>·</span>
-                <span>{post.postCategory}</span>
-                <span>·</span>
-                <span>{post.createdAt}</span>
-                <span>·</span>
-                <span>조회 {post.viewCount}</span>
-              </div>
-            </div>
-
-            <div className="flex h-[56px] w-[56px] flex-col items-center justify-center rounded-[12px] bg-white">
-              <span className="text-success text-[19px] font-semibold">
-                {post.commentCount}
-              </span>
-              <span className="text-[14px] text-gray-400">댓글</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-  */
-
-  /* =============================
-     ✅ Coming Soon 레이아웃
-  ============================== */
-  return (
-    <section>
-      {/* 헤더 */}
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-[19px] font-semibold">커뮤니티 인기 게시글</h2>
-        <button className="">
-          <ChevronRight size={20} />{' '}
+        <button onClick={() => navigate('/index/community')}>
+          <ChevronRight size={20} />
         </button>
       </div>
 
-      {/* Coming Soon 카드 */}
-      <div className="rounded-xl bg-[#F7F7F7] px-4 py-10">
-        <div className="flex flex-col items-center text-center">
-          {/* ⏳ 아이콘 영역 */}
-          <div className="mb-4 flex items-center justify-center">
-            {/* 👉 여기 src만 채우면 됨 */}
-            <img src={soon} alt="coming-soon" className="h-[64px] w-[64px]" />
-          </div>
-
-          {/* 텍스트 */}
-          <p className="text-[18px] font-semibold text-[#1e1e1e]">
-            Coming Soon
-          </p>
-
-          <p className="mt-2 text-[14px] leading-relaxed text-[#9E9E9E]">
-            커뮤니티 기능 준비중이에요!
-            <br />
-            빠른 시일 내에 찾아뵐게요.
-          </p>
+      {loading && (
+        <div className="flex justify-center py-6">
+          <Spinner />
         </div>
-      </div>
+      )}
+
+      {!loading && errorMessage && (
+        <p className="rounded-xl bg-[#F7F7F7] px-4 py-6 text-center text-[14px] text-[#757575]">
+          {errorMessage}
+        </p>
+      )}
+
+      {!loading && !errorMessage && posts.length === 0 && (
+        <p className="rounded-xl bg-[#F7F7F7] px-4 py-6 text-center text-[14px] text-[#9E9E9E]">
+          인기 게시글이 아직 없어요.
+        </p>
+      )}
+
+      {!loading && !errorMessage && posts.length > 0 && (
+        <div className="space-y-2">
+          {posts.map((post) => {
+            const postId = post.postId ?? post.id;
+            const typeLabel = post.type ?? post.boardName ?? '-';
+            const topicLabel = post.topic ?? post.category ?? '-';
+            const likeCount = post.likeCount ?? 0;
+            const commentCount = post.commentCount ?? 0;
+
+            return (
+              <button
+                key={postId}
+                className="w-full rounded-xl bg-[#F7F7F7] px-4 py-3 text-left"
+                onClick={() => navigate(`/index/community/${postId}`)}
+              >
+                <p className="line-clamp-1 text-[15px] font-medium text-[#1E1E1E]">
+                  {post.title}
+                </p>
+                <p className="mt-1 line-clamp-1 text-[13px] text-[#757575]">
+                  {typeLabel} · {topicLabel} · {post.createdAt}
+                </p>
+                <p className="mt-2 text-[12px] text-[#9E9E9E]">
+                  좋아요 {likeCount} · 댓글 {commentCount}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
