@@ -1,5 +1,5 @@
-import { AtSign, Camera, Heart, Lock, LockOpen } from 'lucide-react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { Heart, Lock } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -21,7 +21,7 @@ import leftArrow from '@/assets/images/icons/left_arrow.svg';
 import message from '@/assets/images/icons/message.svg';
 import seeMore from '@/assets/images/icons/see_more.svg';
 import shareIcon from '@/assets/images/icons/share_icon.svg';
-import xIcon from '@/assets/images/icons/x_icon.svg';
+import { CommunityCommentComposer } from '@/components/community/ui/CommunityCommentComposer';
 
 function CommentText({ text }) {
   const tokens = String(text || '').split(/(@[^\s]+)/g);
@@ -182,9 +182,6 @@ export default function CommunityDetail() {
   const [commentImagePreview, setCommentImagePreview] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [editingComment, setEditingComment] = useState(null);
-  const commentImageInputId = useId();
-  const commentInputRef = useRef(null);
-  const commentImageInputRef = useRef(null);
 
   const reportReasons = [
     '욕설/비방/선정적',
@@ -380,49 +377,6 @@ export default function CommunityDetail() {
   const openCommentMenu = (comment) => {
     setSelectedComment(comment);
     setIsCommentMenuOpen(true);
-  };
-
-  const handlePickCommentImage = () => {
-    commentImageInputRef.current?.click();
-  };
-
-  const handleInsertMention = () => {
-    const input = commentInputRef.current;
-    const mentionText = replyTarget?.nickname ? `@${replyTarget.nickname} ` : '@';
-
-    if (!input) {
-      setCommentInput((prev) => `${prev}${mentionText}`);
-      return;
-    }
-
-    const start = input.selectionStart ?? commentInput.length;
-    const end = input.selectionEnd ?? start;
-    const nextValue =
-      commentInput.slice(0, start) + mentionText + commentInput.slice(end);
-    setCommentInput(nextValue);
-
-    requestAnimationFrame(() => {
-      input.focus();
-      const nextCaret = start + mentionText.length;
-      input.setSelectionRange(nextCaret, nextCaret);
-    });
-  };
-
-  const handleCommentImageChange = (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-
-    if (!file.type?.startsWith('image/')) {
-      toast('이미지 파일만 첨부할 수 있어요.', { position: 'bottom-center' });
-      return;
-    }
-
-    if (isBlobUrl(commentImagePreview)) {
-      URL.revokeObjectURL(commentImagePreview);
-    }
-    setCommentImageFile(file);
-    setCommentImagePreview(URL.createObjectURL(file));
   };
 
   const clearCommentInput = () => {
@@ -822,99 +776,20 @@ export default function CommunityDetail() {
         </section>
 
         <section className="mt-2 bg-white">
-          <div className="border-b border-[#EFEFEF] px-4 py-3">
-            <input
-              ref={commentInputRef}
-              value={commentInput}
-              onChange={(e) => setCommentInput(e.target.value)}
-              placeholder={
-                editingComment
-                  ? '댓글 수정하기'
-                  : replyTarget
-                    ? `@${replyTarget.nickname} 님에게 답글 남기기`
-                    : '댓글 남기기'
-              }
-              className="w-full text-[14px] text-[#424242] outline-none placeholder:text-[#B8B8B8]"
-            />
-            {commentImagePreview && (
-              <div className="mt-2 inline-flex items-center gap-2 rounded border border-[#E5E5E5] px-2 py-1">
-                <img
-                  src={commentImagePreview}
-                  alt="댓글 첨부"
-                  className="h-8 w-8 rounded object-cover"
-                />
-                <button
-                  onClick={() => {
-                    if (isBlobUrl(commentImagePreview))
-                      URL.revokeObjectURL(commentImagePreview);
-                    setCommentImagePreview('');
-                    setCommentImageFile(null);
-                  }}
-                >
-                  <img src={xIcon} alt="이미지 제거" className="h-3 w-3" />
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between border-b border-[#EFEFEF] px-4 py-2">
-            <div className="flex items-center gap-3 text-[#A8A8A8]">
-              <button
-                className={`text-[13px] ${isSecretComment ? 'text-[#27BE69]' : ''}`}
-                onClick={() => setIsSecretComment((prev) => !prev)}
-                type="button"
-              >
-                {isSecretComment ? (
-                  <Lock size={16} strokeWidth={2} />
-                ) : (
-                  <LockOpen size={16} strokeWidth={2} />
-                )}
-              </button>
-              <button type="button" onClick={handlePickCommentImage}>
-                <Camera size={16} strokeWidth={2} />
-              </button>
-              <button type="button" onClick={handleInsertMention}>
-                <AtSign size={16} strokeWidth={2} />
-              </button>
-              {replyTarget && (
-                <button
-                  className="text-[11px] text-[#27BE69]"
-                  onClick={() => setReplyTarget(null)}
-                >
-                  답글취소
-                </button>
-              )}
-              {editingComment && (
-                <button
-                  className="text-[11px] text-[#27BE69]"
-                  onClick={clearCommentInput}
-                >
-                  수정취소
-                </button>
-              )}
-            </div>
-            <button
-              className="rounded bg-[#EFEFEF] px-3 py-1 text-[12px] text-[#8F8F8F] disabled:opacity-60"
-              disabled={!commentInput.trim() || isSubmittingComment}
-              onClick={handleSubmitComment}
-            >
-              {isSubmittingComment
-                ? editingComment
-                  ? '수정중'
-                  : '등록중'
-                : editingComment
-                  ? '수정'
-                  : '등록'}
-            </button>
-          </div>
-
-          <input
-            ref={commentImageInputRef}
-            id={commentImageInputId}
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={handleCommentImageChange}
+          <CommunityCommentComposer
+            commentInput={commentInput}
+            setCommentInput={setCommentInput}
+            isSecretComment={isSecretComment}
+            setIsSecretComment={setIsSecretComment}
+            replyTarget={replyTarget}
+            setReplyTarget={setReplyTarget}
+            commentImagePreview={commentImagePreview}
+            setCommentImagePreview={setCommentImagePreview}
+            setCommentImageFile={setCommentImageFile}
+            onSubmit={handleSubmitComment}
+            isSubmittingComment={isSubmittingComment}
+            isEditingComment={Boolean(editingComment)}
+            onCancelEdit={clearCommentInput}
           />
 
           <div className="border-b border-[#EFEFEF] px-4 py-2 text-[13px] text-[#616161]">
