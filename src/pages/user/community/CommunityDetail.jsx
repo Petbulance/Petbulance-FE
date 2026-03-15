@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { AtSign, Camera, Heart, Lock, LockOpen } from 'lucide-react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -14,15 +15,12 @@ import {
   updatePostComment,
   uploadCommentImages,
 } from '@/apis/community/posts';
-import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import defaultProfile from '@/assets/images/icons/defaultImg.svg';
 import eye from '@/assets/images/icons/eye_icon.svg';
 import leftArrow from '@/assets/images/icons/left_arrow.svg';
 import message from '@/assets/images/icons/message.svg';
 import seeMore from '@/assets/images/icons/see_more.svg';
 import shareIcon from '@/assets/images/icons/share_icon.svg';
-import thumbs from '@/assets/images/icons/thumbs.svg';
-import greenThumbs from '@/assets/images/icons/thumsUp_green.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 
 function CommentText({ text }) {
@@ -66,6 +64,11 @@ function CommentItem({ comment, onReply, onMore }) {
         >
           <div className="flex items-center justify-between">
             <p className="text-[12px] text-[#9E9E9E]">
+              {comment.isSecret && (
+                <span className="mr-1 inline-flex align-middle text-[#9E9E9E]">
+                  <Lock size={12} strokeWidth={2} />
+                </span>
+              )}
               <span className="font-medium text-[#424242]">
                 {comment.nickname}
               </span>{' '}
@@ -102,6 +105,17 @@ const normalizeComment = (comment = {}) => {
   const commentId = comment.commentId ?? comment.id;
   const parentId = comment.parentId ?? null;
   const writerNickname = comment.writerNickname || comment.nickname || '익명';
+  const imageList = Array.isArray(comment.images)
+    ? comment.images
+    : Array.isArray(comment.imageUrls)
+      ? comment.imageUrls
+      : [];
+  const firstImageFromList =
+    imageList.length > 0
+      ? typeof imageList[0] === 'string'
+        ? imageList[0]
+        : imageList[0]?.imageUrl || imageList[0]?.url || null
+      : null;
   const rawIsMine = comment.isCommentAuthor;
   const isMineByFlag =
     rawIsMine === true || rawIsMine === 'true' || rawIsMine === 1;
@@ -113,7 +127,12 @@ const normalizeComment = (comment = {}) => {
     profileUrl: comment.writerProfileUrl || comment.profileUrl || null,
     time: comment.createdAt || '',
     text: comment.content || '',
-    image: comment.imageUrl || null,
+    image:
+      comment.imageUrl ||
+      comment.commentImageUrl ||
+      comment.image ||
+      firstImageFromList ||
+      null,
     isSecret: Boolean(comment.secret ?? comment.isSecret),
     isMine: isMineByFlag,
     depth:
@@ -131,8 +150,6 @@ const isBlobUrl = (value) =>
 export default function CommunityDetail() {
   const navigate = useNavigate();
   const { postId } = useParams();
-
-  const fileInputRef = useRef(null);
 
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -165,6 +182,9 @@ export default function CommunityDetail() {
   const [commentImagePreview, setCommentImagePreview] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [editingComment, setEditingComment] = useState(null);
+  const commentImageInputId = useId();
+  const commentInputRef = useRef(null);
+  const commentImageInputRef = useRef(null);
 
   const reportReasons = [
     '욕설/비방/선정적',
@@ -357,13 +377,35 @@ export default function CommunityDetail() {
     }
   };
 
-  const handlePickCommentImage = () => {
-    fileInputRef.current?.click();
-  };
-
   const openCommentMenu = (comment) => {
     setSelectedComment(comment);
     setIsCommentMenuOpen(true);
+  };
+
+  const handlePickCommentImage = () => {
+    commentImageInputRef.current?.click();
+  };
+
+  const handleInsertMention = () => {
+    const input = commentInputRef.current;
+    const mentionText = replyTarget?.nickname ? `@${replyTarget.nickname} ` : '@';
+
+    if (!input) {
+      setCommentInput((prev) => `${prev}${mentionText}`);
+      return;
+    }
+
+    const start = input.selectionStart ?? commentInput.length;
+    const end = input.selectionEnd ?? start;
+    const nextValue =
+      commentInput.slice(0, start) + mentionText + commentInput.slice(end);
+    setCommentInput(nextValue);
+
+    requestAnimationFrame(() => {
+      input.focus();
+      const nextCaret = start + mentionText.length;
+      input.setSelectionRange(nextCaret, nextCaret);
+    });
   };
 
   const handleCommentImageChange = (e) => {
@@ -413,7 +455,7 @@ export default function CommunityDetail() {
           likeCount:
             typeof data.likeCount === 'number'
               ? data.likeCount
-              : prev.likeCount ?? 0,
+              : (prev.likeCount ?? 0),
         };
       });
     } catch (error) {
@@ -459,6 +501,9 @@ export default function CommunityDetail() {
       if (commentImageFile) {
         const uploadedUrls = await uploadCommentImages([commentImageFile]);
         imageUrl = uploadedUrls[0] ?? null;
+        if (!imageUrl) {
+          throw new Error('COMMENT_IMAGE_UPLOAD_FAILED');
+        }
       }
 
       if (editingComment?.id) {
@@ -513,6 +558,12 @@ export default function CommunityDetail() {
           position: 'bottom-center',
         });
       } else {
+        if (error.message === 'COMMENT_IMAGE_UPLOAD_FAILED') {
+          toast('댓글 이미지 업로드에 실패했습니다.', {
+            position: 'bottom-center',
+          });
+          return;
+        }
         toast(
           message ||
             (editingComment?.id
@@ -749,12 +800,16 @@ export default function CommunityDetail() {
           <div className="mt-4 flex items-center gap-3 text-[15px] text-[#9E9E9E]">
             <button
               className={`flex items-center gap-1 transition-colors ${
-                post.liked ? 'text-[#27BE69]' : 'text-[#9E9E9E]'
+                post.liked ? 'text-[#FF6B57]' : 'text-[#9E9E9E]'
               }`}
               onClick={handleTogglePostLike}
               disabled={isTogglingLike}
             >
-              <img src={post.liked ? greenThumbs : thumbs} alt="좋아요" />
+              <Heart
+                className={post.liked ? 'fill-current' : ''}
+                size={16}
+                strokeWidth={2}
+              />
               {post.likeCount ?? 0}
             </button>
             <p className="flex items-center gap-1">
@@ -769,6 +824,7 @@ export default function CommunityDetail() {
         <section className="mt-2 bg-white">
           <div className="border-b border-[#EFEFEF] px-4 py-3">
             <input
+              ref={commentInputRef}
               value={commentInput}
               onChange={(e) => setCommentInput(e.target.value)}
               placeholder={
@@ -806,18 +862,19 @@ export default function CommunityDetail() {
               <button
                 className={`text-[13px] ${isSecretComment ? 'text-[#27BE69]' : ''}`}
                 onClick={() => setIsSecretComment((prev) => !prev)}
+                type="button"
               >
-                🔒
+                {isSecretComment ? (
+                  <Lock size={16} strokeWidth={2} />
+                ) : (
+                  <LockOpen size={16} strokeWidth={2} />
+                )}
               </button>
-              <button>
-                <span className="text-[13px]">@</span>
+              <button type="button" onClick={handlePickCommentImage}>
+                <Camera size={16} strokeWidth={2} />
               </button>
-              <button onClick={handlePickCommentImage}>
-                <img
-                  src={cameraIcon}
-                  alt="사진"
-                  className="h-3.5 w-3.5 opacity-60"
-                />
+              <button type="button" onClick={handleInsertMention}>
+                <AtSign size={16} strokeWidth={2} />
               </button>
               {replyTarget && (
                 <button
@@ -852,10 +909,11 @@ export default function CommunityDetail() {
           </div>
 
           <input
-            ref={fileInputRef}
+            ref={commentImageInputRef}
+            id={commentImageInputId}
             type="file"
             accept="image/*"
-            className="hidden"
+            className="sr-only"
             onChange={handleCommentImageChange}
           />
 
