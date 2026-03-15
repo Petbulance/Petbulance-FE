@@ -6,6 +6,7 @@ import {
   COMMUNITY_TYPE_TO_API,
   fetchCommunityPosts,
 } from '@/apis/community/posts';
+import emptyReview from '@/assets/images/pageImages/emptyReview.svg';
 import { CommunityHeader } from '@/components/community/layout/CommunityHeader';
 import { NoticeBanner } from '@/components/community/ui/NoticeBanner';
 import { PostCard } from '@/components/community/ui/PostCard';
@@ -164,9 +165,19 @@ export default function CommunityMain() {
         )}
 
         {!errorMessage && !isInitialLoading && posts.length === 0 && (
-          <p className="px-6 py-10 text-center text-sm text-[#9E9E9E]">
-            조회된 게시글이 없어요.
-          </p>
+          <div className="flex h-full flex-col items-center justify-center px-[24px] text-cente mt-35">
+            <div className="mb-6 h-[160px] w-[160px]">
+              <img
+                src={emptyReview}
+                className="h-full w-full"
+                alt="후기 없음"
+              />
+            </div>
+
+            <p className="mb-[20px] text-[27px] font-semibold text-[#424242]">
+              조회된 게시글이 없어요.
+            </p>
+          </div>
         )}
 
         {posts.map((post) => (
