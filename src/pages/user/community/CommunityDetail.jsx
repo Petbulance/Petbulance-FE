@@ -44,9 +44,29 @@ function CommentText({ text }) {
   );
 }
 
-function CommentItem({ comment, onReply, onMore }) {
+function CommentItem({ comment, onReply, onMore, isMyPost }) {
   const depth = comment.depth ?? 0;
   const isReply = depth > 0;
+  const canViewSecretComment =
+    !comment.isSecret || comment.isMine || Boolean(isMyPost);
+
+  if (!canViewSecretComment) {
+    return (
+      <article
+        className="border-b border-[#F0F0F0] px-4 py-3"
+        style={{ paddingLeft: `${16 + depth * 18}px` }}
+      >
+        <p className="text-[13px] text-[#616161]">
+          비밀 댓글입니다.
+          {comment.time ? (
+            <span className="ml-1 text-[12px] text-[#9E9E9E]">
+              {comment.time}
+            </span>
+          ) : null}
+        </p>
+      </article>
+    );
+  }
 
   return (
     <article
@@ -59,9 +79,7 @@ function CommentItem({ comment, onReply, onMore }) {
           alt="프로필"
           className="mt-0.5 h-6 w-6 shrink-0 rounded-full"
         />
-        <div
-          className={`min-w-0 flex-1 ${isReply ? 'border-l border-[#DDEEDF] pl-3' : ''}`}
-        >
+        <div className={`min-w-0 flex-1 ${isReply ? 'pl-3' : ''}`}>
           <div className="flex items-center justify-between">
             <p className="text-[12px] text-[#9E9E9E]">
               {comment.isSecret && (
@@ -808,6 +826,7 @@ export default function CommunityDetail() {
                   comment={comment}
                   onReply={handleReplyClick}
                   onMore={openCommentMenu}
+                  isMyPost={isMyPost}
                 />
               ))}
             </div>

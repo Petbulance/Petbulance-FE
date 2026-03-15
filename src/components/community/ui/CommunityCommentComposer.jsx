@@ -92,6 +92,22 @@ export function CommunityCommentComposer({
 
   return (
     <>
+      {replyTarget && !isEditingComment && (
+        <div className="flex items-center justify-between border-b border-[#D9D9D9] bg-[#F5F5F5] px-4 py-2">
+          <p className="text-[13px] text-[#616161]">
+            {replyTarget.nickname}님에게 답글을 남기는 중
+          </p>
+          <button
+            type="button"
+            className="text-[#9E9E9E]"
+            onClick={() => setReplyTarget(null)}
+            aria-label="답글 취소"
+          >
+            <img src={xIcon} alt="" className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
       <div className="border-b border-[#EFEFEF] px-4 py-3">
         <input
           ref={commentInputRef}
@@ -147,15 +163,6 @@ export function CommunityCommentComposer({
           <button type="button" onClick={handleInsertMention}>
             <AtSign size={16} strokeWidth={2} />
           </button>
-
-          {replyTarget && (
-            <button
-              className="text-[11px] text-[#27BE69]"
-              onClick={() => setReplyTarget(null)}
-            >
-              답글취소
-            </button>
-          )}
 
           {isEditingComment && (
             <button
