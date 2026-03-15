@@ -51,6 +51,16 @@ export async function fetchCommunityPostDetail(postId) {
   return data.post ?? data;
 }
 
+export async function createPostLike(postId) {
+  const response = await api.post(`/posts/${postId}/likes`);
+  return response.data?.data ?? {};
+}
+
+export async function deletePostLike(postId) {
+  const response = await api.delete(`/posts/${postId}/likes`);
+  return response.data?.data ?? {};
+}
+
 export async function deleteCommunityPosts(postIds = []) {
   const response = await api.delete('/posts', {
     data: {

@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { Heart, Lock } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import {
   createContentReport,
+  createPostLike,
   createPostComment,
+  deletePostLike,
   deletePostComment,
   deleteCommunityPosts,
   fetchCommunityPostDetail,
@@ -12,15 +15,13 @@ import {
   updatePostComment,
   uploadCommentImages,
 } from '@/apis/community/posts';
-import cameraIcon from '@/assets/images/icons/camera_icon.svg';
 import defaultProfile from '@/assets/images/icons/defaultImg.svg';
 import eye from '@/assets/images/icons/eye_icon.svg';
 import leftArrow from '@/assets/images/icons/left_arrow.svg';
 import message from '@/assets/images/icons/message.svg';
 import seeMore from '@/assets/images/icons/see_more.svg';
 import shareIcon from '@/assets/images/icons/share_icon.svg';
-import thumbs from '@/assets/images/icons/thumbs.svg';
-import xIcon from '@/assets/images/icons/x_icon.svg';
+import { CommunityCommentComposer } from '@/components/community/ui/CommunityCommentComposer';
 
 function CommentText({ text }) {
   const tokens = String(text || '').split(/(@[^\s]+)/g);
@@ -63,6 +64,11 @@ function CommentItem({ comment, onReply, onMore }) {
         >
           <div className="flex items-center justify-between">
             <p className="text-[12px] text-[#9E9E9E]">
+              {comment.isSecret && (
+                <span className="mr-1 inline-flex align-middle text-[#9E9E9E]">
+                  <Lock size={12} strokeWidth={2} />
+                </span>
+              )}
               <span className="font-medium text-[#424242]">
                 {comment.nickname}
               </span>{' '}
@@ -99,6 +105,17 @@ const normalizeComment = (comment = {}) => {
   const commentId = comment.commentId ?? comment.id;
   const parentId = comment.parentId ?? null;
   const writerNickname = comment.writerNickname || comment.nickname || '익명';
+  const imageList = Array.isArray(comment.images)
+    ? comment.images
+    : Array.isArray(comment.imageUrls)
+      ? comment.imageUrls
+      : [];
+  const firstImageFromList =
+    imageList.length > 0
+      ? typeof imageList[0] === 'string'
+        ? imageList[0]
+        : imageList[0]?.imageUrl || imageList[0]?.url || null
+      : null;
   const rawIsMine = comment.isCommentAuthor;
   const isMineByFlag =
     rawIsMine === true || rawIsMine === 'true' || rawIsMine === 1;
@@ -110,7 +127,12 @@ const normalizeComment = (comment = {}) => {
     profileUrl: comment.writerProfileUrl || comment.profileUrl || null,
     time: comment.createdAt || '',
     text: comment.content || '',
-    image: comment.imageUrl || null,
+    image:
+      comment.imageUrl ||
+      comment.commentImageUrl ||
+      comment.image ||
+      firstImageFromList ||
+      null,
     isSecret: Boolean(comment.secret ?? comment.isSecret),
     isMine: isMineByFlag,
     depth:
@@ -128,8 +150,6 @@ const isBlobUrl = (value) =>
 export default function CommunityDetail() {
   const navigate = useNavigate();
   const { postId } = useParams();
-
-  const fileInputRef = useRef(null);
 
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -153,6 +173,7 @@ export default function CommunityDetail() {
   const [isSubmittingPostReport, setIsSubmittingPostReport] = useState(false);
   const [isSubmittingCommentReport, setIsSubmittingCommentReport] =
     useState(false);
+  const [isTogglingLike, setIsTogglingLike] = useState(false);
 
   const [commentInput, setCommentInput] = useState('');
   const [isSecretComment, setIsSecretComment] = useState(false);
@@ -353,30 +374,9 @@ export default function CommunityDetail() {
     }
   };
 
-  const handlePickCommentImage = () => {
-    fileInputRef.current?.click();
-  };
-
   const openCommentMenu = (comment) => {
     setSelectedComment(comment);
     setIsCommentMenuOpen(true);
-  };
-
-  const handleCommentImageChange = (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-
-    if (!file.type?.startsWith('image/')) {
-      toast('이미지 파일만 첨부할 수 있어요.', { position: 'bottom-center' });
-      return;
-    }
-
-    if (isBlobUrl(commentImagePreview)) {
-      URL.revokeObjectURL(commentImagePreview);
-    }
-    setCommentImageFile(file);
-    setCommentImagePreview(URL.createObjectURL(file));
   };
 
   const clearCommentInput = () => {
@@ -389,6 +389,55 @@ export default function CommunityDetail() {
       URL.revokeObjectURL(commentImagePreview);
     }
     setCommentImagePreview('');
+  };
+
+  const handleTogglePostLike = async () => {
+    if (!post?.postId || isTogglingLike) return;
+
+    const currentlyLiked = Boolean(post.liked);
+    setIsTogglingLike(true);
+    try {
+      const data = currentlyLiked
+        ? await deletePostLike(post.postId)
+        : await createPostLike(post.postId);
+
+      setPost((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          liked: Boolean(data.liked),
+          likeCount:
+            typeof data.likeCount === 'number'
+              ? data.likeCount
+              : (prev.likeCount ?? 0),
+        };
+      });
+    } catch (error) {
+      const errorClass = error?.response?.data?.data?.errorClassName;
+      const message = error?.response?.data?.data?.message;
+
+      if (error?.response?.status === 401) {
+        toast('로그인이 필요합니다.', { position: 'bottom-center' });
+      } else if (errorClass === 'POST_NOT_FOUND') {
+        toast('요청하신 게시글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'ALREADY_LIKED') {
+        toast('이미 좋아요를 누른 게시글입니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'LIKE_NOT_FOUND') {
+        toast('좋아요 내역이 존재하지 않습니다.', {
+          position: 'bottom-center',
+        });
+      } else {
+        toast(message || '좋아요 처리에 실패했습니다.', {
+          position: 'bottom-center',
+        });
+      }
+    } finally {
+      setIsTogglingLike(false);
+    }
   };
 
   const handleReplyClick = (targetComment) => {
@@ -406,6 +455,9 @@ export default function CommunityDetail() {
       if (commentImageFile) {
         const uploadedUrls = await uploadCommentImages([commentImageFile]);
         imageUrl = uploadedUrls[0] ?? null;
+        if (!imageUrl) {
+          throw new Error('COMMENT_IMAGE_UPLOAD_FAILED');
+        }
       }
 
       if (editingComment?.id) {
@@ -460,6 +512,12 @@ export default function CommunityDetail() {
           position: 'bottom-center',
         });
       } else {
+        if (error.message === 'COMMENT_IMAGE_UPLOAD_FAILED') {
+          toast('댓글 이미지 업로드에 실패했습니다.', {
+            position: 'bottom-center',
+          });
+          return;
+        }
         toast(
           message ||
             (editingComment?.id
@@ -694,9 +752,20 @@ export default function CommunityDetail() {
           )}
 
           <div className="mt-4 flex items-center gap-3 text-[15px] text-[#9E9E9E]">
-            <p className="flex items-center gap-1">
-              <img src={thumbs} alt="좋아요" /> {post.likeCount}
-            </p>
+            <button
+              className={`flex items-center gap-1 transition-colors ${
+                post.liked ? 'text-[#FF6B57]' : 'text-[#9E9E9E]'
+              }`}
+              onClick={handleTogglePostLike}
+              disabled={isTogglingLike}
+            >
+              <Heart
+                className={post.liked ? 'fill-current' : ''}
+                size={16}
+                strokeWidth={2}
+              />
+              {post.likeCount ?? 0}
+            </button>
             <p className="flex items-center gap-1">
               <img src={eye} alt="조회수" /> {post.viewCount}
             </p>
@@ -707,96 +776,20 @@ export default function CommunityDetail() {
         </section>
 
         <section className="mt-2 bg-white">
-          <div className="border-b border-[#EFEFEF] px-4 py-3">
-            <input
-              value={commentInput}
-              onChange={(e) => setCommentInput(e.target.value)}
-              placeholder={
-                editingComment
-                  ? '댓글 수정하기'
-                  : replyTarget
-                    ? `@${replyTarget.nickname} 님에게 답글 남기기`
-                    : '댓글 남기기'
-              }
-              className="w-full text-[14px] text-[#424242] outline-none placeholder:text-[#B8B8B8]"
-            />
-            {commentImagePreview && (
-              <div className="mt-2 inline-flex items-center gap-2 rounded border border-[#E5E5E5] px-2 py-1">
-                <img
-                  src={commentImagePreview}
-                  alt="댓글 첨부"
-                  className="h-8 w-8 rounded object-cover"
-                />
-                <button
-                  onClick={() => {
-                    if (isBlobUrl(commentImagePreview))
-                      URL.revokeObjectURL(commentImagePreview);
-                    setCommentImagePreview('');
-                    setCommentImageFile(null);
-                  }}
-                >
-                  <img src={xIcon} alt="이미지 제거" className="h-3 w-3" />
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between border-b border-[#EFEFEF] px-4 py-2">
-            <div className="flex items-center gap-3 text-[#A8A8A8]">
-              <button
-                className={`text-[13px] ${isSecretComment ? 'text-[#27BE69]' : ''}`}
-                onClick={() => setIsSecretComment((prev) => !prev)}
-              >
-                🔒
-              </button>
-              <button>
-                <span className="text-[13px]">@</span>
-              </button>
-              <button onClick={handlePickCommentImage}>
-                <img
-                  src={cameraIcon}
-                  alt="사진"
-                  className="h-3.5 w-3.5 opacity-60"
-                />
-              </button>
-              {replyTarget && (
-                <button
-                  className="text-[11px] text-[#27BE69]"
-                  onClick={() => setReplyTarget(null)}
-                >
-                  답글취소
-                </button>
-              )}
-              {editingComment && (
-                <button
-                  className="text-[11px] text-[#27BE69]"
-                  onClick={clearCommentInput}
-                >
-                  수정취소
-                </button>
-              )}
-            </div>
-            <button
-              className="rounded bg-[#EFEFEF] px-3 py-1 text-[12px] text-[#8F8F8F] disabled:opacity-60"
-              disabled={!commentInput.trim() || isSubmittingComment}
-              onClick={handleSubmitComment}
-            >
-              {isSubmittingComment
-                ? editingComment
-                  ? '수정중'
-                  : '등록중'
-                : editingComment
-                  ? '수정'
-                  : '등록'}
-            </button>
-          </div>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleCommentImageChange}
+          <CommunityCommentComposer
+            commentInput={commentInput}
+            setCommentInput={setCommentInput}
+            isSecretComment={isSecretComment}
+            setIsSecretComment={setIsSecretComment}
+            replyTarget={replyTarget}
+            setReplyTarget={setReplyTarget}
+            commentImagePreview={commentImagePreview}
+            setCommentImagePreview={setCommentImagePreview}
+            setCommentImageFile={setCommentImageFile}
+            onSubmit={handleSubmitComment}
+            isSubmittingComment={isSubmittingComment}
+            isEditingComment={Boolean(editingComment)}
+            onCancelEdit={clearCommentInput}
           />
 
           <div className="border-b border-[#EFEFEF] px-4 py-2 text-[13px] text-[#616161]">
