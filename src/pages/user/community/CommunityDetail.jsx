@@ -4,6 +4,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import {
+  COMMUNITY_TOPIC_TO_API,
+  COMMUNITY_TYPE_TO_API,
+  createCommunityPost,
   createContentReport,
   createPostLike,
   createPostComment,
@@ -165,6 +168,23 @@ const normalizeComment = (comment = {}) => {
 const isBlobUrl = (value) =>
   typeof value === 'string' && value.startsWith('blob:');
 
+const resolveApiEnumValue = (value, mapTable) => {
+  if (!value) return undefined;
+  if (Object.values(mapTable).includes(value)) return value;
+  return mapTable[value] ?? value;
+};
+
+const blackToastStyle = {
+  width: '100%',
+  height: '44px',
+  display: 'flex',
+  alignItems: 'center',
+  background: '#222222E5',
+  color: '#ffffff',
+  border: 'none',
+  boxShadow: 'none',
+};
+
 export default function CommunityDetail() {
   const navigate = useNavigate();
   const { postId } = useParams();
@@ -315,12 +335,73 @@ export default function CommunityDetail() {
     setIsDeleting(true);
 
     try {
+      const deletedPostSnapshot = post;
       await deleteCommunityPosts([post.postId]);
       setIsDeleteConfirmOpen(false);
       navigate('/index/community', { replace: true });
       toast('게시글을 삭제했어요', {
         position: 'bottom-center',
-        duration: 3000,
+        duration: 5000,
+        style: {
+          width: '100%',
+          height: '44px',
+          display: 'flex',
+          alignItems: 'center',
+          background: '#222222E5',
+          color: '#ffffff',
+        },
+        action: {
+          label: '취소',
+          onClick: async () => {
+            try {
+              const imageUrls = Array.isArray(deletedPostSnapshot?.images)
+                ? [...deletedPostSnapshot.images]
+                    .sort((a, b) => (a.imageOrder ?? 0) - (b.imageOrder ?? 0))
+                    .map((image) => image.imageUrl)
+                    .filter(Boolean)
+                : [];
+
+              const restored = await createCommunityPost({
+                type: resolveApiEnumValue(
+                  deletedPostSnapshot?.type,
+                  COMMUNITY_TYPE_TO_API
+                ),
+                topic: resolveApiEnumValue(
+                  deletedPostSnapshot?.topic,
+                  COMMUNITY_TOPIC_TO_API
+                ),
+                title: deletedPostSnapshot?.title ?? '',
+                content: deletedPostSnapshot?.content ?? '',
+                imageUrls,
+              });
+
+              const restoredPostId = restored?.postId ?? restored?.id;
+              if (restoredPostId) {
+                navigate(`/index/community/${restoredPostId}`, {
+                  replace: true,
+                });
+              } else {
+                navigate('/index/community', { replace: true });
+              }
+
+              toast('게시글을 복구했어요.', {
+                position: 'bottom-center',
+              });
+            } catch (restoreError) {
+              const restoreMessage =
+                restoreError?.response?.data?.data?.message ||
+                '게시글 복구에 실패했습니다.';
+              toast(restoreMessage, { position: 'bottom-center' });
+            }
+          },
+        },
+        actionButtonStyle: {
+          background: 'transparent',
+          border: 'none',
+          color: '#ffffff',
+          padding: 0,
+          cursor: 'pointer',
+        },
       });
     } catch (error) {
       const errorClass = error?.response?.data?.data?.errorClassName;
@@ -367,7 +448,7 @@ export default function CommunityDetail() {
       setIsReportReasonOpen(false);
       setIsMenuOpen(false);
       setSelectedReportReason('');
-      toast('신고가 정상적으로 접수되었습니다.', {
+      toast('[게시글 신고 완료] 운영자 검토 후 조치 예정입니다.', {
         position: 'bottom-center',
       });
     } catch (error) {
@@ -379,7 +460,7 @@ export default function CommunityDetail() {
           position: 'bottom-center',
         });
       } else if (errorClass === 'ALREADY_REPORTED') {
-        toast('이미 접수된 신고입니다.', { position: 'bottom-center' });
+        toast('이미 신고한 게시글입니다.', { position: 'bottom-center' });
       } else if (errorClass === 'ALREADY_COMPLETED') {
         toast('이미 처리 완료된 신고입니다.', { position: 'bottom-center' });
       } else {
@@ -667,6 +748,7 @@ export default function CommunityDetail() {
     if (!selectedCommentReportReason) {
       toast('신고 사유를 선택해주세요', {
         position: 'bottom-center',
+        style: blackToastStyle,
       });
       return;
     }
@@ -686,8 +768,9 @@ export default function CommunityDetail() {
       setIsCommentReportOpen(false);
       setSelectedCommentReportReason('');
       setSelectedComment(null);
-      toast('신고가 정상적으로 접수되었습니다.', {
+      toast('[댓글 신고 완료] 운영자 검토 후 조치 예정입니다.', {
         position: 'bottom-center',
+        style: blackToastStyle,
       });
     } catch (error) {
       const errorClass = error?.response?.data?.data?.errorClassName;
@@ -696,14 +779,22 @@ export default function CommunityDetail() {
       if (errorClass === 'COMMENT_NOT_FOUND') {
         toast('요청하신 댓글을 찾을 수 없습니다.', {
           position: 'bottom-center',
+          style: blackToastStyle,
         });
       } else if (errorClass === 'ALREADY_REPORTED') {
-        toast('이미 접수된 신고입니다.', { position: 'bottom-center' });
+        toast('이미 신고한 댓글입니다.', {
+          position: 'bottom-center',
+          style: blackToastStyle,
+        });
       } else if (errorClass === 'ALREADY_COMPLETED') {
-        toast('이미 처리 완료된 신고입니다.', { position: 'bottom-center' });
+        toast('이미 처리 완료된 신고입니다.', {
+          position: 'bottom-center',
+          style: blackToastStyle,
+        });
       } else {
         toast(message || '신고 접수에 실패했습니다.', {
           position: 'bottom-center',
+          style: blackToastStyle,
         });
       }
     } finally {

@@ -1,7 +1,7 @@
 import { AtSign, Camera, Lock, LockOpen } from 'lucide-react';
 import { useRef } from 'react';
-import { toast } from 'sonner';
 
+import { toast } from 'sonner';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 
 const isBlobUrl = (value) =>
