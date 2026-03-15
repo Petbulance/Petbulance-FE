@@ -4,7 +4,9 @@ import { toast } from 'sonner';
 
 import {
   createContentReport,
+  createPostLike,
   createPostComment,
+  deletePostLike,
   deletePostComment,
   deleteCommunityPosts,
   fetchCommunityPostDetail,
@@ -20,6 +22,7 @@ import message from '@/assets/images/icons/message.svg';
 import seeMore from '@/assets/images/icons/see_more.svg';
 import shareIcon from '@/assets/images/icons/share_icon.svg';
 import thumbs from '@/assets/images/icons/thumbs.svg';
+import greenThumbs from '@/assets/images/icons/thumsUp_green.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 
 function CommentText({ text }) {
@@ -153,6 +156,7 @@ export default function CommunityDetail() {
   const [isSubmittingPostReport, setIsSubmittingPostReport] = useState(false);
   const [isSubmittingCommentReport, setIsSubmittingCommentReport] =
     useState(false);
+  const [isTogglingLike, setIsTogglingLike] = useState(false);
 
   const [commentInput, setCommentInput] = useState('');
   const [isSecretComment, setIsSecretComment] = useState(false);
@@ -389,6 +393,55 @@ export default function CommunityDetail() {
       URL.revokeObjectURL(commentImagePreview);
     }
     setCommentImagePreview('');
+  };
+
+  const handleTogglePostLike = async () => {
+    if (!post?.postId || isTogglingLike) return;
+
+    const currentlyLiked = Boolean(post.liked);
+    setIsTogglingLike(true);
+    try {
+      const data = currentlyLiked
+        ? await deletePostLike(post.postId)
+        : await createPostLike(post.postId);
+
+      setPost((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          liked: Boolean(data.liked),
+          likeCount:
+            typeof data.likeCount === 'number'
+              ? data.likeCount
+              : prev.likeCount ?? 0,
+        };
+      });
+    } catch (error) {
+      const errorClass = error?.response?.data?.data?.errorClassName;
+      const message = error?.response?.data?.data?.message;
+
+      if (error?.response?.status === 401) {
+        toast('로그인이 필요합니다.', { position: 'bottom-center' });
+      } else if (errorClass === 'POST_NOT_FOUND') {
+        toast('요청하신 게시글을 찾을 수 없습니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'ALREADY_LIKED') {
+        toast('이미 좋아요를 누른 게시글입니다.', {
+          position: 'bottom-center',
+        });
+      } else if (errorClass === 'LIKE_NOT_FOUND') {
+        toast('좋아요 내역이 존재하지 않습니다.', {
+          position: 'bottom-center',
+        });
+      } else {
+        toast(message || '좋아요 처리에 실패했습니다.', {
+          position: 'bottom-center',
+        });
+      }
+    } finally {
+      setIsTogglingLike(false);
+    }
   };
 
   const handleReplyClick = (targetComment) => {
@@ -694,9 +747,16 @@ export default function CommunityDetail() {
           )}
 
           <div className="mt-4 flex items-center gap-3 text-[15px] text-[#9E9E9E]">
-            <p className="flex items-center gap-1">
-              <img src={thumbs} alt="좋아요" /> {post.likeCount}
-            </p>
+            <button
+              className={`flex items-center gap-1 transition-colors ${
+                post.liked ? 'text-[#27BE69]' : 'text-[#9E9E9E]'
+              }`}
+              onClick={handleTogglePostLike}
+              disabled={isTogglingLike}
+            >
+              <img src={post.liked ? greenThumbs : thumbs} alt="좋아요" />
+              {post.likeCount ?? 0}
+            </button>
             <p className="flex items-center gap-1">
               <img src={eye} alt="조회수" /> {post.viewCount}
             </p>
