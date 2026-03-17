@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 
-import eye from '@/assets/images/icons/eye_icon.svg';
 import dot from '@/assets/images/icons/DotIcon.svg';
-import thumbs from '@/assets/images/icons/thumbs.svg';
+import eye from '@/assets/images/icons/eye_icon.svg';
 import message from '@/assets/images/icons/message.svg';
+import thumbs from '@/assets/images/icons/thumbs.svg';
 
 export function PostCard({ post }) {
   const navigate = useNavigate();
+  console.log(post);
   const postId = post.postId ?? post.id;
   const categoryLabel = post.category ?? post.topic ?? '-';
   const animalLabel = post.boardName ?? post.type ?? post.animal ?? '-';
@@ -16,7 +17,7 @@ export function PostCard({ post }) {
   const viewCount = post.viewCount ?? post.views ?? 0;
   const hasImage = (post.imageCount ?? 0) > 0 || post.hasImage;
   const imageCount = post.imageCount ?? (post.hasImage ? 1 : 0);
-  const nickname = post.writerNickname;
+  const nickname = post.nickname ?? post.nickname;
 
   return (
     <article
