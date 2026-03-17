@@ -6,6 +6,7 @@ import {
   COMMUNITY_TYPE_TO_API,
   fetchCommunityPosts,
 } from '@/apis/community/posts';
+import { fetchNotices } from '@/apis/notices';
 import { CommunityHeader } from '@/components/community/layout/CommunityHeader';
 import { NoticeBanner } from '@/components/community/ui/NoticeBanner';
 import { PostCard } from '@/components/community/ui/PostCard';
@@ -23,7 +24,7 @@ export default function CommunityMain() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState('최신순');
   const [posts, setPosts] = useState([]);
-  const [noticeBanner, setNoticeBanner] = useState(null);
+  const [notices, setNotices] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -70,10 +71,6 @@ export default function CommunityMain() {
           return Array.from(deduped.values());
         });
 
-        if (reset) {
-          setNoticeBanner(data.noticeBanner ?? null);
-        }
-
         const nextLastPostId = data.lastPostId ?? null;
         const nextHasNext = Boolean(data.hasNext);
 
@@ -101,9 +98,32 @@ export default function CommunityMain() {
     hasNextRef.current = false;
     lastPostIdRef.current = null;
     setPosts([]);
-    setNoticeBanner(null);
     loadPosts({ reset: true });
   }, [loadPosts]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadNotices = async () => {
+      try {
+        const data = await fetchNotices({ pageSize: 10 });
+        const noticeList = Array.isArray(data.content) ? data.content : [];
+        if (isMounted) {
+          setNotices(noticeList);
+        }
+      } catch {
+        if (isMounted) {
+          setNotices([]);
+        }
+      }
+    };
+
+    loadNotices();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!sentinelRef.current) return;
@@ -148,7 +168,7 @@ export default function CommunityMain() {
         />
       </section>
 
-      <NoticeBanner notice={noticeBanner} />
+      <NoticeBanner notices={notices} />
 
       <section className="flex-1 bg-white">
         {errorMessage && (
