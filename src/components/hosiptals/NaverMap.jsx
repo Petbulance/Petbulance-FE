@@ -1,5 +1,11 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
-import { useSearchParams } from 'react-router-dom'; // ✅ 1. import 추가
+import React, {
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { fetchHospitalsByLocation } from '@/apis/hospitals';
 import marker_closed from '@/assets/images/icons/close_hospital_marker.svg';
@@ -8,124 +14,411 @@ import current_location_marker from '@/assets/images/icons/current_location_mark
 import marker_open from '@/assets/images/icons/open_hospital_marker.svg';
 import selected_close_marker from '@/assets/images/icons/selected_close_marker.svg';
 import selected_marker from '@/assets/images/icons/selected_marker.svg';
-import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
-import { pushDataLayer } from '@/lib/gtm';
 import { loadNaverMap } from '@/lib/loadNaverMap';
 
 import { CurrentHospitalBtn } from './ui/CurrentHospitalBtn';
 
-const NaverMap = React.memo(
-  ({
-    hospitals,
-    setHospitals,
-    selectedHospital,
-    setSelectedHospital,
-    filterState,
-    setFilterState,
-    searchTrigger,
-  }) => {
+const HOSPITAL_PAGE_SIZE = 20;
+const CLUSTER_GRID_SIZE = 90;
+const CLUSTER_MIN_SIZE = 2;
+const CLUSTER_MAX_ZOOM = 14;
+const DEFAULT_MAP_ZOOM = 13;
+const DEFAULT_CURRENT_LOCATION_ZOOM = 13;
+
+const extractCursor = (data = {}) => ({
+  cursorId: data.nextCursorId ?? data.cursorId ?? null,
+  cursorDistance: data.nextCursorDistance ?? data.cursorDistance ?? null,
+  cursorRating: data.nextCursorRating ?? data.cursorRating ?? null,
+  cursorReviewCount:
+    data.nextCursorReviewCount ?? data.cursorReviewCount ?? null,
+  hasNext: Boolean(data.hasNext),
+});
+
+const dedupeHospitals = (prev = [], next = []) => {
+  const map = new Map();
+
+  [...prev, ...next].forEach((hospital) => {
+    if (hospital?.hospitalId == null) return;
+    map.set(hospital.hospitalId, hospital);
+  });
+
+  return [...map.values()];
+};
+
+const getBoundsPayload = (mapInstance) => {
+  const bounds = mapInstance.getBounds();
+  const sw = bounds.getSW();
+  const ne = bounds.getNE();
+
+  return [sw.lat(), sw.lng(), ne.lat(), ne.lng()];
+};
+
+const createHospitalMarkerIcon = (hospital, isSelected) => {
+  const markerImg = isSelected
+    ? hospital.isOpenNow
+      ? selected_marker
+      : selected_close_marker
+    : hospital.isOpenNow
+      ? marker_open
+      : marker_closed;
+
+  return {
+    url: markerImg,
+    size: new window.naver.maps.Size(60, 60),
+    scaledSize: new window.naver.maps.Size(60, 60),
+    anchor: new window.naver.maps.Point(30, 60),
+  };
+};
+
+const createClusterIcon = () => {
+  return {
+    url: marker_open,
+    size: new window.naver.maps.Size(60, 60),
+    scaledSize: new window.naver.maps.Size(60, 60),
+    anchor: new window.naver.maps.Point(30, 60),
+  };
+};
+
+const getClusterKey = (point) =>
+  `${Math.floor(point.x / CLUSTER_GRID_SIZE)}:${Math.floor(
+    point.y / CLUSTER_GRID_SIZE
+  )}`;
+
+const NaverMapBase = React.forwardRef(
+  (
+    {
+      hospitals,
+      setHospitals,
+      selectedHospital,
+      setSelectedHospital,
+      filterState,
+      setFilterState,
+      searchTrigger,
+      onPagingChange,
+    },
+    ref
+  ) => {
     const mapInstance = useRef(null);
     const mapElement = useRef(null);
     const hospitalMarkersRef = useRef([]);
     const currentLocationMarker = useRef(null);
+    const mapEventListenersRef = useRef([]);
+    const hospitalsRef = useRef(hospitals);
+    const selectedHospitalRef = useRef(selectedHospital);
 
     const [searchParams] = useSearchParams();
     const hasProcessedParams = useRef(false);
+    const requestSeqRef = useRef(0);
+    const searchStateRef = useRef({
+      cursor: null,
+      hasNext: false,
+      bounds: null,
+      isLoading: false,
+    });
 
     const [isMapLoaded, setIsMapLoaded] = useState(false);
+    const [paging, setPaging] = useState({
+      hasNext: false,
+      isLoadingMore: false,
+    });
+    const regionKey = Array.isArray(filterState.region)
+      ? filterState.region.join(',')
+      : String(filterState.region ?? '');
+    const animalKey = Array.isArray(filterState.animal)
+      ? filterState.animal.join(',')
+      : String(filterState.animal ?? '');
+
+    useEffect(() => {
+      hospitalsRef.current = hospitals;
+    }, [hospitals]);
+
+    useEffect(() => {
+      selectedHospitalRef.current = selectedHospital;
+    }, [selectedHospital]);
+
+    useEffect(() => {
+      onPagingChange?.(paging);
+    }, [paging, onPagingChange]);
 
     const clearMarkers = useCallback(() => {
-      if (hospitalMarkersRef.current.length > 0) {
-        hospitalMarkersRef.current.forEach((marker) => {
-          marker.setMap(null);
-        });
-        hospitalMarkersRef.current = [];
-      }
+      if (hospitalMarkersRef.current.length === 0) return;
+
+      hospitalMarkersRef.current.forEach((marker) => {
+        marker.setMap(null);
+      });
+      hospitalMarkersRef.current = [];
     }, []);
 
-    const handleSearchHospitals = useCallback(async () => {
-      if (!mapInstance.current) return;
+    const renderMarkers = useCallback(() => {
+      if (!mapInstance.current || !window.naver) return;
 
-      const petTypeLabel = filterState.animal?.[0]
-        ? ANIMAL_CATEGORY_KO[filterState.animal[0]] || filterState.animal[0]
-        : '';
-      const regionLabel =
-        Array.isArray(filterState.region) && filterState.region.length > 0
-          ? filterState.region.join(', ')
-          : filterState.city || '';
+      const map = mapInstance.current;
+      const hospitalsData = hospitalsRef.current || [];
+      const zoom = map.getZoom();
+      const bounds = map.getBounds();
+      const projection = map.getProjection?.();
 
-      pushDataLayer('search_hospital_start', {
-        search_type: '지도',
-        pet_type: petTypeLabel,
-        region: regionLabel,
-        filter_operating: Boolean(filterState.isOpen),
+      clearMarkers();
+
+      if (hospitalsData.length === 0) return;
+
+      const shouldCluster =
+        zoom < CLUSTER_MAX_ZOOM && hospitalsData.length >= CLUSTER_MIN_SIZE;
+
+      if (!shouldCluster || !projection) {
+        hospitalMarkersRef.current = hospitalsData.map((hospital) => {
+          const isSelected =
+            selectedHospitalRef.current?.hospitalId === hospital.hospitalId;
+
+          const marker = new window.naver.maps.Marker({
+            position: new window.naver.maps.LatLng(hospital.lat, hospital.lng),
+            map,
+            icon: createHospitalMarkerIcon(hospital, isSelected),
+          });
+
+          window.naver.maps.Event.addListener(marker, 'click', () => {
+            selectedHospitalRef.current = hospital;
+            setSelectedHospital(hospital);
+            map.panTo(new window.naver.maps.LatLng(hospital.lat, hospital.lng));
+          });
+
+          return marker;
+        });
+
+        return;
+      }
+
+      const clusters = new Map();
+
+      hospitalsData.forEach((hospital) => {
+        const position = new window.naver.maps.LatLng(
+          hospital.lat,
+          hospital.lng
+        );
+
+        if (!bounds.hasLatLng(position)) return;
+
+        const point = projection.fromCoordToOffset(position);
+        if (!point) return;
+
+        const key = getClusterKey(point);
+        const bucket = clusters.get(key) || {
+          items: [],
+          latSum: 0,
+          lngSum: 0,
+        };
+
+        bucket.items.push(hospital);
+        bucket.latSum += hospital.lat;
+        bucket.lngSum += hospital.lng;
+        clusters.set(key, bucket);
       });
 
-      const bounds = mapInstance.current.getBounds();
-      const sw = bounds.getSW();
-      const ne = bounds.getNE();
+      clusters.forEach((bucket) => {
+        const { items, latSum, lngSum } = bucket;
 
-      try {
-        const data = await fetchHospitalsByLocation(
-          [sw.lat(), sw.lng(), ne.lat(), ne.lng()],
-          filterState
+        if (items.length < CLUSTER_MIN_SIZE) {
+          const hospital = items[0];
+          const isSelected =
+            selectedHospitalRef.current?.hospitalId === hospital.hospitalId;
+
+          const marker = new window.naver.maps.Marker({
+            position: new window.naver.maps.LatLng(hospital.lat, hospital.lng),
+            map,
+            icon: createHospitalMarkerIcon(hospital, isSelected),
+          });
+
+          window.naver.maps.Event.addListener(marker, 'click', () => {
+            selectedHospitalRef.current = hospital;
+            setSelectedHospital(hospital);
+            map.panTo(new window.naver.maps.LatLng(hospital.lat, hospital.lng));
+          });
+
+          hospitalMarkersRef.current.push(marker);
+          return;
+        }
+
+        const center = new window.naver.maps.LatLng(
+          latSum / items.length,
+          lngSum / items.length
         );
-        setHospitals(data.list || []);
-      } catch (err) {
-        console.error('병원 검색 실패:', err);
-        setHospitals([]);
-      }
-    }, [filterState, setHospitals]);
 
-    // 현위치 이동 함수
-    const handleCurrentLocation = useCallback(() => {
-      if (!window.naver || !mapInstance.current || !navigator.geolocation)
-        return;
+        const marker = new window.naver.maps.Marker({
+          position: center,
+          map,
+          clickable: true,
+          icon: createClusterIcon(items.length),
+        });
 
-      const geoOptions = {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0,
-      };
+        window.naver.maps.Event.addListener(marker, 'click', () => {
+          selectedHospitalRef.current = null;
+          setSelectedHospital(null);
+          map.setCenter(center);
+          map.setZoom(Math.min(map.getZoom() + 3, 18));
+        });
 
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          const currentPos = new window.naver.maps.LatLng(latitude, longitude);
+        hospitalMarkersRef.current.push(marker);
+      });
+    }, [clearMarkers, setSelectedHospital]);
 
-          mapInstance.current.setCenter(currentPos);
-          mapInstance.current.setZoom(14);
+    const handleSearchHospitals = useCallback(
+      async ({ reset = true, overrideFilterState } = {}) => {
+        if (!mapInstance.current) return;
+        if (
+          !reset &&
+          (!searchStateRef.current.hasNext || searchStateRef.current.isLoading)
+        ) {
+          return;
+        }
 
-          if (currentLocationMarker.current) {
-            currentLocationMarker.current.setPosition(currentPos);
-            currentLocationMarker.current.setMap(mapInstance.current);
+        const activeFilterState = overrideFilterState ?? filterState;
+        const boundsPayload =
+          reset || !searchStateRef.current.bounds
+            ? getBoundsPayload(mapInstance.current)
+            : searchStateRef.current.bounds;
+        const requestId = ++requestSeqRef.current;
+
+        searchStateRef.current.isLoading = true;
+
+        if (reset) {
+          searchStateRef.current.cursor = null;
+          searchStateRef.current.hasNext = false;
+          setPaging({
+            hasNext: false,
+            isLoadingMore: false,
+          });
+        } else {
+          setPaging((prev) => ({ ...prev, isLoadingMore: true }));
+        }
+
+        const pagination = reset
+          ? { size: HOSPITAL_PAGE_SIZE }
+          : {
+              size: HOSPITAL_PAGE_SIZE,
+              ...(searchStateRef.current.cursor ?? {}),
+            };
+
+        try {
+          const data = await fetchHospitalsByLocation(
+            boundsPayload,
+            activeFilterState,
+            pagination
+          );
+
+          if (requestSeqRef.current !== requestId) return;
+
+          const nextList = Array.isArray(data?.list) ? data.list : [];
+          const nextCursor = extractCursor(data);
+
+          searchStateRef.current.bounds = boundsPayload;
+          searchStateRef.current.cursor = nextCursor;
+          searchStateRef.current.hasNext = nextCursor.hasNext;
+
+          if (reset) {
+            setHospitals(nextList);
           } else {
-            currentLocationMarker.current = new window.naver.maps.Marker({
-              position: currentPos,
-              map: mapInstance.current,
-              zIndex: 100,
-              icon: {
-                url: current_location_marker,
-                size: new window.naver.maps.Size(40, 40),
-                scaledSize: new window.naver.maps.Size(40, 40),
-                anchor: new window.naver.maps.Point(20, 20),
-              },
-            });
+            setHospitals((prev) => dedupeHospitals(prev, nextList));
           }
 
-          // 현위치 검색 시 지역 필터 초기화
-          setFilterState((prev) => ({ ...prev, city: '', region: [] }));
+          setPaging({
+            hasNext: nextCursor.hasNext,
+            isLoadingMore: false,
+          });
+        } catch (err) {
+          if (requestSeqRef.current !== requestId) return;
 
-          // 위치 이동 후 검색
-          handleSearchHospitals();
-        },
-        (err) => {
-          console.error('위치 조회 에러:', err);
-          handleSearchHospitals();
-        },
-        geoOptions
-      );
-    }, [handleSearchHospitals, setFilterState]);
+          console.error('병원 검색 실패:', err);
+          if (reset) {
+            setHospitals([]);
+          }
+
+          setPaging((prev) => ({
+            ...prev,
+            isLoadingMore: false,
+            hasNext: reset ? false : prev.hasNext,
+          }));
+        } finally {
+          if (requestSeqRef.current === requestId) {
+            searchStateRef.current.isLoading = false;
+          }
+        }
+      },
+      [filterState, setHospitals]
+    );
+
+    const handleCurrentLocation = useCallback(
+      (nextFilterState) => {
+        if (!window.naver || !mapInstance.current || !navigator.geolocation)
+          return;
+
+        const geoOptions = {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        };
+
+        const baseFilterState = nextFilterState ?? filterState;
+        const resetFilterState = {
+          ...baseFilterState,
+          city: '',
+          region: [],
+        };
+
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            const currentPos = new window.naver.maps.LatLng(
+              latitude,
+              longitude
+            );
+
+            mapInstance.current.setCenter(currentPos);
+            mapInstance.current.setZoom(DEFAULT_CURRENT_LOCATION_ZOOM);
+
+            if (currentLocationMarker.current) {
+              currentLocationMarker.current.setPosition(currentPos);
+              currentLocationMarker.current.setMap(mapInstance.current);
+            } else {
+              currentLocationMarker.current = new window.naver.maps.Marker({
+                position: currentPos,
+                map: mapInstance.current,
+                zIndex: 100,
+                icon: {
+                  url: current_location_marker,
+                  size: new window.naver.maps.Size(40, 40),
+                  scaledSize: new window.naver.maps.Size(40, 40),
+                  anchor: new window.naver.maps.Point(20, 20),
+                },
+              });
+            }
+
+            setFilterState(resetFilterState);
+            handleSearchHospitals({
+              reset: true,
+              overrideFilterState: resetFilterState,
+            });
+          },
+          (err) => {
+            console.error('위치 조회 에러:', err);
+            handleSearchHospitals({
+              reset: true,
+              overrideFilterState: resetFilterState,
+            });
+          },
+          geoOptions
+        );
+      },
+      [filterState, handleSearchHospitals, setFilterState]
+    );
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        loadMoreHospitals: () => handleSearchHospitals({ reset: false }),
+        refreshHospitals: () => handleSearchHospitals({ reset: true }),
+      }),
+      [handleSearchHospitals]
+    );
 
     useEffect(() => {
       const naver = window.naver;
@@ -170,8 +463,7 @@ const NaverMap = React.memo(
           if (validCoords.length === 1) {
             const targetCoord = validCoords[0];
             mapInstance.current.setCenter(targetCoord);
-            const zoomLevel = isWholeCity ? 10 : 10;
-            mapInstance.current.setZoom(zoomLevel);
+            mapInstance.current.setZoom(isWholeCity ? 10 : 10);
           } else {
             const bounds = new naver.maps.LatLngBounds();
             validCoords.forEach((coord) => bounds.extend(coord));
@@ -183,23 +475,29 @@ const NaverMap = React.memo(
               left: 20,
             });
           }
-          setTimeout(() => handleSearchHospitals(), 500);
+
+          setTimeout(() => handleSearchHospitals({ reset: true }), 500);
         }
       });
-    }, [filterState.city, JSON.stringify(filterState.region), isMapLoaded]);
+    }, [filterState, regionKey, isMapLoaded, handleSearchHospitals]);
 
     useEffect(() => {
       if (!isMapLoaded || !mapInstance.current) return;
-      handleSearchHospitals();
-    }, [filterState.sort, JSON.stringify(filterState.animal), isMapLoaded]);
+      handleSearchHospitals({ reset: true });
+    }, [
+      filterState.sort,
+      animalKey,
+      filterState.isOpen,
+      isMapLoaded,
+      handleSearchHospitals,
+    ]);
 
     useEffect(() => {
       if (!isMapLoaded || !mapInstance.current) return;
       if (!searchTrigger) return;
-      handleSearchHospitals();
-    }, [searchTrigger, isMapLoaded]);
+      handleSearchHospitals({ reset: true });
+    }, [searchTrigger, isMapLoaded, handleSearchHospitals]);
 
-    // 지도 초기화
     useEffect(() => {
       const keyId = import.meta.env.VITE_NAVER_MAP_CLIENT_ID;
 
@@ -210,7 +508,7 @@ const NaverMap = React.memo(
 
         const map = new naver.maps.Map(mapElement.current, {
           center: new naver.maps.LatLng(37.5665851, 126.9782038),
-          zoom: 14,
+          zoom: DEFAULT_MAP_ZOOM,
           scaleControl: false,
           logoControl: false,
           mapDataControl: false,
@@ -219,70 +517,72 @@ const NaverMap = React.memo(
 
         mapInstance.current = map;
 
-        naver.maps.Event.addListener(map, 'click', () =>
+        const clickListener = naver.maps.Event.addListener(map, 'click', () =>
           setSelectedHospital(null)
         );
+        const zoomListener = naver.maps.Event.addListener(
+          map,
+          'zoom_changed',
+          () => {
+            renderMarkers();
+          }
+        );
+        const idleListener = naver.maps.Event.addListener(map, 'idle', () => {
+          renderMarkers();
+        });
+
+        mapEventListenersRef.current = [
+          clickListener,
+          zoomListener,
+          idleListener,
+        ];
 
         setIsMapLoaded(true);
 
         const animalTypeParam = searchParams.get('animalType');
 
         if (animalTypeParam && !hasProcessedParams.current) {
-          setFilterState((prev) => ({
-            ...prev,
+          const nextFilterState = {
+            ...filterState,
             animal: [animalTypeParam],
             city: '',
             region: [],
-          }));
+          };
 
-          handleCurrentLocation();
-
+          setFilterState(nextFilterState);
+          handleCurrentLocation(nextFilterState);
           hasProcessedParams.current = true;
         } else {
-          handleSearchHospitals();
+          handleSearchHospitals({ reset: true });
         }
       });
-    }, []);
+    }, [
+      filterState,
+      handleCurrentLocation,
+      handleSearchHospitals,
+      renderMarkers,
+      searchParams,
+      setFilterState,
+      setSelectedHospital,
+    ]);
+
     useEffect(() => {
       if (!mapInstance.current) return;
-      clearMarkers();
+      renderMarkers();
+    }, [hospitals, selectedHospital, renderMarkers]);
 
-      if (hospitals && hospitals.length > 0) {
-        const newMarkers = hospitals.map((hospital) => {
-          const isSelected =
-            selectedHospital?.hospitalId === hospital.hospitalId;
-
-          const markerImg = isSelected
-            ? hospital.isOpenNow
-              ? selected_marker
-              : selected_close_marker
-            : hospital.isOpenNow
-              ? marker_open
-              : marker_closed;
-
-          const marker = new window.naver.maps.Marker({
-            position: new window.naver.maps.LatLng(hospital.lat, hospital.lng),
-            map: mapInstance.current,
-            icon: {
-              url: markerImg,
-              size: new window.naver.maps.Size(60, 60),
-              scaledSize: new window.naver.maps.Size(60, 60),
-              anchor: new window.naver.maps.Point(30, 60),
-            },
+    useEffect(
+      () => () => {
+        if (mapEventListenersRef.current.length > 0) {
+          mapEventListenersRef.current.forEach((listener) => {
+            window.naver?.maps?.Event.removeListener(listener);
           });
-
-          window.naver.maps.Event.addListener(marker, 'click', () => {
-            setSelectedHospital(hospital);
-            mapInstance.current.panTo(
-              new window.naver.maps.LatLng(hospital.lat, hospital.lng)
-            );
-          });
-
-          return marker;
-        });
-        hospitalMarkersRef.current = newMarkers;
-      }
-    }, [hospitals, selectedHospital, clearMarkers, setSelectedHospital]);
+          mapEventListenersRef.current = [];
+        }
+        clearMarkers();
+      },
+      [clearMarkers]
+    );
 
     const handleSearchCurrentLocationClick = useCallback(() => {
       window.dataLayer = window.dataLayer || [];
@@ -291,7 +591,7 @@ const NaverMap = React.memo(
         is_first_search: false,
       });
 
-      handleSearchHospitals();
+      handleSearchHospitals({ reset: true });
     }, [handleSearchHospitals]);
 
     return (
@@ -302,14 +602,18 @@ const NaverMap = React.memo(
         />
         <CurrentHospitalBtn onClick={handleSearchCurrentLocationClick} />
         <button
-          onClick={handleCurrentLocation}
+          onClick={() => handleCurrentLocation()}
           className="absolute right-5 bottom-50 z-[1000] active:scale-95"
         >
           <img src={current_location_btn} alt="location" />
         </button>
       </div>
     );
-  },
+  }
+);
+
+const NaverMap = React.memo(
+  NaverMapBase,
   (prev, next) =>
     prev.hospitals === next.hospitals &&
     prev.selectedHospital === next.selectedHospital &&
