@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import ListIcon from '@/assets/images/icons/ListIcon.svg';
@@ -19,6 +19,8 @@ import { useHospitalFilter } from '@/hooks/useHospitalFilter';
 
 export default function HospitalsMap() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const mapControlRef = useRef(null);
+  const listScrollRef = useRef(null);
 
   const {
     filterState,
@@ -36,11 +38,14 @@ export default function HospitalsMap() {
 
   const [selectedHospital, setSelectedHospital] = useState(null);
   const [searchTrigger, setSearchTrigger] = useState(0);
+  const [pagingState, setPagingState] = useState({
+    hasNext: false,
+    isLoadingMore: false,
+  });
 
   const [myLocation, setMyLocation] = useState({
     lat: null,
     lng: null,
-    isLoaded: false,
   });
 
   const isListOpen = searchParams.get('view') === 'list';
@@ -68,9 +73,12 @@ export default function HospitalsMap() {
     setSearchParams(newParams);
   };
 
+  const handleLoadMoreHospitals = () => {
+    mapControlRef.current?.loadMoreHospitals?.();
+  };
+
   useEffect(() => {
     if (!navigator.geolocation) {
-      setMyLocation((prev) => ({ ...prev, isLoaded: true }));
       return;
     }
 
@@ -85,12 +93,10 @@ export default function HospitalsMap() {
         setMyLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
-          isLoaded: true,
         });
       },
       (error) => {
         console.error('위치 파악 실패', error);
-        setMyLocation((prev) => ({ ...prev, isLoaded: true }));
       },
       geoOptions
     );
@@ -115,6 +121,7 @@ export default function HospitalsMap() {
       />
 
       <NaverMap
+        ref={mapControlRef}
         hospitals={hospitals}
         setHospitals={setHospitals}
         selectedHospital={selectedHospital}
@@ -122,6 +129,7 @@ export default function HospitalsMap() {
         filterState={filterState}
         setFilterState={setFilterState}
         searchTrigger={searchTrigger}
+        onPagingChange={setPagingState}
       />
 
       {!isListOpen && (
@@ -153,7 +161,7 @@ export default function HospitalsMap() {
 
       {isListOpen && (
         <div className="absolute inset-0 z-[1500] flex flex-col bg-[#F5F5F5]">
-          <div className="flex-1 overflow-y-auto">
+          <div ref={listScrollRef} className="flex-1 overflow-y-auto">
             {hospitals && hospitals.length === 0 ? (
               <div className="mt-20 px-8">
                 <NoHospitalResult />
@@ -164,6 +172,10 @@ export default function HospitalsMap() {
                 userLat={myLocation.lat}
                 userLng={myLocation.lng}
                 fromScreen="list"
+                hasNext={pagingState.hasNext}
+                isLoadingMore={pagingState.isLoadingMore}
+                onLoadMore={handleLoadMoreHospitals}
+                scrollRootRef={listScrollRef}
               />
             )}
           </div>

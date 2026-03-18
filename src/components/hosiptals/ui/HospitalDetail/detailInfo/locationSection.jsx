@@ -39,6 +39,12 @@ export function LocationSection({ hospitalData }) {
           mapRef.current = new naver.maps.Map(elRef.current, {
             center: location,
             zoom: 16,
+            scrollWheel: false,
+            zoomControl: true,
+            zoomControlOptions: {
+              position: naver.maps.Position.RIGHT_BOTTOM,
+              style: naver.maps.ZoomControlStyle.SMALL,
+            },
           });
         } else {
           mapRef.current.setCenter(location);

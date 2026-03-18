@@ -165,7 +165,7 @@ export default function CommunityMain() {
         )}
 
         {!errorMessage && !isInitialLoading && posts.length === 0 && (
-          <div className="flex h-full flex-col items-center justify-center px-[24px] text-cente mt-35">
+          <div className="text-cente mt-35 flex h-full flex-col items-center justify-center px-[24px]">
             <div className="mb-6 h-[160px] w-[160px]">
               <img
                 src={emptyReview}
