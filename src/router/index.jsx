@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 
 /* ================= 도메인 판별 ================= */
 // const isAdminDomain = window.location.hostname.startsWith('localhost');
@@ -7,6 +8,10 @@ const isServiceDomain = !isAdminDomain;
 
 /* ================= 공통 ================= */
 import App from '@/App.jsx';
+import Spinner from '@/components/commons/Spinner';
+import { ServiceBanner } from '@/components/commons/banner/index.jsx';
+import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
+
 /* ================= 관리자 ================= */
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
@@ -27,14 +32,14 @@ import TermsManage from '@/components/admin/views/terms/TermsManage.jsx';
 import TermsModify from '@/components/admin/views/terms/TermsModify.jsx';
 import UserManagementDetail from '@/components/admin/views/usermanagement/UserManagementDetail.jsx';
 import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
-import { ServiceBanner } from '@/components/commons/banner/index.jsx';
-import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
+import AdminLogin from '@/pages/admin/auth/AdminLogin.jsx';
+
+/* ================= 사용자 서비스 (정적 Import) ================= */
 import { HospitalDetailLayout } from '@/components/hosiptals/layout/hospitalDetailLayout';
 import MainLayout from '@/components/user/layout/MainLayout.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
 import NotiLayout from '@/components/user/layout/NotiLayout.jsx';
 import SupportMyInquiry from '@/components/user/my/SupportMyInquiry.jsx';
-import AdminLogin from '@/pages/admin/auth/AdminLogin.jsx';
 import GoogleCallback from '@/pages/user/auth/GoogleCallback.jsx';
 import KakaoCallback from '@/pages/user/auth/KakaoCallback.jsx';
 import NaverCallback from '@/pages/user/auth/NaverCallback.jsx';
@@ -43,14 +48,7 @@ import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import { Community } from '@/pages/user/community';
 import CommunityDetail from '@/pages/user/community/CommunityDetail.jsx';
 import CommunityMain from '@/pages/user/community/CommunityMain.jsx';
-import CommunityWrite from '@/pages/user/community/CommunityWrite.jsx';
 import Home from '@/pages/user/Home.jsx';
-import { EditReview } from '@/pages/user/hospitalReview/EditReview';
-import HosptialsReviews from '@/pages/user/hospitalReview/HosptialsReviews.jsx';
-import ReviewDetailPage from '@/pages/user/hospitalReview/ReviewDetailPage';
-import { ReviewMain } from '@/pages/user/hospitalReview/ReviewMain';
-// import { ReviewSerch } from '@/pages/user/hospitalReview/ReviewSearch';
-import { WriteReview } from '@/pages/user/hospitalReview/WriteReview';
 import { HospitalDetail } from '@/pages/user/hospitals/HospitalDetail.jsx';
 import Hospitals from '@/pages/user/hospitals/Hospitals';
 import { HospitalSearch } from '@/pages/user/hospitals/HospitalSearch';
@@ -58,9 +56,7 @@ import HospitalsMap from '@/pages/user/hospitals/HospitalsMap';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
 import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
-import MyPage from '@/pages/user/my/MyPage.jsx';
 import Notice from '@/pages/user/my/Notice.jsx';
-import ProfileEdit from '@/pages/user/my/ProfileEdit.jsx';
 import ReviewManage from '@/pages/user/my/ReviewManage.jsx';
 import Support from '@/pages/user/my/Support/Support.jsx';
 import SupportInquiryDetail from '@/pages/user/my/Support/SupportInquiryDetail.jsx';
@@ -75,6 +71,44 @@ import NotificationSetting from '@/pages/user/notification/NotificationSetting.j
 import { CommunityTabTemporary } from '@/pages/user/community/CommunityTabTemporary.jsx';
 import { CommunitySearch } from '@/pages/user/community/CommunitySearch';
 import { CommunitySearchLayout } from '@/components/community/layout/CommunitySearchLayout.jsx';
+
+/* ================= 동적 Import (Lazy Loading) ================= */
+// 마이페이지 및 커뮤니티 작성
+const MyPage = lazy(() => import('@/pages/user/my/MyPage.jsx'));
+const ProfileEdit = lazy(() => import('@/pages/user/my/ProfileEdit.jsx'));
+const CommunityWrite = lazy(
+  () => import('@/pages/user/community/CommunityWrite.jsx')
+);
+
+// 리뷰 관련 동적 Import
+const HosptialsReviews = lazy(
+  () => import('@/pages/user/hospitalReview/HosptialsReviews.jsx')
+);
+const ReviewDetailPage = lazy(
+  () => import('@/pages/user/hospitalReview/ReviewDetailPage')
+);
+const WriteReview = lazy(() =>
+  import('@/pages/user/hospitalReview/WriteReview').then((m) => ({
+    default: m.WriteReview,
+  }))
+);
+const ReviewMain = lazy(() =>
+  import('@/pages/user/hospitalReview/ReviewMain').then((m) => ({
+    default: m.ReviewMain,
+  }))
+);
+const EditReview = lazy(() =>
+  import('@/pages/user/hospitalReview/EditReview').then((m) => ({
+    default: m.EditReview,
+  }))
+);
+
+/* ================= 공통 로딩 UI (Fallback) ================= */
+const PageLoader = () => (
+  <div className="flex h-screen w-full items-center justify-center bg-white">
+    <Spinner />
+  </div>
+);
 
 const router = createBrowserRouter([
   /* ================= 루트 ================= */
@@ -139,7 +173,6 @@ const router = createBrowserRouter([
           { path: 'search', element: <HospitalSearch /> },
         ],
       },
-
       {
         path: 'hospitals/:id',
         element: (
@@ -150,24 +183,72 @@ const router = createBrowserRouter([
           </LayoutShell>
         ),
       },
+      /* ================= 리뷰 (Lazy 적용) ================= */
       {
         path: 'reviews',
-        element: <HosptialsReviews />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <HosptialsReviews />
+          </Suspense>
+        ),
         children: [
-          { index: true, element: <ReviewMain /> },
+          {
+            index: true,
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <ReviewMain />
+              </Suspense>
+            ),
+          },
           // { path: 'search', element: <ReviewSerch /> },
-          { path: 'write', element: <WriteReview /> },
-          { path: ':reviewId', element: <ReviewDetailPage /> },
-          { path: ':reviewId/edit', element: <EditReview /> },
+          {
+            path: 'write',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <WriteReview />
+              </Suspense>
+            ),
+          },
+          {
+            path: ':reviewId',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <ReviewDetailPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: ':reviewId/edit',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <EditReview />
+              </Suspense>
+            ),
+          },
         ],
       },
+      /* ================= 커뮤니티 (Write 영역 Lazy 적용) ================= */
       {
         path: 'community',
         element: <Community />,
         children: [
           { index: true, element: <CommunityMain /> },
-          { path: 'write', element: <CommunityWrite /> },
-          { path: ':postId/edit', element: <CommunityWrite /> },
+          {
+            path: 'write',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <CommunityWrite />
+              </Suspense>
+            ),
+          },
+          {
+            path: ':postId/edit',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <CommunityWrite />
+              </Suspense>
+            ),
+          },
           { path: ':postId', element: <CommunityDetail /> },
           {
             path: 'search',
@@ -181,13 +262,15 @@ const router = createBrowserRouter([
         element: <Community />,
         children: [{ index: true, element: <CommunityTabTemporary /> }],
       },
-      // 마이페이지
+      /* ================= 마이페이지 (MyPage, ProfileEdit Lazy 적용) ================= */
       {
         path: 'mypage',
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <MainLayout title="마이페이지">
-              <MyPage />
+              <Suspense fallback={<PageLoader />}>
+                <MyPage />
+              </Suspense>
             </MainLayout>
           </LayoutShell>
         ),
@@ -197,7 +280,9 @@ const router = createBrowserRouter([
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <MypageLayout title="프로필수정">
-              <ProfileEdit />
+              <Suspense fallback={<PageLoader />}>
+                <ProfileEdit />
+              </Suspense>
             </MypageLayout>
           </LayoutShell>
         ),
@@ -388,8 +473,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // 노티
-
   /* ================= OAuth ================= */
   { path: '/auth/kakao/callback', element: <KakaoCallback /> },
   { path: '/auth/google/callback', element: <GoogleCallback /> },
