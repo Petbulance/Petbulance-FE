@@ -145,6 +145,8 @@ export function HosipitalDetail({
         src={image}
         alt="병원 이미지"
         className="h-25 w-25 rounded-[16.88px] object-cover"
+        loading="lazy"
+        decoding="async"
       />
       <div className="flex flex-col">
         <div className="flex items-center gap-1">
