@@ -45,8 +45,10 @@ export async function fetchCommunityPosts({
   return response.data?.data ?? {};
 }
 
-export async function fetchCommunityPostDetail(postId) {
-  const response = await api.get(`/posts/${postId}`);
+export async function fetchCommunityPostDetail(postId, options = {}) {
+  const response = await api.get(`/posts/${postId}`, {
+    authType: options.authType,
+  });
   const data = response.data?.data ?? {};
   return data.post ?? data;
 }

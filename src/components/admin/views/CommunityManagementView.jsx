@@ -1,22 +1,125 @@
 import { AlertTriangle, Plus, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { COMMUNITY_REPORTS } from '@/components/admin/mock/communityReports.mock';
+import { fetchAdminReports } from '@/apis/admin/reports';
 import Pagination from '@/components/admin/Pagination.jsx';
 
 import { Badge } from '../ui/Badge';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
+
+const REPORT_TYPE_LABEL = {
+  POST: '게시글',
+  COMMENT: '댓글',
+  REVIEW: '리뷰',
+};
+
+const STATUS_LABEL = {
+  PENDING: '대기',
+  COMPLETED: '완료',
+  REJECTED: '반려',
+};
+
+const ACTION_TYPE_LABEL = {
+  WARNING: '경고',
+  SUSPEND: '정지',
+  PUBLISH: '게시',
+};
+
+const getReportTypeColor = (type) => {
+  if (type === 'POST') return 'purple';
+  if (type === 'COMMENT') return 'blue';
+  if (type === 'REVIEW') return 'indigo';
+  return 'gray';
+};
+
+const getStatusColor = (status) => {
+  if (status === 'PENDING') return 'yellow';
+  if (status === 'COMPLETED') return 'green';
+  if (status === 'REJECTED') return 'gray';
+  return 'gray';
+};
+
+const getActionColor = (actionType) => {
+  if (actionType === 'WARNING') return 'yellow';
+  if (actionType === 'SUSPEND') return 'red';
+  if (actionType === 'PUBLISH') return 'green';
+  return 'gray';
+};
+
+const getReportContent = (item) => {
+  if (item.reportType === 'POST') {
+    return {
+      text: item.post?.title || '-',
+      writer: item.post?.writerNickname || '-',
+      createdAt: item.post?.createdAt || '-',
+      reportCount: item.post?.reportCount ?? 0,
+    };
+  }
+
+  if (item.reportType === 'COMMENT') {
+    return {
+      text: item.comment?.content || '-',
+      writer: item.comment?.writerNickname || '-',
+      createdAt: item.comment?.createdAt || '-',
+      reportCount: item.comment?.reportCount ?? 0,
+    };
+  }
+
+  return {
+    text: '-',
+    writer: '-',
+    createdAt: '-',
+    reportCount: 0,
+  };
+};
 
 export default function CommunityManagementView() {
-  const [activeTab, setActiveTab] = useState('reports');
+  const navigate = useNavigate();
+  const activeTab = 'reports';
   const [page, setPage] = useState(1);
+  const [reports, setReports] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const totalPages = Math.ceil(COMMUNITY_REPORTS.length / PAGE_SIZE);
-  const pagedList = COMMUNITY_REPORTS.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
-  );
+  const loadReports = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAdminReports({
+        page,
+        size: PAGE_SIZE,
+      });
+      setReports(data.content || []);
+      setTotalPages(data.totalPages || 0);
+      setTotalElements(data.totalElements || 0);
+    } catch (error) {
+      console.error('커뮤니티 신고 목록 조회 실패:', error);
+      setReports([]);
+      setTotalPages(0);
+      setTotalElements(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    if (activeTab === 'reports') {
+      loadReports();
+    }
+  }, [activeTab, loadReports]);
+
+  const getPostId = (item) => item.post?.postId ?? item.comment?.postId ?? null;
+
+  const handleMoveDetail = (item) => {
+    const postId = getPostId(item);
+    if (!postId) return;
+
+    navigate(`/admin/community/${item.reportId}`, {
+      state: { report: item },
+    });
+  };
 
   const forbiddenWords = ['바보', '멍청이', '비추천', '광고글', '스팸단어'];
 
@@ -52,6 +155,9 @@ export default function CommunityManagementView() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-800">커뮤니티 관리</h2>
+            <span className="text-xs text-gray-500">
+              총 {totalElements}건 · {page}/{Math.max(totalPages, 1)} 페이지
+            </span>
             {/*   <span className="text-xs text-gray-500">
               최신순 10개씩 보기
             </span>*/}
@@ -71,73 +177,94 @@ export default function CommunityManagementView() {
               </thead>
 
               <tbody className="divide-y border-gray-100">
-                {pagedList.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-gray-100 hover:bg-blue-50"
-                  >
-                    <td className="px-6 py-4">
-                      <Badge color={item.type === '게시글' ? 'purple' : 'blue'}>
-                        {item.type}
-                      </Badge>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <div className="cursor-pointer truncate font-medium text-blue-600 hover:underline">
-                        {item.content}
-                      </div>
-                      <div className="mt-1 text-xs text-gray-500">
-                        {item.author} | {item.date}
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 text-sm font-semibold text-red-600">
-                      {item.caseType}
-                    </td>
-
-                    <td className="px-6 py-4">{item.reportDate}</td>
-
-                    <td className="px-6 py-4">
-                      <Badge
-                        color={
-                          item.status === '대기'
-                            ? 'yellow'
-                            : item.status === '완료'
-                              ? 'green'
-                              : 'gray'
-                        }
+                {!loading &&
+                  reports.map((item) => {
+                    const content = getReportContent(item);
+                    return (
+                      <tr
+                        key={item.reportId}
+                        className="border-gray-100 hover:bg-blue-50"
                       >
-                        {item.status}
-                      </Badge>
-                    </td>
+                        <td className="px-6 py-4">
+                          <Badge color={getReportTypeColor(item.reportType)}>
+                            {REPORT_TYPE_LABEL[item.reportType] ||
+                              item.reportType}
+                          </Badge>
+                        </td>
 
-                    <td className="px-6 py-4">
-                      <div className="flex gap-1">
-                        <button className="rounded bg-yellow-50 px-2 py-1 text-xs text-yellow-700 hover:bg-yellow-100">
-                          경고
-                        </button>
-                        <button className="rounded bg-red-50 px-2 py-1 text-xs text-red-700 hover:bg-red-100">
-                          정지
-                        </button>
-                        <button className="rounded bg-green-50 px-2 py-1 text-xs text-green-700 hover:bg-green-100">
-                          게시
-                        </button>
-                      </div>
+                        <td className="px-6 py-4">
+                          <button
+                            type="button"
+                            onClick={() => handleMoveDetail(item)}
+                            disabled={!getPostId(item)}
+                            className="max-w-full cursor-pointer truncate text-left font-medium text-blue-600 hover:underline disabled:cursor-not-allowed disabled:text-gray-400"
+                          >
+                            {content.text}
+                          </button>
+                          <div className="mt-1 text-xs text-gray-500">
+                            {content.writer} | {content.createdAt} | 신고{' '}
+                            {content.reportCount}회
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4 text-sm font-semibold text-red-600">
+                          {item.reportReason || '-'}
+                        </td>
+
+                        <td className="px-6 py-4">{item.reportedAt || '-'}</td>
+
+                        <td className="px-6 py-4">
+                          <Badge color={getStatusColor(item.status)}>
+                            {STATUS_LABEL[item.status] || item.status}
+                          </Badge>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <Badge color={getActionColor(item.actionType)}>
+                            {ACTION_TYPE_LABEL[item.actionType] ||
+                              item.actionType ||
+                              '-'}
+                          </Badge>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                {!loading && reports.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-6 py-10 text-center text-sm text-gray-400"
+                    >
+                      신고 내역이 없습니다.
                     </td>
                   </tr>
-                ))}
+                )}
+
+                {loading && (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="px-6 py-10 text-center text-sm text-gray-400"
+                    >
+                      불러오는 중...
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center pt-4">
-            <Pagination
-              page={page}
-              totalPages={totalPages}
-              onChange={setPage}
-            />
-          </div>
+          {totalPages > 0 && (
+            <div className="flex justify-center pt-4">
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onChange={setPage}
+              />
+            </div>
+          )}
         </div>
       )}
 

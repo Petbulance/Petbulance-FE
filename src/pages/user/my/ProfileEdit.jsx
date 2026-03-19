@@ -195,7 +195,7 @@ export default function ProfileEdit() {
           <img
             src={profileImage || defaultImg}
             alt="프로필"
-            className="h-24 w-24 rounded-full border-[0.8px] border-[var(--border-secondary,#757575)] object-cover"
+            className="h-24 w-24 rounded-full border-[0.8px] border-[var(--border-secondary,#757575)] object-contain"
           />
 
           <button

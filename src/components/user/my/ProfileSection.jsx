@@ -73,7 +73,7 @@ export default function ProfileSection({ isLoggedIn }) {
           <img
             src={profile?.profileImageUrl}
             alt="프로필"
-            className="h-10 w-10 rounded-full object-cover"
+            className="h-10 w-10 rounded-full object-contain"
           />
 
           <div>

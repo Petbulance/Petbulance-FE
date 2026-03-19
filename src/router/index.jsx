@@ -11,6 +11,7 @@ import App from '@/App.jsx';
 import AdminLayout from '@/components/admin/layout/AdminLayout.jsx';
 import ActivityLogs from '@/components/admin/views/ActivityLogs.jsx';
 import CommunityManagementView from '@/components/admin/views/CommunityManagementView.jsx';
+import CommunityReportDetail from '@/components/admin/views/CommunityReportDetail.jsx';
 import ContentCreate from '@/components/admin/views/Content/ContentCreate.jsx';
 import ContentModify from '@/components/admin/views/Content/ContentModify.jsx';
 import ContentView from '@/components/admin/views/Content/ContentView.jsx';
@@ -29,6 +30,7 @@ import UserManagementDetail from '@/components/admin/views/usermanagement/UserMa
 import UserManagementView from '@/components/admin/views/usermanagement/UserManagementView.jsx';
 import { ServiceBanner } from '@/components/commons/banner/index.jsx';
 import { LayoutShell } from '@/components/commons/layout/LayoutShell.jsx';
+import { CommunitySearchLayout } from '@/components/community/layout/CommunitySearchLayout.jsx';
 import { HospitalDetailLayout } from '@/components/hosiptals/layout/hospitalDetailLayout';
 import MainLayout from '@/components/user/layout/MainLayout.jsx';
 import MypageLayout from '@/components/user/layout/MypageLayout.jsx';
@@ -43,6 +45,8 @@ import SocialSignUp from '@/pages/user/auth/SocialSignUp.jsx';
 import { Community } from '@/pages/user/community';
 import CommunityDetail from '@/pages/user/community/CommunityDetail.jsx';
 import CommunityMain from '@/pages/user/community/CommunityMain.jsx';
+import { CommunitySearch } from '@/pages/user/community/CommunitySearch';
+import { CommunityTabTemporary } from '@/pages/user/community/CommunityTabTemporary.jsx';
 import CommunityWrite from '@/pages/user/community/CommunityWrite.jsx';
 import Home from '@/pages/user/Home.jsx';
 import { EditReview } from '@/pages/user/hospitalReview/EditReview';
@@ -72,9 +76,6 @@ import NotFoundPage from '@/pages/user/NotFoundPage.jsx';
 import NoticeDetail from '@/pages/user/notification/NoticeDetail.jsx';
 import NotificationPage from '@/pages/user/notification/NotificationPage.jsx';
 import NotificationSetting from '@/pages/user/notification/NotificationSetting.jsx';
-import { CommunityTabTemporary } from '@/pages/user/community/CommunityTabTemporary.jsx';
-import { CommunitySearch } from '@/pages/user/community/CommunitySearch';
-import { CommunitySearchLayout } from '@/components/community/layout/CommunitySearchLayout.jsx';
 
 const router = createBrowserRouter([
   /* ================= 루트 ================= */
@@ -95,6 +96,7 @@ const router = createBrowserRouter([
       { path: 'reviews', element: <ReviewView /> },
       { path: 'reviews/:id', element: <ReviewDetail /> },
       { path: 'community', element: <CommunityManagementView /> },
+      { path: 'community/:reportId', element: <CommunityReportDetail /> },
       { path: 'cs', element: <CustomerCenterView /> },
       { path: 'cs/:id', element: <CustomerCenterDetail /> },
       { path: 'content', element: <ContentView /> },

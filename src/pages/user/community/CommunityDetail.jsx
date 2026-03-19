@@ -80,7 +80,7 @@ function CommentItem({ comment, onReply, onMore, isMyPost }) {
         <img
           src={comment.profileUrl || defaultProfile}
           alt="프로필"
-          className="mt-0.5 h-6 w-6 shrink-0 rounded-full"
+          className="mt-0.5 h-6 w-6 shrink-0 rounded-full object-contain"
         />
         <div className={`min-w-0 flex-1 ${isReply ? 'pl-3' : ''}`}>
           <div className="flex items-center justify-between">
@@ -844,7 +844,7 @@ export default function CommunityDetail() {
             <img
               src={writerProfileSrc}
               alt="프로필"
-              className="h-8 w-8 rounded-full"
+              className="h-8 w-8 rounded-full object-contain"
             />
             <div>
               <p className="text-[14px] font-medium text-[#424242]">

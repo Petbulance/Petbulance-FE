@@ -53,6 +53,7 @@ export default function LatestReceiptReview() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
+  const isSingleReview = reviews.length === 1;
 
   /* ===============================
      최신 영수증 후기 조회
@@ -102,7 +103,7 @@ export default function LatestReceiptReview() {
       </div>
 
       {/* ================= 캐러셀 ================= */}
-      <div className="-mx-[24px]">
+      <div className={isSingleReview ? '' : '-mx-[24px]'}>
         <Carousel
           opts={{ loop: true, align: 'center' }}
           plugins={[
@@ -112,11 +113,15 @@ export default function LatestReceiptReview() {
             }),
           ]}
         >
-          <CarouselContent className="-ml-4">
+          <CarouselContent
+            className={isSingleReview ? 'ml-0 justify-center' : '-ml-4'}
+          >
             {reviews.map((review) => (
               <CarouselItem
                 key={review.id}
-                className="basis-[80%] pl-4"
+                className={
+                  isSingleReview ? 'basis-full pl-0' : 'basis-[80%] pl-4'
+                }
                 onClick={() => navigate(`/index/reviews/${review.id}`)}
               >
                 {/* 카드 */}
