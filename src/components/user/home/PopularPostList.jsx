@@ -4,12 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { fetchCommunityPosts } from '@/apis/community/posts';
 import Spinner from '@/components/commons/Spinner.jsx';
-
-const formatSuspensionDateTime = (message = '') =>
-  String(message).replace(
-    /(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?/g,
-    (_, date, hour, minute) => `${date} ${Number(hour)}:${Number(minute)}`
-  );
+import { formatSuspensionDateTime } from '@/utils/formatSuspensionDateTime';
 
 export default function PopularPostList() {
   const navigate = useNavigate();

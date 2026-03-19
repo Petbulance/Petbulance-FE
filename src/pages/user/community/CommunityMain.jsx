@@ -13,6 +13,7 @@ import { PostCard } from '@/components/community/ui/PostCard';
 import { SortDropdown } from '@/components/community/ui/SortDropdown';
 import { TopicFilterChips } from '@/components/community/ui/TopicFilterChips';
 import { TOPIC_FILTERS } from '@/data/community';
+import { formatSuspensionDateTime } from '@/utils/formatSuspensionDateTime';
 
 export default function CommunityMain() {
   const sentinelRef = useRef(null);
@@ -79,8 +80,9 @@ export default function CommunityMain() {
       } catch (error) {
         const serverMessage = error?.response?.data?.data?.message;
         setErrorMessage(
-          serverMessage ||
-            '게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+          serverMessage
+            ? formatSuspensionDateTime(serverMessage)
+            : '게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
         );
       } finally {
         isLoadingRef.current = false;
