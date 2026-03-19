@@ -5,6 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { fetchCommunityPosts } from '@/apis/community/posts';
 import Spinner from '@/components/commons/Spinner.jsx';
 
+const formatSuspensionDateTime = (message = '') =>
+  String(message).replace(
+    /(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?/g,
+    (_, date, hour, minute) => `${date} ${Number(hour)}:${Number(minute)}`
+  );
+
 export default function PopularPostList() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -34,7 +40,9 @@ export default function PopularPostList() {
         if (!mounted) return;
         const serverMessage = error?.response?.data?.data?.message;
         setErrorMessage(
-          serverMessage || '인기 게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+          serverMessage
+            ? formatSuspensionDateTime(serverMessage)
+            : '인기 게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
         );
       } finally {
         if (mounted) setLoading(false);
