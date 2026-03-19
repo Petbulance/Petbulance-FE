@@ -12,6 +12,8 @@ export function DetailContent({ hospitalData }) {
       hospital_id: String(hospitalData?.hospitalId || ''),
       from_screen: 'detail_cta',
       call_type: '직접전화',
+      click_location: 'cta_button',
+      hospital_name: hospitalData?.name || '',
     });
     window.location.href = `tel:${hospitalData.phone}`;
   };

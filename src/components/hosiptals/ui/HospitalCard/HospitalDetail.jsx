@@ -86,6 +86,8 @@ export function HosipitalDetail({
       hospital_id: String(id),
       from_screen: 'detail_cta',
       call_type: '직접전화',
+      click_location: 'header_phone_number',
+      hospital_name: name,
     };
     console.log('[GA] click_call_hospital payload', gaPayload);
     pushDataLayer('click_call_hospital', gaPayload);
