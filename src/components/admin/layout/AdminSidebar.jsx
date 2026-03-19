@@ -2,7 +2,14 @@ import { LogOut } from 'lucide-react';
 
 import logo from '@/assets/images/logo/pet_logo.png';
 
-export default function AdminSidebar({ menus, isOpen, currentPath, onChange }) {
+export default function AdminSidebar({
+  menus,
+  isOpen,
+  currentPath,
+  onChange,
+  onLogout,
+  isLoggingOut = false,
+}) {
   /** ✅ 하위 경로 포함 active 판별 */
   const isActiveMenu = (menuPath) => {
     if (menuPath === '/admin') {
@@ -56,9 +63,13 @@ export default function AdminSidebar({ menus, isOpen, currentPath, onChange }) {
 
       {/* 로그아웃 */}
       <div className="border-t border-gray-100 p-4">
-        <button className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600">
+        <button
+          onClick={onLogout}
+          disabled={isLoggingOut}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+        >
           <LogOut size={20} />
-          {isOpen && '로그아웃'}
+          {isOpen && (isLoggingOut ? '로그아웃 중...' : '로그아웃')}
         </button>
       </div>
     </aside>

@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import api from '@/apis/api.jsx';
 import useAdminStore from '@/stores/useAdminStore.js';
 
 import AdminHeader from './AdminHeader';
@@ -20,6 +21,7 @@ import AdminSidebar from './AdminSidebar';
 
 export default function AdminLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const clearAdminProfile = useAdminStore((state) => state.clearAdminProfile);
@@ -76,6 +78,23 @@ export default function AdminLayout() {
     }
   }, [clearAdminProfile, navigate, location.pathname]);
 
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+
+    try {
+      await api.get('/auth/logout', { authType: 'admin' });
+    } catch (error) {
+      console.error('관리자 로그아웃 실패', error);
+    } finally {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_refresh_token');
+      clearAdminProfile();
+      navigate('/admin/auth/login', { replace: true });
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#F8FAFC] text-[#1E293B]">
       <AdminSidebar
@@ -83,6 +102,8 @@ export default function AdminLayout() {
         isOpen={isSidebarOpen}
         currentPath={location.pathname}
         onChange={(path) => navigate(path)}
+        onLogout={handleLogout}
+        isLoggingOut={isLoggingOut}
         onToggle={() => setIsSidebarOpen((v) => !v)}
       />
 
