@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   COMMUNITY_SORT_TO_API,
@@ -8,14 +9,17 @@ import {
 } from '@/apis/community/posts';
 import { fetchNotices } from '@/apis/notices';
 import { CommunityHeader } from '@/components/community/layout/CommunityHeader';
-import { NoticeBanner } from '@/components/community/ui/NoticeBanner';
 import { PostCard } from '@/components/community/ui/PostCard';
 import { SortDropdown } from '@/components/community/ui/SortDropdown';
 import { TopicFilterChips } from '@/components/community/ui/TopicFilterChips';
+import { NoticeBanner } from '@/components/community/ui/NoticeBanner';
+import CommunityBanDetailModal from '@/components/community/ui/CommunityBanDetailModal';
 import { TOPIC_FILTERS } from '@/data/community';
 import { formatSuspensionDateTime } from '@/utils/formatSuspensionDateTime';
+import NoticeModal from '@/components/commons/layout/NoticeModal';
 
 export default function CommunityMain() {
+  const navigate = useNavigate();
   const sentinelRef = useRef(null);
   const isLoadingRef = useRef(false);
   const hasNextRef = useRef(false);
@@ -29,6 +33,9 @@ export default function CommunityMain() {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isBanPopupOpen, setIsBanPopupOpen] = useState(false);
+  const [isBanDetailOpen, setIsBanDetailOpen] = useState(false);
+  const [banMessage, setBanMessage] = useState('');
 
   const requestParams = useMemo(
     () => ({
@@ -79,11 +86,23 @@ export default function CommunityMain() {
         hasNextRef.current = nextHasNext;
       } catch (error) {
         const serverMessage = error?.response?.data?.data?.message;
-        setErrorMessage(
-          serverMessage
-            ? formatSuspensionDateTime(serverMessage)
-            : '게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
-        );
+
+        if (
+          error?.response?.data?.data?.errorClassName === 'COMMUNITY_BANNED'
+        ) {
+          setErrorMessage('');
+          setBanMessage(
+            serverMessage
+              ? formatSuspensionDateTime(serverMessage)
+              : '커뮤니티 이용이 정지되었습니다.'
+          );
+          setIsBanPopupOpen(true);
+        } else {
+          setErrorMessage(
+            serverMessage ||
+              '게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+          );
+        }
       } finally {
         isLoadingRef.current = false;
         setIsLoading(false);
@@ -173,10 +192,38 @@ export default function CommunityMain() {
       <NoticeBanner notices={notices} />
 
       <section className="flex-1 bg-white">
-        {errorMessage && (
+        {errorMessage && !isBanPopupOpen && (
           <p className="px-6 py-10 text-center text-sm text-[#616161]">
             {errorMessage}
           </p>
+        )}
+
+        {isBanPopupOpen && (
+          <NoticeModal
+            open={isBanPopupOpen}
+            title="알림"
+            content={banMessage}
+            confirmText="홈으로"
+            cancelText="자세히"
+            onConfirm={() => {
+              setIsBanPopupOpen(false);
+              navigate('/index/home');
+            }}
+            onCancel={() => {
+              setIsBanPopupOpen(false);
+              setIsBanDetailOpen(true);
+            }}
+          />
+        )}
+
+        {isBanDetailOpen && (
+          <CommunityBanDetailModal
+            open={isBanDetailOpen}
+            onClose={() => {
+              setIsBanDetailOpen(false);
+              setIsBanPopupOpen(true);
+            }}
+          />
         )}
 
         {!errorMessage && isInitialLoading && (
