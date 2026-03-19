@@ -8,7 +8,7 @@ import { RequestSection } from './requestSection';
 
 export function DetailContent({ hospitalData }) {
   const handleCallInquiryClick = () => {
-    pushDataLayer('click_call_hospital', {
+    pushDataLayer('tag_call_cta_click', {
       hospital_id: String(hospitalData?.hospitalId || ''),
       from_screen: 'detail_cta',
       call_type: '직접전화',
