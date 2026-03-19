@@ -89,8 +89,8 @@ export function HosipitalDetail({
       click_location: 'header_phone_number',
       hospital_name: name,
     };
-    console.log('[GA] click_call_hospital payload', gaPayload);
-    pushDataLayer('click_call_hospital', gaPayload);
+    console.log('[GA] tag_phone_number_click payload', gaPayload);
+    pushDataLayer('tag_phone_number_click', gaPayload);
   };
 
   useEffect(() => {
