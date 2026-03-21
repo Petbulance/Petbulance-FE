@@ -76,20 +76,23 @@ export function NoticeBanner({ notices = [] }) {
         }
       >
         <div
-          className="flex h-full w-[200%]"
+          className="flex h-[200%] w-full flex-col"
           style={{
-            transform: isAnimating ? 'translateX(-50%)' : 'translateX(0)',
+            transform: isAnimating ? 'translateY(-50%)' : 'translateY(0)',
             transition: isTransitionEnabled
               ? `transform ${ANIMATION_MS}ms ease`
               : 'none',
           }}
         >
-          <p className="w-1/2 shrink-0 truncate" aria-hidden={isAnimating}>
+          <p
+            className="h-1/2 shrink-0 truncate leading-6"
+            aria-hidden={isAnimating}
+          >
             {renderNotice(currentNotice)}
           </p>
 
           {noticeList.length > 1 && (
-            <p className="w-1/2 shrink-0 truncate">
+            <p className="h-1/2 shrink-0 truncate leading-6">
               {renderNotice(nextNotice)}
             </p>
           )}
