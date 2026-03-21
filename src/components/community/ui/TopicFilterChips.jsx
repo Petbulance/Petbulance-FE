@@ -13,7 +13,7 @@ export function TopicFilterChips({ selectedTopic, onSelectTopic }) {
               className={`shrink-0 rounded-full px-3 py-1 text-[12.94px] ${
                 isActive
                   ? 'bg-[#2DA969] text-white'
-                  : 'border border-[##EEEEEE] bg-white text-[#424242]'
+                  : 'border border-[#EEEEEE] bg-white text-[#424242]'
               }`}
             >
               {filter}

@@ -22,7 +22,7 @@ export function PostCard({ post }) {
   return (
     <article
       key={postId}
-      className="cursor-pointer border-b border-[##EEEEEE] px-6 py-4"
+      className="cursor-pointer border-b border-[#EEEEEE] px-6 py-4"
       onClick={() => navigate(`/index/community/${postId}`)}
     >
       <div className="flex gap-3">
