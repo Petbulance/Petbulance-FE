@@ -217,6 +217,21 @@ const blackToastStyle = {
   boxShadow: 'none',
 };
 
+const toBoolean = (value) =>
+  value === true || value === 'true' || value === 1 || value === '1';
+
+const normalizePostDetail = (post = {}) => {
+  const liked = toBoolean(
+    post.liked ?? post.likedByUser ?? post.isLikedByUser ?? post.isLiked
+  );
+
+  return {
+    ...post,
+    liked,
+    likedByUser: liked,
+  };
+};
+
 export default function CommunityDetail() {
   const navigate = useNavigate();
   const { postId } = useParams();
@@ -286,7 +301,7 @@ export default function CommunityDetail() {
       try {
         const data = await fetchCommunityPostDetail(postId);
         if (!mounted) return;
-        setPost(data);
+        setPost(normalizePostDetail(data));
       } catch (error) {
         if (!mounted) return;
         const errorClass = error?.response?.data?.data?.errorClassName;
@@ -546,9 +561,11 @@ export default function CommunityDetail() {
 
       setPost((prev) => {
         if (!prev) return prev;
+        const nextLiked = toBoolean(data.liked ?? data.likedByUser);
         return {
           ...prev,
-          liked: Boolean(data.liked),
+          liked: nextLiked,
+          likedByUser: nextLiked,
           likeCount:
             typeof data.likeCount === 'number'
               ? data.likeCount
@@ -566,10 +583,28 @@ export default function CommunityDetail() {
           position: 'bottom-center',
         });
       } else if (errorClass === 'ALREADY_LIKED') {
+        setPost((prev) =>
+          prev
+            ? {
+                ...prev,
+                liked: true,
+                likedByUser: true,
+              }
+            : prev
+        );
         toast('이미 좋아요를 누른 게시글입니다.', {
           position: 'bottom-center',
         });
       } else if (errorClass === 'LIKE_NOT_FOUND') {
+        setPost((prev) =>
+          prev
+            ? {
+                ...prev,
+                liked: false,
+                likedByUser: false,
+              }
+            : prev
+        );
         toast('좋아요 내역이 존재하지 않습니다.', {
           position: 'bottom-center',
         });
