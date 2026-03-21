@@ -12,7 +12,7 @@ import {
   fetchMyPosts,
 } from '@/apis/community/posts';
 import eyeIcon from '@/assets/images/icons/eye_icon.svg';
-import sadParrot from '@/assets/images/icons/sad_parrot.png';
+import sadHam from '@/assets/images/icons/sadHam.png';
 import Spinner from '@/components/commons/Spinner.jsx';
 
 const PAGE_SIZE = 10;
@@ -100,15 +100,15 @@ function ActionSheet({ open, onClose, onSelectDelete }) {
 
       <div className="absolute inset-0 flex items-center px-4">
         <div className="w-full rounded-xl bg-white px-5 py-5 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
-          <p className="mb-3 text-[28px] font-semibold text-[#1E1E1E]">
+          <p className="mb-3 text-[24px] font-semibold text-[#1E1E1E]">
             커뮤니티 게시글 삭제
           </p>
           <button
             type="button"
-            className="flex w-full items-center gap-2 rounded-lg py-2 text-left text-[22px] text-[#424242] hover:bg-[#F5F5F5]"
+            className="flex w-full items-center gap-2 rounded-lg py-2 text-left text-[22px] text-[#616161] hover:bg-[#F5F5F5]"
             onClick={onSelectDelete}
           >
-            <Trash2 size={22} strokeWidth={1.8} />
+            <Trash2 size={21} strokeWidth={1.8} />
             선택 삭제
           </button>
         </div>
@@ -439,14 +439,12 @@ export default function BoardManage() {
       {!isInitialLoading && !errorMessage && posts.length === 0 && (
         <div className="flex h-full flex-col items-center justify-center px-4 pb-24 text-center">
           <img
-            src={sadParrot}
+            src={sadHam}
             alt="작성한 글 없음"
-            className="mb-4 h-20 w-20"
+            className="mb-4 h-[160px] w-[160px]"
           />
-          <p className="text-[18px] font-semibold text-[#424242]">
-            작성한 글이 없어요.
-          </p>
-          <p className="mt-2 text-[13px] leading-5 text-[#9E9E9E]">
+          <p className="text-[27px] text-[#424242]">작성한 글이 없어요.</p>
+          <p className="mt-2 text-[20px] text-[#616161]">
             첫 게시글을 작성하고
             <br />
             펫뷸런스 커뮤니티에 참여해보세요!
@@ -455,7 +453,7 @@ export default function BoardManage() {
           <button
             type="button"
             onClick={() => navigate('/index/community')}
-            className="mt-8 h-10 w-full max-w-[320px] rounded-[8px] border border-[#27BE69] text-[14px] font-medium text-[#27BE69]"
+            className="mt-8 min-h-[68px] w-full rounded-xl border border-[#2DA969] text-[27px] text-[#2DA969]"
           >
             커뮤니티 구경하기
           </button>

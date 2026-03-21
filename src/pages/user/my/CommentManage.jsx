@@ -8,7 +8,7 @@ import {
   deletePostComment,
   fetchMyComments,
 } from '@/apis/community/posts';
-import sadParrot from '@/assets/images/icons/sad_parrot.png';
+import sadHam from '@/assets/images/icons/sadHam.png';
 import Spinner from '@/components/commons/Spinner.jsx';
 
 const PAGE_SIZE = 10;
@@ -385,15 +385,13 @@ export default function CommentManage() {
       {!isInitialLoading && !errorMessage && comments.length === 0 && (
         <div className="flex h-full flex-col items-center justify-center px-4 pb-24 text-center">
           <img
-            src={sadParrot}
-            alt="작성한 댓글 없음"
-            className="mb-4 h-20 w-20"
+            src={sadHam}
+            alt="작성한 글 없음"
+            className="mb-4 h-[160px] w-[160px]"
           />
-          <p className="text-[18px] font-semibold text-[#424242]">
-            작성한 댓글이 없어요.
-          </p>
-          <p className="mt-2 text-[13px] leading-5 text-[#9E9E9E]">
-            댓글을 작성하고
+          <p className="text-[27px] text-[#424242]">작성한 글이 없어요.</p>
+          <p className="mt-2 text-[20px] text-[#616161]">
+            첫 게시글을 작성하고
             <br />
             펫뷸런스 커뮤니티에 참여해보세요!
           </p>
@@ -401,7 +399,7 @@ export default function CommentManage() {
           <button
             type="button"
             onClick={() => navigate('/index/community')}
-            className="mt-8 h-10 w-full max-w-[320px] rounded-[8px] border border-[#27BE69] text-[14px] font-medium text-[#27BE69]"
+            className="mt-8 min-h-[68px] w-full rounded-xl border border-[#2DA969] text-[27px] text-[#2DA969]"
           >
             커뮤니티 구경하기
           </button>
