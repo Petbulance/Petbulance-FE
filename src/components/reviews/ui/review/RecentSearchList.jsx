@@ -8,9 +8,7 @@ export function RecentSearchList({ keywords, onDelete }) {
         <li key={item.id} className="flex items-center justify-between">
           <button className="flex items-center gap-2">
             <img src={clock_icon} alt="clock_icon" />
-            <span className="cursor-pointer text-[19px] text-[#424242] hover:underline">
-              {item.keyword}
-            </span>
+            <span className="text-[19px] text-[#424242]">{item.keyword}</span>
           </button>
 
           <button
