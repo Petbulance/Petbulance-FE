@@ -19,6 +19,7 @@ export function HospitalInfoSlide({
 }) {
   const navigate = useNavigate();
   const [swiperInstance, setSwiperInstance] = useState(null);
+  const isSingleHospital = hospitals.length === 1;
 
   useEffect(() => {
     if (swiperInstance && selectedHospital && hospitals) {
@@ -56,11 +57,11 @@ export function HospitalInfoSlide({
               prevEl: '.custom-prev',
               nextEl: '.custom-next',
             }}
-            className="h-full w-full !overflow-visible px-1 py-4"
+            className="h-full w-full !overflow-visible py-4"
           >
             {hospitals.map((h) => (
               <SwiperSlide key={h.hospitalId}>
-                <div className="h-full w-full">
+                <div className={`h-full w-full ${isSingleHospital && 'px-6'}`}>
                   <HospitalCard
                     img={h.image}
                     name={h.name}
