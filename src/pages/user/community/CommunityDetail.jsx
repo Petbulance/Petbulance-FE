@@ -1,4 +1,4 @@
-import { Heart, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -880,11 +880,7 @@ export default function CommunityDetail() {
               onClick={handleTogglePostLike}
               disabled={isTogglingLike}
             >
-              <Heart
-                className={post.liked ? 'fill-current' : ''}
-                size={16}
-                strokeWidth={2}
-              />
+              <span aria-hidden>👍</span>
               {post.likeCount ?? 0}
             </button>
             <p className="flex items-center gap-1">
