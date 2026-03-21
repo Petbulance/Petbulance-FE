@@ -831,14 +831,14 @@ export default function CommunityDetail() {
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         <section className="bg-white px-5 pt-4 pb-5">
-          <div className="mb-3 flex items-center gap-1 text-[12px]">
-            <span className="rounded-full bg-[#F1E89A] px-2 py-1 text-[#424242]">
-              {post.type}
-            </span>
-            <span className="rounded-full bg-[#F2F2F2] px-2 py-1 text-[#9E9E9E]">
-              {post.topic}
-            </span>
-          </div>
+          {/*<div className="mb-3 flex items-center gap-1 text-[12px]">*/}
+          {/*  <span className="rounded-full bg-[#F1E89A] px-2 py-1 text-[#424242]">*/}
+          {/*    {post.type}*/}
+          {/*  </span>*/}
+          {/*  <span className="rounded-full bg-[#F2F2F2] px-2 py-1 text-[#9E9E9E]">*/}
+          {/*    {post.topic}*/}
+          {/*  </span>*/}
+          {/*</div>*/}
 
           <div className="mb-3 flex items-center gap-2">
             <img

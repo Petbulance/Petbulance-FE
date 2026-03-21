@@ -11,7 +11,7 @@ import {
   uploadPostImages,
 } from '@/apis/community/posts';
 import cameraIcon from '@/assets/images/icons/camera_icon.svg';
-import downArrow from '@/assets/images/icons/gray_bottom_arrow.svg';
+import downArrow from '@/assets/images/icons/down_arrow.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 import xIconBlack from '@/assets/images/icons/x_icon_black.svg';
 
@@ -502,16 +502,13 @@ export default function CommunityWrite() {
               {ANIMAL_CATEGORIES.map((item) => (
                 <button
                   key={item}
-                  className="flex w-full items-center justify-between rounded px-1 py-2 text-left text-[14px] text-[#424242]"
+                  className="flex w-full items-center rounded px-1 py-2 text-left text-[14px] text-[#424242]"
                   onClick={() => {
                     setCategory(item);
                     setIsCategoryOpen(false);
                   }}
                 >
                   {item}
-                  {category === item && (
-                    <span className="text-[#2DA969]">✓</span>
-                  )}
                 </button>
               ))}
             </div>
