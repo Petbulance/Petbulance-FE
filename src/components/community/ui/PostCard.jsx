@@ -8,16 +8,16 @@ import thumbs from '@/assets/images/icons/thumbs.svg';
 export function PostCard({ post }) {
   const navigate = useNavigate();
   console.log(post);
-  const postId = post.postId ?? post.id;
-  const categoryLabel = post.category ?? post.topic ?? '-';
-  const animalLabel = post.boardName ?? post.type ?? post.animal ?? '-';
-  const createdAt = post.createdAt ?? post.time ?? '-';
-  const likeCount = post.likeCount ?? post.likes ?? 0;
-  const commentCount = post.commentCount ?? post.comments ?? 0;
-  const viewCount = post.viewCount ?? post.views ?? 0;
-  const hasImage = (post.imageCount ?? 0) > 0 || post.hasImage;
-  const imageCount = post.imageCount ?? (post.hasImage ? 1 : 0);
-  const nickname = post.nickname ?? post.nickname;
+  const postId = post.postId;
+  const categoryLabel = post.topic ?? '-';
+  const animalLabel = post.type ?? '-';
+  const createdAt = post.createdAt ?? '-';
+  const likeCount = post.likeCount ?? 0;
+  const commentCount = post.commentCount ?? 0;
+  const viewCount = post.viewCount ?? 0;
+  const hasImage = (post.imageCount ?? 0) > 0;
+  const imageCount = post.imageCount;
+  const nickname = post.writerNickname;
 
   return (
     <article

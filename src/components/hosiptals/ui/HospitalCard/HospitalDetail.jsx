@@ -142,47 +142,55 @@ export function HosipitalDetail({
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex w-full items-start gap-3">
       <img
         src={image}
         alt="병원 이미지"
-        className="h-25 w-25 rounded-[16.88px] object-cover"
+        className="h-20 w-20 shrink-0 rounded-[16.88px] object-cover sm:h-25 sm:w-25"
         loading="lazy"
         decoding="async"
       />
-      <div className="flex flex-col">
-        <div className="flex items-center gap-1">
-          <div className="text-[19px] font-semibold text-[#1E1E1E]">{name}</div>
-          <div className="flex items-center justify-center gap-0.5 text-[16px] font-medium">
+      <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 items-center gap-1">
+          <div className="min-w-0 truncate text-[16px] font-semibold text-[#1E1E1E] sm:text-[19px]">
+            {name}
+          </div>
+          <div className="flex shrink-0 items-center justify-center gap-0.5 text-[13px] font-medium sm:text-[16px]">
             <img src={Star} alt="star_icon" />
             <span className="text-[#424242]">{formattedRating}</span>
             <span className="text-[#9E9E9E]">({reviewCount || 0})</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.75 text-[14px] font-medium">
-          <span className={openNow ? 'text-[#067DFD]' : 'text-[#BDBDBD]'}>
+        <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[12px] font-medium leading-tight sm:text-[14px]">
+          <span
+            className={`shrink-0 whitespace-nowrap ${
+              openNow ? 'text-[#067DFD]' : 'text-[#BDBDBD]'
+            }`}
+          >
             {openNow ? '진료 중' : '진료 마감'}
           </span>
 
           {formattedTimeDisplay && (
             <>
-              <img src={DotIcon} alt="dot_icon" />
-              <span className="text-[#424242]">{formattedTimeDisplay}</span>
+              <img className="shrink-0" src={DotIcon} alt="dot_icon" />
+              <span className="shrink-0 whitespace-nowrap text-[#424242]">
+                {formattedTimeDisplay}
+              </span>
             </>
           )}
 
-          <img src={DotIcon} alt="dot_icon" />
-          <span className="text-[#9E9E9E]">
+          <img className="shrink-0" src={DotIcon} alt="dot_icon" />
+          <span className="shrink-0 whitespace-nowrap text-[#9E9E9E]">
             {distance !== null ? `${distance}km` : '- km'}
           </span>
         </div>
 
-        <div className="flex items-center gap-1 font-[#067DFD] text-[15px] font-semibold text-[#067DFD]">
+        <div className="flex min-w-0 items-center gap-1 text-[13px] font-semibold text-[#067DFD] sm:text-[15px]">
           <img src={PhoneIcon} alt="PhoneIcon" />
           <a
             href={`tel:${phone}`}
-            className="hover:underline"
+            className="whitespace-nowrap hover:underline"
             onClick={handleCallClick}
           >
             {phone}
