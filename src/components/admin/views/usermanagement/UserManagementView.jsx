@@ -52,18 +52,6 @@ export default function UserManagement() {
     fetchUsers(initialSearch);
   };
 
-  /* =========================
-   계정 삭제
-========================= */ const handleDelete = async (userId) => {
-    try {
-      await api.delete(`/admin/user/test/delete/${userId}`);
-      setUsers((prev) => prev.filter((user) => user.userId !== userId));
-      alert('삭제');
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">유저 관리</h2>
@@ -75,11 +63,7 @@ export default function UserManagement() {
         onReset={handleReset}
       />
 
-      <UserManagementList
-        users={users}
-        loading={loading}
-        onDelete={handleDelete}
-      />
+      <UserManagementList users={users} loading={loading} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -63,6 +63,7 @@ export default function CommunityWrite() {
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetchingPost, setIsFetchingPost] = useState(isEditMode);
+  const topicDropdownRef = useRef(null);
 
   const canSubmit = useMemo(
     () => Boolean(category && topic && title.trim() && content.trim()),
@@ -121,6 +122,32 @@ export default function CommunityWrite() {
       mounted = false;
     };
   }, [isEditMode, navigate, postId]);
+
+  useEffect(() => {
+    if (!isTopicOpen) return;
+
+    const handlePointerDown = (event) => {
+      if (!topicDropdownRef.current?.contains(event.target)) {
+        setIsTopicOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsTopicOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isTopicOpen]);
 
   const handleAddImages = (event) => {
     const files = Array.from(event.target.files || []);
@@ -318,7 +345,7 @@ export default function CommunityWrite() {
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-4">
-        <div className="relative">
+        <div ref={topicDropdownRef} className="relative">
           <button
             className="flex h-8 items-center gap-1 rounded-md px-2 text-[12px] text-[#616161]"
             onClick={() => setIsTopicOpen((prev) => !prev)}

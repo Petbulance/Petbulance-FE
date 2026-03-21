@@ -1,8 +1,13 @@
 import { ChevronLeft, Clock } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import api from '@/apis/api.jsx';
+import {
+  deleteAdminUser,
+  fetchAdminUserDetail,
+  reactivateAdminUserCommunity,
+  reactivateAdminUserReview,
+} from '@/apis/admin/users.js';
 import { StatusBadge } from '@/components/admin/ui/StatusBadge.jsx';
 
 /* =========================
@@ -29,25 +34,78 @@ export default function UserManagementDetail() {
   const [userTab, setUserTab] = useState('info');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isReviewReactivating, setIsReviewReactivating] = useState(false);
+  const [isCommunityReactivating, setIsCommunityReactivating] = useState(false);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
 
   /* =========================
      API 조회
   ========================= */
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get(`/admin/user/${id}`);
-        setUser(res.data.data);
-      } catch (error) {
-        console.error(error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
+  const loadUser = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAdminUserDetail(id);
+      setUser(data);
+    } catch (error) {
+      console.error(error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  const handleReactivateCommunity = async () => {
+    if (!id || isCommunityReactivating) return;
+
+    setIsCommunityReactivating(true);
+    try {
+      const data = await reactivateAdminUserCommunity(id);
+      window.alert(data.message || '커뮤니티 정지를 해제했습니다.');
+      await loadUser();
+    } catch (error) {
+      const message = error?.response?.data?.data?.message;
+      window.alert(message || '커뮤니티 정지 해제에 실패했습니다.');
+    } finally {
+      setIsCommunityReactivating(false);
+    }
+  };
+
+  const handleReactivateReview = async () => {
+    if (!id || isReviewReactivating) return;
+
+    setIsReviewReactivating(true);
+    try {
+      const data = await reactivateAdminUserReview(id);
+      window.alert(data.message || '후기 정지를 해제했습니다.');
+      await loadUser();
+    } catch (error) {
+      const message = error?.response?.data?.data?.message;
+      window.alert(message || '후기 정지 해제에 실패했습니다.');
+    } finally {
+      setIsReviewReactivating(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!id || isDeletingUser) return;
+    if (!window.confirm('해당 유저를 탈퇴 처리하시겠습니까?')) return;
+
+    setIsDeletingUser(true);
+    try {
+      await deleteAdminUser(id);
+      window.alert('탈퇴 처리되었습니다.');
+      navigate('/admin/users', { replace: true });
+    } catch (error) {
+      const message = error?.response?.data?.data?.message;
+      window.alert(message || '탈퇴 처리에 실패했습니다.');
+    } finally {
+      setIsDeletingUser(false);
+    }
+  };
 
   /* =========================
      로딩 / 에러
@@ -143,14 +201,30 @@ export default function UserManagementDetail() {
               <div className="border-t pt-4">
                 <h4 className="mb-3 text-sm font-bold">관리 조치</h4>
                 <div className="flex gap-2">
-                  <button className="rounded bg-purple-50 px-4 py-2 text-sm text-purple-700 hover:bg-purple-100">
-                    후기 정지 해제
+                  <button
+                    onClick={handleReactivateReview}
+                    disabled={isReviewReactivating}
+                    className="rounded bg-purple-50 px-4 py-2 text-sm text-purple-700 hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isReviewReactivating
+                      ? '후기 정지 해제 중...'
+                      : '후기 정지 해제'}
                   </button>
-                  <button className="rounded bg-indigo-50 px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-100">
-                    커뮤 정지 해제
+                  <button
+                    onClick={handleReactivateCommunity}
+                    disabled={isCommunityReactivating}
+                    className="rounded bg-indigo-50 px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isCommunityReactivating
+                      ? '커뮤 정지 해제 중...'
+                      : '커뮤 정지 해제'}
                   </button>
-                  <button className="rounded bg-red-50 px-4 py-2 text-sm text-red-600 hover:bg-red-100">
-                    강제 탈퇴 처리
+                  <button
+                    onClick={handleDeleteUser}
+                    disabled={isDeletingUser}
+                    className="rounded bg-red-50 px-4 py-2 text-sm text-red-600 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isDeletingUser ? '탈퇴 처리 중...' : '강제 탈퇴 처리'}
                   </button>
                 </div>
               </div>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { StatusBadge } from '@/components/admin/ui/StatusBadge.jsx';
@@ -44,10 +43,7 @@ const mapSignUpPath = (path) => {
   }
 };
 
-export default function UserManagementList({
-  users = [],
-  onDelete = () => {},
-}) {
+export default function UserManagementList({ users = [] }) {
   const navigate = useNavigate();
 
   const handleSelect = (userId) => {
@@ -65,7 +61,6 @@ export default function UserManagementList({
               <th className="px-6 py-3">가입일</th>
               <th className="px-6 py-3">상태 (누적경고)</th>
               <th className="px-6 py-3">상세</th>
-              <th className="px-6 py-3">계정 삭제</th>
             </tr>
           </thead>
 
@@ -73,7 +68,7 @@ export default function UserManagementList({
             {users.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={5}
                   className="py-12 text-center text-sm text-gray-400"
                 >
                   검색 결과가 없습니다.
@@ -125,18 +120,6 @@ export default function UserManagementList({
                         }}
                       >
                         상세보기
-                      </button>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <button
-                        className="rounded border border-red-500 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDelete(user.userId);
-                        }}
-                      >
-                        삭제
                       </button>
                     </td>
                   </tr>
