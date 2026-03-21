@@ -1,10 +1,4 @@
-export const TOPIC_FILTERS = [
-  '전체',
-  '건강/질병',
-  '용품/사료',
-  '일상/자랑',
-  '중고거래',
-];
+export const TOPIC_FILTERS = ['전체', '건강/질병', '용품/사료', '일상/자랑'];
 
 export const SORT_OPTIONS = ['최신순', '인기순', '댓글순'];
 

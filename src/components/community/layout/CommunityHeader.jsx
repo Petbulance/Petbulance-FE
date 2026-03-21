@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+import { fetchNotifications } from '@/apis/notifications';
 import arrow from '@/assets/images/icons/arrow_header.svg';
 import Bell from '@/assets/images/icons/bell.svg';
 import Search from '@/assets/images/icons/community_search.svg';
 
 export function CommunityHeader({ selectedType, onSelectType }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   const dropdownRef = useRef(null);
   const animalTypes = [
     '전체',
@@ -30,6 +33,32 @@ export function CommunityHeader({ selectedType, onSelectType }) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadNotifications = async () => {
+      try {
+        const data = await fetchNotifications({ size: 100 });
+        if (!mounted) return;
+        const unreadCount = (data?.content ?? []).filter(
+          (item) => !item.read
+        ).length;
+        setNotificationCount(unreadCount);
+      } catch {
+        if (mounted) setNotificationCount(0);
+      }
+    };
+
+    loadNotifications();
+
+    return () => {
+      mounted = false;
+    };
+  }, [location.pathname]);
+
+  const displayCount = notificationCount > 99 ? '99+' : notificationCount;
+  const isSingleDigit = String(notificationCount).length === 1;
 
   return (
     <div className="relative flex items-center justify-between border-b-[1px] border-[#E0E0E0] px-1 pl-5">
@@ -62,8 +91,29 @@ export function CommunityHeader({ selectedType, onSelectType }) {
         )}
       </div>
       <div className="flex items-center text-[#525252]">
-        <img src={Search} onClick={() => navigate('/index/community/search')} />
-        <img src={Bell} />
+        <img
+          src={Search}
+          alt="검색"
+          onClick={() => navigate('/index/community/search')}
+        />
+        <button
+          type="button"
+          className="relative ml-1"
+          onClick={() => navigate('/index/notification')}
+        >
+          <img src={Bell} alt="알림" />
+          {notificationCount > 0 && (
+            <span
+              className={`absolute -top-1 -right-1 flex items-center justify-center bg-[#27BE69] text-[10px] font-semibold text-white ${
+                isSingleDigit
+                  ? 'h-[16px] w-[16px] rounded-full'
+                  : 'h-[16px] min-w-[16px] rounded-full px-1'
+              }`}
+            >
+              {displayCount}
+            </span>
+          )}
+        </button>
       </div>
     </div>
   );

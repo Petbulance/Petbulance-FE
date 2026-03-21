@@ -2,10 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
-  COMMENT_SEARCH_TYPE_OPTIONS,
-  POST_SEARCH_TYPE_OPTIONS,
-} from '@/data/community';
-import {
   deleteAllRecentCommunityKeywords,
   deleteRecentCommunityKeyword,
   fetchRecentCommunityKeywords,
@@ -13,6 +9,10 @@ import {
   searchCommunityPosts,
 } from '@/apis/community/search';
 import { ANIMAL_CATEGORY_KO } from '@/data/animalSort';
+import {
+  COMMENT_SEARCH_TYPE_OPTIONS,
+  POST_SEARCH_TYPE_OPTIONS,
+} from '@/data/community';
 
 function getFilterLabel(selectedAnimalFilter, selectedCategoryFilter) {
   const animalLabel =
@@ -101,7 +101,6 @@ export function useCommunitySearch({ searchKeyword, setIsSearchHeaderHidden }) {
     '건강/질병': 'HEALTH',
     '용품/사료': 'SUPPLIES',
     '일상/자랑': 'DAILY',
-    중고거래: 'TRADE',
   };
 
   const normalizeRecentKeywords = (items = []) => {

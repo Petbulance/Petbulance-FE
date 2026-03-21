@@ -16,7 +16,7 @@ import xIcon from '@/assets/images/icons/x_icon.svg';
 import xIconBlack from '@/assets/images/icons/x_icon_black.svg';
 
 const ANIMAL_CATEGORIES = ['소형포유류', '조류', '파충류', '양서류', '어류'];
-const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑', '중고거래'];
+const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑'];
 
 const mapApiEnumToLabel = (apiValue, mapTable, fallback = '') => {
   if (!apiValue) return fallback;

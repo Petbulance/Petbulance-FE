@@ -8,7 +8,7 @@ import reviewImage from '@/assets/images/icons/review_img_ex.svg';
 import xIcon from '@/assets/images/icons/x_icon.svg';
 
 const ANIMAL_CATEGORIES = ['소형포유류', '조류', '파충류', '양서류', '어류'];
-const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑', '중고거래'];
+const TOPIC_OPTIONS = ['건강/질병', '용품/사료', '일상/자랑'];
 
 const EDIT_POSTS = {
   1: {

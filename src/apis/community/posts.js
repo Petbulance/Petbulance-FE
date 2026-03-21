@@ -15,7 +15,6 @@ export const COMMUNITY_TOPIC_TO_API = {
   '건강/질병': 'HEALTH',
   '용품/사료': 'SUPPLIES',
   '일상/자랑': 'DAILY',
-  중고거래: 'TRADE',
 };
 
 export const COMMUNITY_SORT_TO_API = {
