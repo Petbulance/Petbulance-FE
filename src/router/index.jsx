@@ -61,6 +61,7 @@ import { HospitalSearch } from '@/pages/user/hospitals/HospitalSearch';
 import HospitalsMap from '@/pages/user/hospitals/HospitalsMap';
 import Authorization from '@/pages/user/my/Authorization.jsx';
 import BoardManage from '@/pages/user/my/BoardManage.jsx';
+import CommentManage from '@/pages/user/my/CommentManage.jsx';
 import LoginSetting from '@/pages/user/my/LoginSetting.jsx';
 import MyPage from '@/pages/user/my/MyPage.jsx';
 import Notice from '@/pages/user/my/Notice.jsx';
@@ -249,7 +250,7 @@ const router = createBrowserRouter([
         element: (
           <LayoutShell banner={<ServiceBanner />}>
             <MypageLayout title="댓글 관리" left="true">
-              <BoardManage />
+              <CommentManage />
             </MypageLayout>
           </LayoutShell>
         ),

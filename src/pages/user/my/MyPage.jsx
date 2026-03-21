@@ -114,12 +114,12 @@ export default function MyPage() {
           <Item
             Icon={Document}
             label="게시글 관리"
-            onClick={() => alert('준비중입니다.')}
+            onClick={() => requireLogin('/index/mypage/boardmanage')}
           />
           <Item
             Icon={Forum}
             label="댓글 관리"
-            onClick={() => alert('준비중입니다.')}
+            onClick={() => requireLogin('/index/mypage/commentmanage')}
           />
         </Group>
 

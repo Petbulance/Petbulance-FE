@@ -44,6 +44,38 @@ export async function fetchCommunityPosts({
   return response.data?.data ?? {};
 }
 
+export async function fetchMyPosts({
+  keyword,
+  lastPostId,
+  pageSize = 10,
+} = {}) {
+  const response = await api.get('/posts/me', {
+    params: {
+      keyword: keyword || undefined,
+      lastPostId: lastPostId ?? undefined,
+      pageSize,
+    },
+  });
+
+  return response.data?.data ?? {};
+}
+
+export async function fetchMyComments({
+  keyword,
+  lastCommentId,
+  pageSize = 10,
+} = {}) {
+  const response = await api.get('/comments/me', {
+    params: {
+      keyword: keyword || undefined,
+      lastCommentId: lastCommentId ?? undefined,
+      pageSize,
+    },
+  });
+
+  return response.data?.data ?? {};
+}
+
 export async function fetchCommunityPostDetail(postId, options = {}) {
   const response = await api.get(`/posts/${postId}`, {
     authType: options.authType,
