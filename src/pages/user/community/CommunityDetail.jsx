@@ -946,7 +946,7 @@ export default function CommunityDetail() {
               disabled={isTogglingLike}
             >
               <span
-                className={post.liked ? 'text-[#FF6B57]' : 'text-[#B8B8B8]'}
+                className={post.liked ? 'text-[#E74D23]' : 'text-[#B8B8B8]'}
               >
                 <LikeHeartIcon liked={post.liked} />
               </span>
