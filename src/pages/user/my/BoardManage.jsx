@@ -87,6 +87,25 @@ function DeleteConfirmModal({ open, onCancel, onConfirm }) {
 }
 
 function ActionSheet({ open, onClose, onSelectDelete }) {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handlePointerDown = (event) => {
+      if (!panelRef.current?.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
@@ -99,7 +118,10 @@ function ActionSheet({ open, onClose, onSelectDelete }) {
       />
 
       <div className="absolute inset-0 flex items-center px-4">
-        <div className="w-full rounded-xl bg-white px-5 py-5 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+        <div
+          ref={panelRef}
+          className="w-full rounded-xl bg-white px-5 py-5 shadow-[0_8px_20px_rgba(0,0,0,0.12)]"
+        >
           <p className="mb-3 text-[24px] font-semibold text-[#1E1E1E]">
             커뮤니티 게시글 삭제
           </p>
