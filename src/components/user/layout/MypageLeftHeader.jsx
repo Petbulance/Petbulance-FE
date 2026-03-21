@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 export default function MypageLeftHeader({ title }) {
   const navigate = useNavigate();
   const isBoardManage = title === '게시글 관리';
+  const isCommentManage = title === '댓글 관리';
 
   return (
     <header className="sticky top-0 z-50 bg-white px-4 py-3 shadow-sm">
@@ -18,12 +19,18 @@ export default function MypageLeftHeader({ title }) {
           <h1 className="text-[25px] font-semibold text-gray-900">{title}</h1>
         </div>
 
-        {isBoardManage ? (
+        {isBoardManage || isCommentManage ? (
           <button
             type="button"
-            aria-label="게시글 관리 메뉴"
+            aria-label="작성글 관리 메뉴"
             onClick={() =>
-              window.dispatchEvent(new CustomEvent('boardmanage:open-menu'))
+              window.dispatchEvent(
+                new CustomEvent(
+                  isBoardManage
+                    ? 'boardmanage:open-menu'
+                    : 'commentmanage:open-menu'
+                )
+              )
             }
             className="text-[#616161]"
           >

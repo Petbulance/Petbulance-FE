@@ -1,42 +1,153 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Check, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
-import { fetchMyComments } from '@/apis/community/posts';
+import {
+  createPostComment,
+  deletePostComment,
+  fetchMyComments,
+} from '@/apis/community/posts';
+import sadParrot from '@/assets/images/icons/sad_parrot.png';
 import Spinner from '@/components/commons/Spinner.jsx';
 
 const PAGE_SIZE = 10;
 
-function CommentItem({ comment }) {
-  const navigate = useNavigate();
+const TOAST_STYLE = {
+  width: '100%',
+  height: '44px',
+  display: 'flex',
+  alignItems: 'center',
+  background: '#222222E5',
+  color: '#ffffff',
+};
 
-  const createdAt = comment.createdAt
-    ? new Date(comment.createdAt).toLocaleString('ko-KR')
-    : '-';
+const formatCreatedAt = (value) => {
+  if (!value) return '-';
+  if (typeof value === 'string' && value.includes('전')) return value;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hour = String(date.getHours()).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  return `${month}월 ${day}일 · ${hour}:${minute}`;
+};
+
+function DeleteConfirmModal({ open, onCancel, onConfirm }) {
+  if (!open) return null;
 
   return (
-    <button
-      type="button"
-      className="w-full border-b border-[#EEEEEE] px-4 py-4 text-left"
-      onClick={() => navigate(`/index/community/${comment.postId}`)}
-    >
-      <div className="mb-2 flex items-center gap-2">
-        <span className="rounded border border-[#E0E0E0] px-2 py-0.5 text-[12px] text-[#616161]">
-          {comment.hidden ? '숨김' : '게시중'}
-        </span>
-        <span className="text-[12px] text-[#9E9E9E]">{createdAt}</span>
-      </div>
+    <div className="absolute inset-0 z-40 flex items-center justify-center">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/50"
+        onClick={onCancel}
+        aria-label="삭제 취소"
+      />
+      <div className="relative mx-5 w-full max-w-[320px] rounded-xl bg-white px-5 py-5 text-center">
+        <p className="mb-1 text-[12px] text-[#9E9E9E]">주의</p>
+        <p className="text-[15px] leading-6 text-[#1E1E1E]">
+          댓글을 삭제하면 되돌릴 수 없어요.
+          <br />
+          그래도 삭제하시겠어요?
+        </p>
 
-      <p className="line-clamp-1 text-[16px] font-medium text-[#1E1E1E]">
-        {comment.postTitle}
-      </p>
-      <p className="mt-1 line-clamp-2 text-[14px] text-[#616161]">
-        {comment.commentContent}
-      </p>
-    </button>
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-9 flex-1 rounded-full border border-[#E0E0E0] text-[14px] text-[#9E9E9E]"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="h-9 flex-1 rounded-full bg-[#FF3B30] text-[14px] text-white"
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActionSheet({ open, onClose, onSelectDelete }) {
+  if (!open) return null;
+
+  return (
+    <div className="absolute inset-0 z-30">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/40"
+        onClick={onClose}
+        aria-label="액션시트 닫기"
+      />
+
+      <div className="absolute inset-0 flex items-center px-4">
+        <div className="w-full rounded-xl bg-white px-5 py-5 shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+          <p className="mb-3 text-[28px] font-semibold text-[#1E1E1E]">
+            커뮤니티 댓글 삭제
+          </p>
+          <button
+            type="button"
+            className="flex w-full items-center gap-2 rounded-lg py-2 text-left text-[22px] text-[#424242] hover:bg-[#F5F5F5]"
+            onClick={onSelectDelete}
+          >
+            <Trash2 size={22} strokeWidth={1.8} />
+            선택 삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CommentItem({ comment, isSelectMode, checked, onToggle, onClick }) {
+  return (
+    <article className="border-b border-[#EFEFEF] px-4 py-4">
+      <div className="flex gap-2.5">
+        {isSelectMode && (
+          <button
+            type="button"
+            onClick={() => onToggle(comment.commentId)}
+            className={`mt-0.5 h-4 w-4 shrink-0 rounded-[3px] border ${
+              checked
+                ? 'border-[#27BE69] bg-[#27BE69] text-white'
+                : 'border-[#CFCFCF] bg-white'
+            }`}
+          >
+            {checked && <Check size={12} strokeWidth={3} />}
+          </button>
+        )}
+
+        <button
+          type="button"
+          className="min-w-0 flex-1 text-left"
+          onClick={onClick}
+        >
+          <p className="line-clamp-1 text-[13px] font-medium text-[#1E1E1E]">
+            {comment.postTitle || '제목'}
+          </p>
+          <p className="mt-1 text-[10px] text-[#B0B0B0]">
+            {formatCreatedAt(comment.createdAt)}
+          </p>
+          <p className="mt-2 line-clamp-3 text-[12px] leading-6 text-[#424242]">
+            {comment.commentContent}
+          </p>
+        </button>
+      </div>
+    </article>
   );
 }
 
 export default function CommentManage() {
+  const navigate = useNavigate();
+
   const observerRef = useRef(null);
   const lastCommentIdRef = useRef(null);
   const isFetchingRef = useRef(false);
@@ -47,10 +158,14 @@ export default function CommentManage() {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [keywordInput, setKeywordInput] = useState('');
-  const [keyword, setKeyword] = useState('');
+  const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedCommentIds, setSelectedCommentIds] = useState([]);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  const requestKeyword = useMemo(() => keyword.trim(), [keyword]);
+  const selectedCount = selectedCommentIds.length;
+  const isAllSelected =
+    comments.length > 0 && selectedCount === comments.length;
 
   const loadComments = useCallback(
     async ({ reset }) => {
@@ -68,7 +183,6 @@ export default function CommentManage() {
 
       try {
         const data = await fetchMyComments({
-          keyword: requestKeyword || undefined,
           lastCommentId: reset ? null : lastCommentIdRef.current,
           pageSize: PAGE_SIZE,
         });
@@ -97,13 +211,15 @@ export default function CommentManage() {
         setIsFetchingMore(false);
       }
     },
-    [hasNext, requestKeyword]
+    [hasNext]
   );
 
   useEffect(() => {
     lastCommentIdRef.current = null;
     setComments([]);
     setHasNext(false);
+    setSelectedCommentIds([]);
+    setIsSelectMode(false);
     loadComments({ reset: true });
   }, [loadComments]);
 
@@ -123,66 +239,259 @@ export default function CommentManage() {
     return () => observer.disconnect();
   }, [loadComments]);
 
-  const handleSearch = () => {
-    setKeyword(keywordInput);
+  useEffect(() => {
+    const handleOpenMenu = () => {
+      if (isSelectMode) return;
+      setIsActionSheetOpen(true);
+    };
+
+    window.addEventListener('commentmanage:open-menu', handleOpenMenu);
+    return () =>
+      window.removeEventListener('commentmanage:open-menu', handleOpenMenu);
+  }, [isSelectMode]);
+
+  const handleToggleSelect = (commentId) => {
+    setSelectedCommentIds((prev) =>
+      prev.includes(commentId)
+        ? prev.filter((id) => id !== commentId)
+        : [...prev, commentId]
+    );
+  };
+
+  const handleToggleAllSelect = () => {
+    if (isAllSelected) {
+      setSelectedCommentIds([]);
+      return;
+    }
+    setSelectedCommentIds(comments.map((comment) => comment.commentId));
+  };
+
+  const handleEnterSelectMode = () => {
+    setIsActionSheetOpen(false);
+    setIsSelectMode(true);
+    setSelectedCommentIds([]);
+  };
+
+  const handleCancelDeleteConfirm = () => {
+    setIsDeleteConfirmOpen(false);
+    toast('댓글 삭제를 취소했어요', {
+      position: 'bottom-center',
+      style: TOAST_STYLE,
+      action: {
+        label: 'x',
+        onClick: () => toast.dismiss(),
+      },
+    });
+  };
+
+  const handleDeleteSelectedComments = async () => {
+    if (selectedCommentIds.length === 0) return;
+
+    try {
+      const removedCommentIds = [...selectedCommentIds];
+      const deletedSnapshots = comments.filter((comment) =>
+        removedCommentIds.includes(comment.commentId)
+      );
+
+      await Promise.all(removedCommentIds.map((id) => deletePostComment(id)));
+
+      setComments((prev) =>
+        prev.filter((comment) => !removedCommentIds.includes(comment.commentId))
+      );
+      setSelectedCommentIds([]);
+      setIsSelectMode(false);
+      setIsDeleteConfirmOpen(false);
+
+      toast('댓글 삭제를 완료했어요', {
+        position: 'bottom-center',
+        style: TOAST_STYLE,
+        action: {
+          label: '취소',
+          onClick: () => {
+            toast.dismiss();
+            (async () => {
+              try {
+                if (deletedSnapshots.length === 0) {
+                  throw new Error('NO_SNAPSHOT');
+                }
+
+                await Promise.all(
+                  deletedSnapshots.map((snapshot) =>
+                    createPostComment(snapshot.postId, {
+                      content: snapshot.commentContent || '',
+                      imageUrl: null,
+                      isSecret: false,
+                      parentId: null,
+                      mentionUserNickname: null,
+                    })
+                  )
+                );
+
+                lastCommentIdRef.current = null;
+                setHasNext(false);
+                setComments([]);
+                await loadComments({ reset: true });
+
+                toast('댓글 삭제를 취소했어요', {
+                  position: 'bottom-center',
+                  style: TOAST_STYLE,
+                  action: {
+                    label: 'x',
+                    onClick: () => toast.dismiss(),
+                  },
+                });
+              } catch {
+                toast('댓글 복원에 실패했습니다.', {
+                  position: 'bottom-center',
+                  style: TOAST_STYLE,
+                  action: {
+                    label: 'x',
+                    onClick: () => toast.dismiss(),
+                  },
+                });
+              }
+            })();
+          },
+        },
+      });
+    } catch (error) {
+      const message = error?.response?.data?.data?.message;
+      toast(message || '댓글 삭제에 실패했습니다.', {
+        position: 'bottom-center',
+        style: TOAST_STYLE,
+        action: {
+          label: 'x',
+          onClick: () => toast.dismiss(),
+        },
+      });
+      setIsDeleteConfirmOpen(false);
+    }
   };
 
   return (
-    <div className="flex h-full flex-col bg-white">
-      <div className="border-b border-[#EEEEEE] px-4 py-3">
-        <div className="flex gap-2">
-          <input
-            value={keywordInput}
-            onChange={(e) => setKeywordInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch();
-            }}
-            placeholder="댓글 내용 검색"
-            className="h-9 flex-1 rounded border border-[#E0E0E0] px-3 text-[14px] outline-none"
-          />
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="h-9 rounded bg-[#2DA969] px-4 text-[14px] text-white"
-          >
-            검색
-          </button>
+    <div className="relative flex h-full flex-col bg-white">
+      {isInitialLoading && (
+        <div className="flex h-full items-center justify-center">
+          <Spinner />
         </div>
-      </div>
+      )}
 
-      <main className="min-h-0 flex-1 overflow-y-auto">
-        {isInitialLoading && (
-          <div className="flex h-full items-center justify-center">
-            <Spinner />
-          </div>
-        )}
+      {!isInitialLoading && errorMessage && (
+        <p className="px-4 py-10 text-center text-[14px] text-[#616161]">
+          {errorMessage}
+        </p>
+      )}
 
-        {!isInitialLoading && errorMessage && (
-          <p className="px-4 py-10 text-center text-[14px] text-[#616161]">
-            {errorMessage}
-          </p>
-        )}
-
-        {!isInitialLoading && !errorMessage && comments.length === 0 && (
-          <p className="px-4 py-10 text-center text-[14px] text-[#9E9E9E]">
+      {!isInitialLoading && !errorMessage && comments.length === 0 && (
+        <div className="flex h-full flex-col items-center justify-center px-4 pb-24 text-center">
+          <img
+            src={sadParrot}
+            alt="작성한 댓글 없음"
+            className="mb-4 h-20 w-20"
+          />
+          <p className="text-[18px] font-semibold text-[#424242]">
             작성한 댓글이 없어요.
           </p>
-        )}
+          <p className="mt-2 text-[13px] leading-5 text-[#9E9E9E]">
+            댓글을 작성하고
+            <br />
+            펫뷸런스 커뮤니티에 참여해보세요!
+          </p>
 
-        {!isInitialLoading &&
-          !errorMessage &&
-          comments.map((comment) => (
-            <CommentItem key={comment.commentId} comment={comment} />
-          ))}
+          <button
+            type="button"
+            onClick={() => navigate('/index/community')}
+            className="mt-8 h-10 w-full max-w-[320px] rounded-[8px] border border-[#27BE69] text-[14px] font-medium text-[#27BE69]"
+          >
+            커뮤니티 구경하기
+          </button>
+        </div>
+      )}
 
-        <div ref={observerRef} className="h-8 w-full" />
+      {!isInitialLoading && !errorMessage && comments.length > 0 && (
+        <>
+          {isSelectMode && (
+            <div className="flex items-center justify-between border-b border-[#EFEFEF] px-4 py-2">
+              <button
+                type="button"
+                className="flex items-center gap-2 text-[13px] text-[#616161]"
+                onClick={handleToggleAllSelect}
+              >
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded-[3px] border ${
+                    isAllSelected
+                      ? 'border-[#27BE69] bg-[#27BE69] text-white'
+                      : 'border-[#CFCFCF] bg-white'
+                  }`}
+                >
+                  {isAllSelected && <Check size={12} strokeWidth={3} />}
+                </span>
+                전체선택
+              </button>
 
-        {isFetchingMore && (
-          <div className="pb-6 text-center text-[13px] text-[#9E9E9E]">
-            불러오는 중...
-          </div>
-        )}
-      </main>
+              <button
+                type="button"
+                className="h-6 rounded border border-[#E0E0E0] px-2 text-[11px] text-[#757575]"
+                onClick={() => {
+                  if (selectedCount === 0) {
+                    toast('삭제할 댓글을 선택해주세요.', {
+                      position: 'bottom-center',
+                      style: TOAST_STYLE,
+                      action: {
+                        label: 'x',
+                        onClick: () => toast.dismiss(),
+                      },
+                    });
+                    return;
+                  }
+                  setIsDeleteConfirmOpen(true);
+                }}
+              >
+                삭제
+              </button>
+            </div>
+          )}
+
+          <main className="min-h-0 flex-1 overflow-y-auto">
+            {comments.map((comment) => (
+              <CommentItem
+                key={comment.commentId}
+                comment={comment}
+                isSelectMode={isSelectMode}
+                checked={selectedCommentIds.includes(comment.commentId)}
+                onToggle={handleToggleSelect}
+                onClick={() => {
+                  if (isSelectMode) {
+                    handleToggleSelect(comment.commentId);
+                    return;
+                  }
+                  navigate(`/index/community/${comment.postId}`);
+                }}
+              />
+            ))}
+
+            <div ref={observerRef} className="h-8 w-full" />
+
+            {isFetchingMore && (
+              <div className="pb-6 text-center text-[13px] text-[#9E9E9E]">
+                불러오는 중...
+              </div>
+            )}
+          </main>
+        </>
+      )}
+
+      <ActionSheet
+        open={isActionSheetOpen}
+        onClose={() => setIsActionSheetOpen(false)}
+        onSelectDelete={handleEnterSelectMode}
+      />
+
+      <DeleteConfirmModal
+        open={isDeleteConfirmOpen}
+        onCancel={handleCancelDeleteConfirm}
+        onConfirm={handleDeleteSelectedComments}
+      />
     </div>
   );
 }
