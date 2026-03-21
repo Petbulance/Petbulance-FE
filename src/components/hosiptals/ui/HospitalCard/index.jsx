@@ -19,7 +19,7 @@ export function HospitalInfoSlide({
 }) {
   const navigate = useNavigate();
   const [swiperInstance, setSwiperInstance] = useState(null);
-  const isSingleHospital = hospitals.length === 1;
+  const isSingleHospital = hospitals?.length === 1;
 
   useEffect(() => {
     if (swiperInstance && selectedHospital && hospitals) {
