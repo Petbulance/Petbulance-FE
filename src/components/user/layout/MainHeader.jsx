@@ -1,15 +1,39 @@
 import { Notification } from '@carbon/icons-react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import { fetchNotifications } from '@/apis/notifications';
 
 export default function MainHeader({ title }) {
   const location = useLocation();
   const navigate = useNavigate();
   const isMyPage = title === '마이페이지';
   const isHome = location.pathname === '/index/home';
+  const [notificationCount, setNotificationCount] = useState(0);
 
-  // 알림 개수 예시
-  const notificationCount = 0; // 예시
-  // 99+ 분기
+  useEffect(() => {
+    let mounted = true;
+
+    const loadNotifications = async () => {
+      try {
+        const data = await fetchNotifications({ size: 100 });
+        if (!mounted) return;
+        const unreadCount = (data?.content ?? []).filter(
+          (item) => !item.read
+        ).length;
+        setNotificationCount(unreadCount);
+      } catch {
+        if (mounted) setNotificationCount(0);
+      }
+    };
+
+    loadNotifications();
+
+    return () => {
+      mounted = false;
+    };
+  }, [location.pathname]);
+
   const displayCount = notificationCount > 99 ? '99+' : notificationCount;
   const isSingleDigit = String(notificationCount).length === 1;
 

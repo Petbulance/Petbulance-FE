@@ -8,11 +8,6 @@ export default function NotificationPage() {
   const [activeTab, setActiveTab] = useState('공지사항');
 
   const handleTabChange = (tab) => {
-    if (tab === '내 활동') {
-      alert('준비중입니다');
-      return;
-    }
-
     setActiveTab(tab);
   };
 
@@ -23,7 +18,7 @@ export default function NotificationPage() {
       <main className="flex-1 overflow-y-auto">
         {activeTab === '공지사항' && <NoticeList />}
 
-        {/*{activeTab === '내 활동' && <ActivityList />}*/}
+        {activeTab === '내 활동' && <ActivityList />}
       </main>
     </div>
   );
