@@ -821,10 +821,10 @@ export default function CommunityDetail() {
         </button>
         <div className="flex items-center gap-4">
           <button>
-            <img src={shareIcon} alt="공유" />
+            <img src={shareIcon} className="h-[28px] w-[28px]" alt="공유" />
           </button>
           <button onClick={() => setIsMenuOpen(true)}>
-            <img src={seeMore} alt="더보기" />
+            <img src={seeMore} className="h-[28px] w-[28px]" alt="더보기" />
           </button>
         </div>
       </header>
