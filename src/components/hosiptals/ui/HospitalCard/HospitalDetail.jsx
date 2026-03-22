@@ -162,7 +162,7 @@ export function HosipitalDetail({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[12px] font-medium leading-tight sm:text-[14px]">
+        <div className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[12px] leading-tight font-medium sm:text-[14px]">
           <span
             className={`shrink-0 whitespace-nowrap ${
               openNow ? 'text-[#067DFD]' : 'text-[#BDBDBD]'

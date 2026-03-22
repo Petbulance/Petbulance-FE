@@ -116,6 +116,14 @@ export default function ReviewDetailPage() {
   const isMyReview =
     review && profile && review.userNickname === profile.nickname;
 
+  const handleHospitalNameClick = () => {
+    if (!review?.hospitalId) return;
+
+    navigate(`/index/hospitals/${review.hospitalId}`, {
+      state: { from_screen: 'review_detail' },
+    });
+  };
+
   return (
     <div className="relative h-full bg-white">
       <div className="flex h-fit flex-col border-b border-[#EEEEEE] bg-white px-6 pt-5 pb-5">
@@ -134,9 +142,13 @@ export default function ReviewDetailPage() {
         {/* 병원 정보 및 별점 */}
         <div className="mb-[26px] flex">
           <div className="flex flex-1 flex-col justify-center">
-            <div className="mb-2 text-[20px] font-medium text-[#1E1E1E]">
+            <button
+              type="button"
+              onClick={handleHospitalNameClick}
+              className="mb-2 w-fit cursor-pointer bg-transparent p-0 text-left text-[20px] font-medium text-[#1E1E1E] hover:underline"
+            >
               {review.hospitalName}
-            </div>
+            </button>
             <div className="mb-2 flex items-center gap-2">
               <div className="flex">
                 {Array.from({ length: 5 }).map((_, i) => (
