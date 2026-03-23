@@ -168,7 +168,7 @@ export default function CommunityMain() {
 
   return (
     <div className="relative flex min-h-full flex-col bg-[#F2F4F6]">
-      <section className="border-b border-gray-200 bg-white">
+      <section className="sticky top-0 z-50 bg-white">
         <CommunityHeader
           selectedType={selectedType}
           onSelectType={setSelectedType}
