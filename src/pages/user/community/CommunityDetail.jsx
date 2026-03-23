@@ -999,8 +999,8 @@ export default function CommunityDetail() {
               ))}
             </div>
           ) : (
-            <div className="px-4 py-5 text-[13px] text-[#B0B0B0]">
-              작성된 댓글이 없습니다.
+            <div className="px-4 py-5 text-center text-[13px] text-[#B0B0B0]">
+              첫 댓글을 남겨보세요.
             </div>
           )}
         </section>
