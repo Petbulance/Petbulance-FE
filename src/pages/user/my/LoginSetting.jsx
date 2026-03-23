@@ -175,13 +175,13 @@ export default function LoginSetting() {
         <div className="flex h-[72px] items-center justify-between border-b">
           <span className="text-[19px] font-medium">자동 로그인</span>
           <Switch
-            checked={autoLogin}
+            checked={false}
             onCheckedChange={setAutoLogin}
             className="data-[state=checked]:bg-success"
           />
         </div>
         <p className="mt-2 text-[14px] text-gray-400">
-          자동 로그인을 해제하면 모든 기기에서 로그아웃 처리됩니다.
+          해당 기능은 앱에서만 사용하는 기능입니다.
         </p>
       </div>
 
