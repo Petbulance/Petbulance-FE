@@ -61,7 +61,7 @@ export function CommunityHeader({ selectedType, onSelectType }) {
   const isSingleDigit = String(notificationCount).length === 1;
 
   return (
-    <div className="relative flex items-center justify-between border-b-[1px] border-[#E0E0E0] px-1 pl-5">
+    <div className="relative flex h-[57px] items-center justify-between border-b-[1px] border-[#E0E0E0] py-[14px] pr-[22px] pl-6 leading-[24px]">
       <div ref={dropdownRef} className="relative">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
@@ -95,10 +95,11 @@ export function CommunityHeader({ selectedType, onSelectType }) {
           src={Search}
           alt="검색"
           onClick={() => navigate('/index/community/search')}
+          className="cursor-pointer"
         />
         <button
           type="button"
-          className="relative ml-1"
+          className="relative"
           onClick={() => navigate('/index/notification')}
         >
           <img src={Bell} alt="알림" />
