@@ -1,4 +1,4 @@
-import { Check, Trash2 } from 'lucide-react';
+import { Check, Lock, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -8,6 +8,7 @@ import {
   deletePostComment,
   fetchMyComments,
 } from '@/apis/community/posts';
+import lock from '@/assets/images/icons/lock_Comment.png';
 import sadHam from '@/assets/images/icons/sadHam.png';
 import Spinner from '@/components/commons/Spinner.jsx';
 
@@ -108,6 +109,8 @@ function ActionSheet({ open, onClose, onSelectDelete }) {
 }
 
 function CommentItem({ comment, isSelectMode, checked, onToggle, onClick }) {
+  const isSecretComment = Boolean(comment.secret ?? comment.isSecret);
+
   return (
     <article className="border-b border-[#EFEFEF] px-4 py-4">
       <div className="flex gap-2.5">
@@ -130,14 +133,20 @@ function CommentItem({ comment, isSelectMode, checked, onToggle, onClick }) {
           className="min-w-0 flex-1 text-left"
           onClick={onClick}
         >
-          <p className="line-clamp-1 text-[13px] font-medium text-[#1E1E1E]">
+          <p className="line-clamp-1 text-[19px] font-medium text-[#424242]">
             {comment.postTitle || '제목'}
           </p>
-          <p className="mt-1 text-[10px] text-[#B0B0B0]">
+          <p className="mt-1 text-[14px] text-[#9e9e9e]">
             {formatCreatedAt(comment.createdAt)}
           </p>
-          <p className="mt-2 line-clamp-3 text-[12px] leading-6 text-[#424242]">
-            {comment.commentContent}
+          <p className="mt-2 line-clamp-3 text-[16px] leading-6 text-[#424242]">
+            {isSecretComment && (
+              <span className="mr-0.5 inline-flex items-center align-middle text-[#1E1E1E]">
+                {/*<Lock size={14} strokeWidth={2.2} />*/}
+                <img className="block h-[14px] w-[14px]" src={lock} alt="비밀 댓글" />
+              </span>
+            )}
+            <span className="align-middle">{comment.commentContent}</span>
           </p>
         </button>
       </div>

@@ -162,10 +162,10 @@ function PostItem({ post, isSelectMode, checked, onToggle, onClick }) {
           className="min-w-0 flex-1 text-left"
           onClick={onClick}
         >
-          <p className="line-clamp-1 text-[13px] font-medium text-[#1E1E1E]">
+          <p className="line-clamp-1 text-[19px] font-medium text-[#424242]">
             {post.title || '제목'}
           </p>
-          <p className="mt-1 flex items-center gap-1 text-[10px] text-[#B0B0B0]">
+          <p className="mt-1 flex items-center gap-1 text-[14px] text-[#9e9e9e]">
             <span>{formatCreatedAt(post.createdAt)}</span>
             <span>·</span>
             <img src={eyeIcon} alt="조회수" className="h-3 w-3 opacity-60" />
@@ -180,15 +180,15 @@ function PostItem({ post, isSelectMode, checked, onToggle, onClick }) {
               <img
                 src={post.thumbnailUrl}
                 alt="썸네일"
-                className="h-[84px] w-[84px] shrink-0 rounded-[10px] bg-[#F2F2F2] object-cover"
+                className="h-[76px] w-[76px] shrink-0 rounded-[10px] bg-[#F2F2F2] object-cover"
               />
-              <p className="line-clamp-3 text-[12px] leading-6 text-[#424242]">
+              <p className="line-clamp-3 text-[16px] leading-6 text-[#424242]">
                 {post.content}
               </p>
             </div>
           ) : (
             <div className="mt-2">
-              <p className="mt-1 line-clamp-3 text-[12px] leading-6 text-[#424242]">
+              <p className="mt-1 line-clamp-3 text-[16px] leading-6 text-[#424242]">
                 {post.content}
               </p>
             </div>

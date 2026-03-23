@@ -379,7 +379,7 @@ export default function CommunityWrite() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="글 제목"
-              className="h-9 w-full rounded-[6px] border border-[#E5E5E5] px-2 pr-8 text-[13px] outline-none"
+              className="h-9 w-full rounded-[6px] border border-[#E5E5E5] px-2 pr-8 text-[19px] outline-none"
               maxLength={40}
             />
             {title && (
@@ -467,7 +467,7 @@ export default function CommunityWrite() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="반려동물 자랑글 혹은 케어 방법 질문 등을 작성해보세요."
-            className="h-[240px] w-full rounded-[6px] border border-[#E5E5E5] px-2 py-2 text-[20px] leading-5 text-[#BDBDBD] outline-none"
+            className="h-[240px] w-full rounded-[6px] border border-[#E5E5E5] px-2 py-2 text-[20px] leading-5 text-[#424242] outline-none"
             maxLength={1200}
           />
         </div>
