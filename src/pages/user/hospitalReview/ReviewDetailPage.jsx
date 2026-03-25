@@ -2,6 +2,7 @@ import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import { fetchReceiptDetail } from '@/apis/reviews/receipts';
+import { createReviewReport } from '@/apis/reviews/reports';
 import { cancelReviewLike, toggleReviewLike } from '@/apis/reviews/reviewLike';
 
 import green_thumbsUp from '@/assets/images/icons/thumsUp_green.svg';
@@ -14,8 +15,13 @@ import thumbsUp from '@/assets/images/icons/thumsUp.svg';
 import { CategoryButton } from '@/components/hosiptals/ui/HospitalCard/CategoryButton';
 import { ANIMAL_CATEGORY_KO, ANIMAL_NAME_KO } from '@/data/animalSort';
 import ConfirmSelectModal from '@/components/commons/layout/ConfirmSelectModal';
+import { ReviewReportModal } from '@/components/reviews/ui/ReviewReportModal';
+import { ReviewReportReasonModal } from '@/components/reviews/ui/ReviewReportReasonModal';
 import useUserStore from '@/stores/useUserStore';
 import { deleteReviewApi } from '@/apis/reviews/deleteReview';
+import { REVIEW_REPORT_REASONS } from '@/data/reviewReportReasons';
+import { reportToastOptions } from '@/components/reviews/ui/reviewToast';
+import { toast } from 'sonner';
 
 export default function ReviewDetailPage() {
   const { reviewId } = useParams();
@@ -27,6 +33,10 @@ export default function ReviewDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [isReportReasonOpen, setIsReportReasonOpen] = useState(false);
+  const [selectedReportReason, setSelectedReportReason] = useState('');
+  const [isSubmittingReviewReport, setIsSubmittingReviewReport] =
+    useState(false);
 
   const { isDeleteModalOpen, setIsDeleteModalOpen } = useOutletContext();
 
@@ -124,6 +134,50 @@ export default function ReviewDetailPage() {
     });
   };
 
+  const handleOpenReviewReportReason = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedReportReason('');
+    setIsReportReasonOpen(true);
+  };
+
+  const handleCloseReviewReportReason = () => {
+    setIsReportReasonOpen(false);
+    setSelectedReportReason('');
+  };
+
+  const handleSubmitReviewReport = async () => {
+    if (!selectedReportReason) {
+      toast('신고 사유를 선택해주세요.', reportToastOptions);
+      return;
+    }
+
+    setIsSubmittingReviewReport(true);
+
+    try {
+      const result = await createReviewReport({
+        reviewId: review.id,
+        reportReason: selectedReportReason,
+      });
+
+      if (result.success) {
+        toast(
+          result.message || '[후기 신고 완료] 운영자 검토 후 조치 예정입니다.',
+          reportToastOptions
+        );
+        handleCloseReviewReportReason();
+      } else {
+        toast(
+          result.message || '신고 접수에 실패했습니다.',
+          reportToastOptions
+        );
+      }
+    } catch (error) {
+      toast(error?.message || '신고 접수에 실패했습니다.', reportToastOptions);
+    } finally {
+      setIsSubmittingReviewReport(false);
+    }
+  };
+
   return (
     <div className="relative h-full bg-white">
       <div className="flex h-fit flex-col border-b border-[#EEEEEE] bg-white px-6 pt-5 pb-5">
@@ -214,6 +268,23 @@ export default function ReviewDetailPage() {
           </button>
         </div>
       </div>
+
+      {!isMyReview && isDeleteModalOpen && (
+        <ReviewReportModal
+          onClose={() => setIsDeleteModalOpen(false)}
+          onReportClick={handleOpenReviewReportReason}
+        />
+      )}
+
+      <ReviewReportReasonModal
+        open={isReportReasonOpen}
+        reasons={REVIEW_REPORT_REASONS}
+        selectedReason={selectedReportReason}
+        onSelectReason={setSelectedReportReason}
+        onClose={handleCloseReviewReportReason}
+        onSubmit={handleSubmitReviewReport}
+        isSubmitting={isSubmittingReviewReport}
+      />
 
       {isMyReview && (
         <ConfirmSelectModal
