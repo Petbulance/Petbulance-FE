@@ -8,7 +8,7 @@ export function HospitalReviewDetailHeader({ setIsDeleteModalOpen }) {
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between border-b border-[#E0E0E0] bg-white px-5.5 py-3.5">
-      <button onClick={() => navigate(-1)}>
+      <button onClick={() => navigate('/index/reviews')}>
         <img src={left_arrow} alt="back" />
       </button>
       <button
