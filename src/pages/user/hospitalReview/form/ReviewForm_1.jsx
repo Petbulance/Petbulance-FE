@@ -224,7 +224,7 @@ export default function ReviewForm_1({
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="absolute right-6 bottom-0 left-6">
           <NextBtn label="다음" onClick={onNext} isComplete={isComplete} />
         </div>
       </div>
