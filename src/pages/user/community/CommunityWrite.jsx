@@ -335,7 +335,7 @@ export default function CommunityWrite() {
 
         <button
           onClick={() => setIsCategoryOpen(true)}
-          className="absolute left-1/2 flex -translate-x-1/2 items-center gap-1 text-[14px] text-[#424242]"
+          className="absolute left-1/2 flex -translate-x-1/2 items-center gap-1 text-[20px] text-[#424242]"
         >
           {category || '라운지 선택'}
           <img src={downArrow} alt="라운지 선택" className="h-3 w-3" />
@@ -347,7 +347,7 @@ export default function CommunityWrite() {
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-3 pb-4">
         <div ref={topicDropdownRef} className="relative">
           <button
-            className="flex h-8 items-center gap-1 rounded-md px-2 text-[12px] text-[#616161]"
+            className="flex h-8 items-center gap-1 rounded-md px-2 text-[18px] text-[#616161]"
             onClick={() => setIsTopicOpen((prev) => !prev)}
           >
             {topic || '주제를 선택해주세요'}
@@ -355,11 +355,11 @@ export default function CommunityWrite() {
           </button>
 
           {isTopicOpen && (
-            <div className="absolute top-9 left-0 z-20 w-[132px] overflow-hidden rounded-md border border-[#E0E0E0] bg-white">
+            <div className="absolute top-9 left-0 z-20 w-[180px] overflow-hidden rounded-md border border-[#E0E0E0] bg-white">
               {TOPIC_OPTIONS.map((option) => (
                 <button
                   key={option}
-                  className="block w-full border-b border-[#EFEFEF] px-3 py-2 text-left text-[12px] text-[#616161] last:border-b-0"
+                  className="block w-full border-b border-[#EFEFEF] px-3 py-2 text-left text-[19px] text-[#616161] last:border-b-0"
                   onClick={() => {
                     setTopic(option);
                     setIsTopicOpen(false);
@@ -373,13 +373,13 @@ export default function CommunityWrite() {
         </div>
 
         <div className="mt-4">
-          <label className="mb-1 block text-[12px] text-[#757575]">제목</label>
+          <label className="mb-1 block text-[19px] text-[#757575]">제목</label>
           <div className="relative">
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="글 제목"
-              className="h-9 w-full rounded-[6px] border border-[#E5E5E5] px-2 pr-8 text-[13px] outline-none"
+              className="h-9 w-full rounded-[6px] border border-[#E5E5E5] px-2 pr-8 text-[19px] outline-none"
               maxLength={40}
             />
             {title && (
@@ -394,16 +394,16 @@ export default function CommunityWrite() {
         </div>
 
         <div className="mt-3">
-          <label className="mb-1 block text-[12px] text-[#757575]">사진</label>
+          {/*<label className="mb-1 block text-[12px] text-[#757575]">사진</label>*/}
           <div className="flex items-center gap-1.5 overflow-x-auto overflow-y-visible py-1">
             {images.length === 0 ? (
-              <label className="flex h-[60px] w-[60px] shrink-0 cursor-pointer flex-col items-center justify-center rounded-[8px] border border-[#E0E0E0] bg-[#FAFAFA] text-[#9E9E9E]">
+              <label className="flex h-[96px] w-[96px] shrink-0 cursor-pointer flex-col items-center justify-center rounded-[8px] border border-[#E0E0E0] bg-[#FAFAFA] text-[#9E9E9E]">
                 <img
                   src={cameraIcon}
                   alt="사진추가"
-                  className="h-4 w-4 opacity-70"
+                  className="h-7 w-7 opacity-70"
                 />
-                <span className="mt-1 text-[12px]">0/10</span>
+                <span className="text-[16px]">0/10</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -417,7 +417,7 @@ export default function CommunityWrite() {
                 {images.map((image, index) => (
                   <div
                     key={image.id}
-                    className="relative h-[60px] w-[60px] shrink-0"
+                    className="relative h-[96px] w-[96px] shrink-0"
                   >
                     <div className="relative h-full w-full overflow-hidden rounded-[6px] border border-[#E0E0E0]">
                       <img
@@ -443,7 +443,7 @@ export default function CommunityWrite() {
                 ))}
 
                 {images.length < 10 && (
-                  <label className="flex h-[60px] w-[60px] shrink-0 cursor-pointer items-center justify-center rounded-[6px] border border-[#E0E0E0] bg-[#FAFAFA]">
+                  <label className="flex h-[96px] w-[96px] shrink-0 cursor-pointer items-center justify-center rounded-[6px] border border-[#E0E0E0] bg-[#FAFAFA]">
                     <span className="text-[34px] leading-none text-[#D0D0D0]">
                       +
                     </span>
@@ -462,22 +462,22 @@ export default function CommunityWrite() {
         </div>
 
         <div className="mt-3">
-          <label className="mb-1 block text-[12px] text-[#757575]">내용</label>
+          <label className="mb-1 block text-[19px] text-[#757575]">내용</label>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="반려동물 자랑글 혹은 케어 방법 팁 등을 작성해보세요."
-            className="h-[240px] w-full rounded-[6px] border border-[#E5E5E5] px-2 py-2 text-[13px] leading-5 text-[#424242] outline-none"
+            placeholder="반려동물 자랑글 혹은 케어 방법 질문 등을 작성해보세요."
+            className="h-[240px] w-full rounded-[6px] border border-[#E5E5E5] px-2 py-2 text-[20px] leading-5 text-[#424242] outline-none"
             maxLength={1200}
           />
         </div>
       </div>
 
-      <footer className="border-t border-[#F0F0F0] bg-white px-4 py-3">
+      <footer className="border-[#F0F0F0] bg-white px-4 py-3">
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || isSubmitting}
-          className={`h-10 w-full rounded-[8px] text-[14px] font-medium text-white ${canSubmit && !isSubmitting ? 'bg-[#2DA969]' : 'bg-[#DCDCDC]'}`}
+          className={`h-10 w-full rounded-[8px] text-[24px] font-medium ${canSubmit && !isSubmitting ? 'text-white' : 'text-[#BDBDBD]'} ${canSubmit && !isSubmitting ? 'bg-[#2DA969]' : 'bg-[#E0E0E0]'}`}
         >
           {isSubmitting
             ? isEditMode
@@ -494,15 +494,15 @@ export default function CommunityWrite() {
             onClick={() => setIsCategoryOpen(false)}
             aria-label="카테고리 선택 닫기"
           />
-          <div className="relative w-[260px] rounded-[12px] bg-white p-4">
-            <p className="mb-2 text-[14px] font-medium text-[#1E1E1E]">
+          <div className="relative w-[420px] rounded-[12px] bg-white p-4">
+            <p className="mb-2 text-[23px] font-semibold text-[#1E1E1E]">
               작성할 라운지를 선택해주세요
             </p>
             <div className="space-y-1">
               {ANIMAL_CATEGORIES.map((item) => (
                 <button
                   key={item}
-                  className="flex w-full items-center rounded px-1 py-2 text-left text-[14px] text-[#424242]"
+                  className="flex w-full items-center rounded px-1 py-2 text-left text-[18px] text-[#424242]"
                   onClick={() => {
                     setCategory(item);
                     setIsCategoryOpen(false);
