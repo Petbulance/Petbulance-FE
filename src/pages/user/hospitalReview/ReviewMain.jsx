@@ -121,9 +121,7 @@ export function ReviewMain() {
 
       <ReviewContent data={reviews} />
 
-      <div className="pointer-events-none sticky bottom-4 flex justify-end px-4">
-        <WriteBtn onClick={handleWriteClick} />
-      </div>
+      <WriteBtn onClick={handleWriteClick} />
 
       {/* 필터 시트 */}
       {activeSheet && (
