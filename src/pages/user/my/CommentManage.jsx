@@ -143,7 +143,11 @@ function CommentItem({ comment, isSelectMode, checked, onToggle, onClick }) {
             {isSecretComment && (
               <span className="mr-0.5 inline-flex items-center align-middle text-[#1E1E1E]">
                 {/*<Lock size={14} strokeWidth={2.2} />*/}
-                <img className="block h-[14px] w-[14px]" src={lock} alt="비밀 댓글" />
+                <img
+                  className="block h-[14px] w-[14px]"
+                  src={lock}
+                  alt="비밀 댓글"
+                />
               </span>
             )}
             <span className="align-middle">{comment.commentContent}</span>
