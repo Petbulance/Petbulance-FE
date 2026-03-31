@@ -52,16 +52,20 @@ export default function MainHeader({ title }) {
         >
           {title}
         </h1>
-        <div className="relative">
-          <Notification
-            className="h-5 w-5 cursor-pointer text-gray-600"
+        <div className="relative h-8 w-8 shrink-0">
+          <button
+            type="button"
+            className="flex h-full w-full items-center justify-center"
             onClick={() => navigate('/index/notification')}
-          />
+            aria-label="알림"
+          >
+            <Notification className="h-5 w-5 cursor-pointer text-gray-600" />
+          </button>
 
           {/* 알림 뱃지 */}
           {notificationCount > 0 && (
             <span
-              className={`absolute -top-2 -right-2 flex items-center justify-center bg-[#27BE69] text-[10px] font-semibold text-white ${
+              className={`pointer-events-none absolute top-[2px] right-[2px] flex items-center justify-center bg-[#27BE69] text-[10px] font-semibold text-white ${
                 isSingleDigit
                   ? 'h-[16px] w-[16px] rounded-full'
                   : 'h-[16px] min-w-[16px] rounded-full px-1'

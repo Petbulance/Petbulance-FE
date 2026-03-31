@@ -99,13 +99,14 @@ export function CommunityHeader({ selectedType, onSelectType }) {
         />
         <button
           type="button"
-          className="relative"
+          className="relative h-8 w-8 shrink-0"
           onClick={() => navigate('/index/notification')}
+          aria-label="알림"
         >
-          <img src={Bell} alt="알림" />
+          <img src={Bell} alt="알림" className="h-8 w-8" />
           {notificationCount > 0 && (
             <span
-              className={`absolute -top-1 -right-1 flex items-center justify-center bg-[#27BE69] text-[10px] font-semibold text-white ${
+              className={`pointer-events-none absolute top-[2px] right-[2px] flex items-center justify-center bg-[#27BE69] text-[10px] font-semibold text-white ${
                 isSingleDigit
                   ? 'h-[16px] w-[16px] rounded-full'
                   : 'h-[16px] min-w-[16px] rounded-full px-1'
