@@ -89,7 +89,7 @@ function CommentItem({ comment, onReply, onMore, isMyPost }) {
   if (!canViewSecretComment) {
     return (
       <article
-        className="border-b border-[#F0F0F0] px-4 py-3"
+        className={`border-b border-[#F0F0F0] px-4 py-3 ${comment.isPostAuthor ? 'bg-[#F5F5F5]' : 'bg-white'}`}
         style={{ paddingLeft: `${16 + depth * 18}px` }}
       >
         <p className="text-[13px] text-[#616161]">
@@ -106,28 +106,33 @@ function CommentItem({ comment, onReply, onMore, isMyPost }) {
 
   return (
     <article
-      className="border-b border-[#F0F0F0] px-4 py-3"
+      className={`border-b border-[#E0E0E0] px-4 py-3 ${comment.isPostAuthor ? 'bg-[#F5F5F5]' : 'bg-white'}`}
       style={{ paddingLeft: `${16 + depth * 18}px` }}
     >
       <div className="flex gap-2.5">
         <img
           src={comment.profileUrl || defaultProfile}
           alt="프로필"
-          className="mt-0.5 h-6 w-6 shrink-0 rounded-full object-contain"
+          className="mt-0.5 h-[40px] w-[40px] shrink-0 rounded-full object-contain"
         />
         <div className={`min-w-0 flex-1 ${isReply ? 'pl-3' : ''}`}>
           <div className="flex items-center justify-between">
-            <p className="text-[12px] text-[#9E9E9E]">
+            <div className="flex min-w-0 items-center gap-1 text-[12px] text-[#9E9E9E]">
               {comment.isSecret && (
-                <span className="mr-1 inline-flex align-middle text-[#9E9E9E]">
-                  <Lock size={12} strokeWidth={2} />
+                <span className="inline-flex shrink-0 align-middle text-[#9E9E9E]">
+                  <Lock size={20} strokeWidth={2} />
                 </span>
               )}
-              <span className="font-medium text-[#424242]">
+              <span className="truncate text-[18px] font-medium text-[#424242]">
                 {comment.nickname}
-              </span>{' '}
-              {comment.time}
-            </p>
+              </span>
+              {comment.isPostAuthor && (
+                <span className="inline-flex shrink-0 rounded-[6px] bg-[#EEEEEE] px-[4px] py-[2px] align-middle text-[16px] leading-[1.2] font-medium text-[#9E9E9E]">
+                  작성자
+                </span>
+              )}
+              <span className="shrink-0">{comment.time}</span>
+            </div>
             <button
               className="text-[14px] leading-none text-[#B8B8B8]"
               onClick={() => onMore(comment)}
@@ -144,7 +149,7 @@ function CommentItem({ comment, onReply, onMore, isMyPost }) {
             />
           )}
           <button
-            className="mt-2 rounded border border-[#D7D7D7] px-2 py-0.5 text-[11px] text-[#767676]"
+            className="mt-[12px] rounded-md border border-[#D7D7D7] bg-white px-2 py-0.5 text-[16px] text-[#767676]"
             onClick={() => onReply(comment)}
           >
             답글
@@ -189,6 +194,9 @@ const normalizeComment = (comment = {}) => {
       null,
     isSecret: Boolean(comment.secret ?? comment.isSecret),
     isMine: isMineByFlag,
+    isPostAuthor: toBoolean(
+      comment.isCommentFromPostAuthor ?? comment.commentFromPostAuthor
+    ),
     depth:
       typeof comment.depth === 'number'
         ? comment.depth
