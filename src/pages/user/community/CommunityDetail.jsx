@@ -881,6 +881,26 @@ export default function CommunityDetail() {
       setIsSubmittingCommentReport(false);
     }
   };
+
+  const handleShare = async () => {
+    const shareData = {
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('링크가 클립보드에 복사되었습니다.');
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('공유 실패:', error);
+      }
+    }
+  };
+
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#F2F4F6]">
       <header className="sticky top-0 z-10 flex h-[48px] items-center justify-between border-b border-[#E0E0E0] bg-white px-5">
@@ -888,7 +908,7 @@ export default function CommunityDetail() {
           <img src={leftArrow} alt="뒤로가기" />
         </button>
         <div className="flex items-center gap-4">
-          <button>
+          <button onClick={handleShare}>
             <img src={shareIcon} className="h-[28px] w-[28px]" alt="공유" />
           </button>
           <button onClick={() => setIsMenuOpen(true)}>
