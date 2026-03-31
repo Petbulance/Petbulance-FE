@@ -1,3 +1,4 @@
+import { IncidentReporter } from '@carbon/icons-react';
 import { Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -1046,18 +1047,18 @@ export default function CommunityDetail() {
               </button>
             </div>
           ) : (
-            <div className="absolute top-1/2 left-1/2 w-[168px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[10px] bg-white">
-              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[15px] font-medium text-[#1E1E1E]">
+            <div className="absolute top-1/2 left-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[10px] bg-white">
+              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[23px] font-semibold text-[#1E1E1E]">
                 신고하기
               </p>
               <button
-                className="flex w-full items-center gap-2 px-4 py-3 text-[13px] text-[#616161]"
+                className="flex w-full items-center gap-2 px-4 py-3 text-[18px] text-[#616161]"
                 onClick={() => {
                   setIsCommentMenuOpen(false);
                   setIsCommentReportOpen(true);
                 }}
               >
-                <span className="text-[12px]">⚑</span>
+                <IncidentReporter size={24} aria-hidden="true" />
                 댓글 신고
               </button>
             </div>
@@ -1108,30 +1109,30 @@ export default function CommunityDetail() {
             }}
             aria-label="댓글 신고 닫기"
           />
-          <div className="relative mx-6 w-full max-w-[320px] rounded-[12px] bg-white p-4">
-            <h3 className="mb-3 text-[14px] font-medium text-[#1E1E1E]">
+          <div className="relative mx-6 w-full max-w-[420px] rounded-[12px] bg-white p-4">
+            <h3 className="mb-3 text-[23px] font-semibold text-[#1E1E1E]">
               댓글 신고 이유를 알려주세요.
             </h3>
-            <div className="space-y-1.5">
+            <div className="space-y-3">
               {reportReasons.map((reason) => (
                 <label
                   key={reason}
-                  className="flex cursor-pointer items-center gap-2 text-[12px] text-[#424242]"
+                  className="flex cursor-pointer items-center gap-3 text-[16px] text-[#424242]"
                 >
                   <input
                     type="radio"
                     name="commentReportReason"
                     checked={selectedCommentReportReason === reason}
                     onChange={() => setSelectedCommentReportReason(reason)}
-                    className="h-3.5 w-3.5 accent-[#27BE69]"
+                    className="h-[21px] w-[21px] shrink-0 appearance-none rounded-full border-2 border-[#27BE69] bg-white transition-colors checked:border-[#27BE69] checked:bg-[#27BE69] focus-visible:outline-none"
                   />
                   {reason}
                 </label>
               ))}
             </div>
-            <div className="mt-4 flex gap-2">
+            <div className="mt-6 flex gap-3">
               <button
-                className="flex-1 rounded-[6px] border border-[#E0E0E0] py-2 text-[13px] text-[#757575]"
+                className="flex-1 rounded-2xl border border-[#CFCFCF] py-3 text-[20px] font-semibold text-[#616161]"
                 onClick={() => {
                   setIsCommentReportOpen(false);
                   setSelectedCommentReportReason('');
@@ -1140,7 +1141,7 @@ export default function CommunityDetail() {
                 취소
               </button>
               <button
-                className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white"
+                className="flex-1 rounded-2xl border border-[#27BE69] py-3 text-[20px] font-semibold text-[#27BE69] disabled:opacity-50"
                 disabled={isSubmittingCommentReport}
                 onClick={handleSubmitCommentReport}
               >
@@ -1185,15 +1186,15 @@ export default function CommunityDetail() {
               </button>
             </div>
           ) : (
-            <div className="absolute top-1/2 left-1/2 w-[168px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[10px] bg-white">
-              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[15px] font-medium text-[#1E1E1E]">
+            <div className="absolute top-1/2 left-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[10px] bg-white">
+              <p className="border-b border-[#EFEFEF] px-4 py-2.5 text-[23px] font-semibold text-[#1E1E1E]">
                 신고하기
               </p>
               <button
-                className="flex w-full items-center gap-2 px-4 py-3 text-[13px] text-[#616161]"
+                className="flex w-full items-center gap-2 px-4 py-3 text-[18px] font-semibold text-[#616161]"
                 onClick={() => setIsReportReasonOpen(true)}
               >
-                <span className="text-[12px]">⚑</span>
+                <IncidentReporter size={24} aria-hidden="true" />
                 게시글 신고
               </button>
             </div>
@@ -1244,30 +1245,30 @@ export default function CommunityDetail() {
             }}
             aria-label="신고 사유 닫기"
           />
-          <div className="relative mx-6 w-full max-w-[320px] rounded-[12px] bg-white p-4">
-            <h3 className="mb-3 text-[14px] font-medium text-[#1E1E1E]">
+          <div className="relative mx-6 w-full max-w-[420px] rounded-[12px] bg-white p-4">
+            <h3 className="mb-3 text-[23px] font-semibold text-[#1E1E1E]">
               게시글 신고 이유를 알려주세요.
             </h3>
-            <div className="space-y-1.5">
+            <div className="space-y-3">
               {reportReasons.map((reason) => (
                 <label
                   key={reason}
-                  className="flex cursor-pointer items-center gap-2 text-[12px] text-[#424242]"
+                  className="flex cursor-pointer items-center gap-3 text-[16px] text-[#424242]"
                 >
                   <input
                     type="radio"
                     name="reportReason"
                     checked={selectedReportReason === reason}
                     onChange={() => setSelectedReportReason(reason)}
-                    className="h-3.5 w-3.5 accent-[#27BE69]"
+                    className="h-[21px] w-[21px] shrink-0 appearance-none rounded-full border-2 border-[#27BE69] bg-white transition-colors checked:border-[#27BE69] checked:bg-[#27BE69] focus-visible:outline-none"
                   />
                   {reason}
                 </label>
               ))}
             </div>
-            <div className="mt-4 flex gap-2">
+            <div className="mt-6 flex gap-3">
               <button
-                className="flex-1 rounded-[6px] border border-[#E0E0E0] py-2 text-[13px] text-[#757575]"
+                className="flex-1 rounded-2xl border border-[#CFCFCF] py-3 text-[20px] font-semibold text-[#616161]"
                 onClick={() => {
                   setIsReportReasonOpen(false);
                   setIsMenuOpen(false);
@@ -1276,7 +1277,7 @@ export default function CommunityDetail() {
                 취소
               </button>
               <button
-                className="flex-1 rounded-[6px] bg-[#27BE69] py-2 text-[13px] text-white"
+                className="flex-1 rounded-2xl border border-[#27BE69] py-3 text-[20px] font-semibold text-[#27BE69] disabled:opacity-50"
                 disabled={isSubmittingPostReport}
                 onClick={handleSubmitReport}
               >
