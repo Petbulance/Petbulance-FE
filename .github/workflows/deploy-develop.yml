@@ -1,6 +1,5 @@
 name: React CI/CD to EC2 (Develop)
 
-# develop 브랜치에 push가 발생했을 때만 실행
 on:
   push:
     branches: ['develop']
@@ -20,7 +19,7 @@ jobs:
         with:
           node-version: '23.11.0'
       
-      # 2.5 node_modules 폴더 통째로 캐싱하기
+      # 2.5 node_modules 폴더 캐싱하기
       - name: Cache node_modules
         id: cache-node-modules
         uses: actions/cache@v3
